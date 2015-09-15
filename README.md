@@ -26,4 +26,8 @@ Run ``mvn clean install`` - that's it!
 
 ## License
 
-This 
+This project is published under The Apache Software License Version 2.0. For details see files NOTICE and LICENSE.
+
+## Contact
+
+* [d.nuest@52north.org](@nuest)
