@@ -14,19 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.n52.youngs.load;
+package org.n52.test;
 
+import com.google.common.collect.ImmutableList;
+import java.net.URL;
 import java.util.Collection;
-import org.n52.youngs.api.Record;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.greaterThan;
+import org.junit.Assert;
+import org.junit.Test;
+import org.n52.youngs.harvest.CswSource;
 
 /**
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public interface Sink {
+public class CswSourceTestIT {
 
-    public boolean store(Record record);
+    @Test
+    public void namespaceParameterCreation() throws Exception {
+        CswSource source = new CswSource(new URL("http://api.eurogeoss-broker.eu/dab/services/cswiso"), (Collection<String>) ImmutableList.of("http://www.opengis.net/cat/csw/2.0.2"), "csw:Record", "http://www.opengis.net/cat/csw/2.0.2");
 
-    public void store(Collection<Record> records);
+        long count = source.getRecordCount();
+        Assert.assertThat("record count is higher than last manual check", count, is(greaterThan(900000l)));
+    }
 
 }

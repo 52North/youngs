@@ -14,19 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.n52.youngs.load;
-
-import java.util.Collection;
-import org.n52.youngs.api.Record;
+package org.n52.youngs.transform;
 
 /**
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public interface Sink {
+public interface  MappingEntry {
 
-    public boolean store(Record record);
+    public String getXPath();
 
-    public void store(Collection<Record> records);
+    public String getFieldName();
+
+    public boolean isIsoQueryable();
+
+    public String getIsoQueryableName();
 
 }

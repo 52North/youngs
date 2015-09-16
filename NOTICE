@@ -15,6 +15,40 @@ limitations under the License.
 
 This project includes:
 
+  ANTLR 3 Runtime under BSD licence
+  Apache Commons Codec under The Apache Software License, Version 2.0
+  Apache Commons Logging under The Apache Software License, Version 2.0
+  Apache HttpClient under Apache License, Version 2.0
+  Apache HttpClient Fluent API under Apache License, Version 2.0
+  Apache HttpCore under Apache License, Version 2.0
+  ASM Commons under BSD
+  ASM Core under BSD
+  elasticsearch under The Apache Software License, Version 2.0
+  Guava: Google Core Libraries for Java under The Apache Software License, Version 2.0
+  Hamcrest All under New BSD License
+  Hamcrest Core under New BSD License
+  JAXB2 Basics - Runtime under BSD-Style License
+  JUnit under Eclipse Public License 1.0
+  Lucene Common Analyzers under Apache 2
+  Lucene Core under Apache 2
+  Lucene Grouping under Apache 2
+  Lucene Highlighter under Apache 2
+  Lucene Join under Apache 2
+  Lucene Memory under Apache 2
+  Lucene Miscellaneous under Apache 2
+  Lucene Queries under Apache 2
+  Lucene QueryParsers under Apache 2
+  Lucene Sandbox under Apache 2
+  Lucene Spatial under Apache 2
+  Lucene Suggest under Apache 2
+  OGC CSW 2.0.2 under BSD-Style License
+  OGC Filter 1.1.0 under BSD-Style License
+  OGC GML 3.1.1 under BSD-Style License
+  OGC OWS 1.0.0 under BSD-Style License
   SLF4J API Module under MIT License
+  SnakeYAML under Apache License Version 2.0
+  Spatial4J under The Apache Software License, Version 2.0
+  StAX API under The Apache Software License, Version 2.0
+  W3C XLink 1.0 under BSD-Style License
   Youngs under The Apache Software License, Version 2.0
 

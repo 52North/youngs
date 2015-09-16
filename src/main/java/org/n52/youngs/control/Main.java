@@ -16,6 +16,19 @@
  */
 package org.n52.youngs.control;
 
+import com.google.common.collect.Lists;
+import java.util.Collections;
+import javax.xml.xpath.XPathFactory;
+import org.n52.youngs.load.impl.ElasticsearchRemoteHttpSink;
+import org.n52.youngs.api.Report;
+import org.n52.youngs.control.impl.SingleThreadBulkRunner;
+import org.n52.youngs.transform.impl.CswToBuilderMapper;
+import org.n52.youngs.harvest.CswSource;
+import org.n52.youngs.harvest.Source;
+import org.n52.youngs.load.Sink;
+import org.n52.youngs.transform.Mapper;
+import org.n52.youngs.transform.MappingConfiguration;
+import org.n52.youngs.transform.impl.YamlMappingConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +40,31 @@ public class Main {
 
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        // http://api.eurogeoss-broker.eu/dab/services/cswiso?service=CSW&version=2.0.2&request=GetCapabilities
+        Source source = new CswSource("http://api.eurogeoss-broker.eu/dab/services/cswiso",
+                Collections.singleton("http://www.isotc211.org/2005/gmd"),
+                "gmd:MD_Metadata",
+                "http://www.isotc211.org/2005/gmd");
 
+        MappingConfiguration configuration = new YamlMappingConfiguration(null);
+        Mapper mapper = new CswToBuilderMapper(configuration);
+
+        String host = "localhost";
+        String cluster = "elasticsearch";
+        String index = "csw";
+        String type = "record";
+        int port = 9300;
+        Sink sink = new ElasticsearchRemoteHttpSink(host, port, cluster, index, type);
+
+        Runner runner = new SingleThreadBulkRunner()
+                .setBulkSize(12)
+                .setRecordsLimit(50)
+                .harvest(source)
+                .transform(mapper);
+        Report report = runner.load(sink);
+
+        log.info("Done: {}", report);
     }
 
 }

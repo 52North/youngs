@@ -16,20 +16,22 @@
  */
 package org.n52.youngs.control;
 
+import org.n52.youngs.api.Report;
 import org.n52.youngs.harvest.Source;
 import org.n52.youngs.load.Sink;
 import org.n52.youngs.transform.Mapper;
 
 /**
- *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
 public interface Runner {
 
-    public void harvest(Source source);
+    public Runner harvest(Source source);
 
-    public void transform(Mapper mapper);
+    public Runner transform(Mapper mapper);
 
-    public void load(Sink sink);
+    public Report load(Sink sink);
+
+    public double getCompletedPercentage();
 
 }

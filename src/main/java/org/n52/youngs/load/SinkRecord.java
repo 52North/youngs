@@ -16,10 +16,12 @@
  */
 package org.n52.youngs.load;
 
+import org.n52.youngs.api.Record;
+
 /**
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public interface SinkRecord {
+public interface SinkRecord extends Record {
     //
 }

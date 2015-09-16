@@ -14,19 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.n52.youngs.load;
+package org.n52.youngs.api;
 
 import java.util.Collection;
-import org.n52.youngs.api.Record;
+import java.util.Map;
 
 /**
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public interface Sink {
+public interface Report {
 
-    public boolean store(Record record);
+    public int getNumberOfRecordsAdded();
 
-    public void store(Collection<Record> records);
+    public int getNumberOfRecordsFailed();
+
+    public void addSuccessfulRecord(String id);
+
+    public void addFailedRecord(String id, String reason);
+
+    public Collection<String> getAddedIds();
+
+    /**
+     *
+     * @return a map from ID to failure reason description.
+     */
+    public Map<String, String> getFailedIds();
 
 }

@@ -14,19 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.n52.youngs.load;
+package org.n52.youngs.load.impl;
 
-import java.util.Collection;
-import org.n52.youngs.api.Record;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.n52.youngs.load.SinkRecord;
 
 /**
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public interface Sink {
+public class BuilderRecord implements SinkRecord {
 
-    public boolean store(Record record);
+    private final XContentBuilder builder;
 
-    public void store(Collection<Record> records);
+    public BuilderRecord(XContentBuilder builder) {
+        this.builder = builder;
+    }
+
+    public XContentBuilder getBuilder() {
+        return builder;
+    }
 
 }

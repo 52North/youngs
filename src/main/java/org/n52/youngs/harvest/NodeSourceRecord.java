@@ -14,19 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.n52.youngs.load;
+package org.n52.youngs.harvest;
 
-import java.util.Collection;
-import org.n52.youngs.api.Record;
+import org.w3c.dom.Node;
 
 /**
- *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public interface Sink {
+public class NodeSourceRecord implements SourceRecord {
 
-    public boolean store(Record record);
+    private final Node record;
 
-    public void store(Collection<Record> records);
+    public NodeSourceRecord(Node record) {
+        this.record = record;
+    }
+
+    public Node getRecord() {
+        return this.record;
+    }
 
 }
