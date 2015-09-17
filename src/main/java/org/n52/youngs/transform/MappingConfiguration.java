@@ -17,6 +17,7 @@
 package org.n52.youngs.transform;
 
 import java.util.Collection;
+import org.w3c.dom.Document;
 
 /**
  *
@@ -24,6 +25,26 @@ import java.util.Collection;
  */
 public interface MappingConfiguration {
 
+    public static final String XPATH_10 = "1.0";
+
+    public static final String XPATH_20 = "2.0";
+
+    public static final String DEFAULT_XPATH_VERSION = XPATH_20;
+
+    public static final double DEFAULT_VERSION = 1.0d;
+
+    public static final String DEFAULT_NAME = "<unnamed>";
+    
+    public static final String DEFAULT_APPLICABILITY_PATH = "true()";
+
     public Collection<MappingEntry> getEntries();
+
+    public String getName();
+
+    public double getVersion();
+
+    public String getXPathVersion();
+
+    public boolean isApplicable(Document doc);
 
 }

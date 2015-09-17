@@ -101,8 +101,17 @@ public class SingleThreadBulkRunner implements Runner {
         Objects.nonNull(sink);
 
         log.info("Starting harvest from {} to {} with {}", source, sink, mapper);
-        final Stopwatch timer = Stopwatch.createStarted();
         Report report = new ReportImpl();
+        
+        boolean prepareSink = sink.prepare(mapper.getMapper());
+        if(!prepareSink) {
+            String msg = "The sink could not be prepared. Stopping load, please check the logs.";
+            log.error(msg);
+            report.addMessage(msg);
+            return report;
+        }
+        
+        final Stopwatch timer = Stopwatch.createStarted();
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
 

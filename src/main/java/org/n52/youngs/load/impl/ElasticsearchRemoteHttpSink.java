@@ -21,6 +21,7 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.n52.youngs.transform.MappingConfiguration;
 
 /**
  *
@@ -48,6 +49,11 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
     @Override
     public Client getClient() {
         return this.client;
+    }
+
+    @Override
+    public boolean prepare(MappingConfiguration mapping) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

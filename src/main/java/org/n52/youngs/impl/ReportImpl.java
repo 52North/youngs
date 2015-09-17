@@ -16,8 +16,10 @@
  */
 package org.n52.youngs.impl;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Map;
 import org.n52.youngs.api.Report;
@@ -31,6 +33,8 @@ public class ReportImpl implements Report {
     private final Collection<String> added = Lists.newArrayList();
 
     private final Map<String, String> failed = Maps.newHashMap();
+    
+    private final Map<LocalTime, String> messages = Maps.newHashMap();
 
     @Override
     public int getNumberOfRecordsAdded() {
@@ -65,5 +69,25 @@ public class ReportImpl implements Report {
     public Map<String, String> getFailedIds() {
         return failed;
     }
+
+    @Override
+    public void addMessage(String message) {
+        this.messages.put(LocalTime.now(), message);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("### Report ###\n");
+        sb.append(" Added: ").append(getNumberOfRecordsAdded()).append("\n");
+        sb.append(" Failed: ").append(getNumberOfRecordsFailed()).append("\n").append("\n");
+        sb.append(" Added IDs: ").append(Joiner.on(",").join(added)).append("\n");
+        sb.append(" Faild IDs: ").append(Joiner.on(",").withKeyValueSeparator(": ").join(failed)).append("\n");
+        
+        return sb.toString();
+    }
+    
+    
 
 }

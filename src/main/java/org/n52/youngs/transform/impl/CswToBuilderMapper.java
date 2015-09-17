@@ -42,21 +42,25 @@ public class CswToBuilderMapper implements Mapper {
 
     private static final Logger log = LoggerFactory.getLogger(CswToBuilderMapper.class);
 
-    private final MappingConfiguration mapping;
+    private final MappingConfiguration mapper;
 
     private final XPathFactory factory;
 
     private final NamespaceContext nc;
 
-    public CswToBuilderMapper(MappingConfiguration mapping) {
-        this.mapping = mapping;
-
+    public CswToBuilderMapper(MappingConfiguration mapper) {
+        this.mapper = mapper;
         factory = XPathFactory.newInstance();
         nc = NamespaceContextImpl.create();
     }
 
+    @Override
+    public MappingConfiguration getMapper() {
+        return mapper;
+    }
+
     /**
-     * @return a record containing a builder of the provided SourceRecord, or null if the mapping could not be completed.
+     * @return a record containing a builder of the provided SourceRecord, or null if the mapper could not be completed.
      */
     @Override
     public BuilderRecord map(SourceRecord source) {
@@ -92,7 +96,7 @@ public class CswToBuilderMapper implements Mapper {
 //                .field("message", "trying out Elasticsearch")
 
         // evaluate xpaths and save the results in the builder
-        mapping.getEntries().forEach(entry -> {
+        mapper.getEntries().forEach(entry -> {
             try {
                 String value = xPath.evaluate(entry.getXPath(), node);
                 builder.field(entry.getFieldName(), value);

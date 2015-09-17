@@ -16,14 +16,14 @@
  */
 package org.n52.youngs.control;
 
-import com.google.common.collect.Lists;
+import com.google.common.io.Resources;
 import java.util.Collections;
-import javax.xml.xpath.XPathFactory;
 import org.n52.youngs.load.impl.ElasticsearchRemoteHttpSink;
 import org.n52.youngs.api.Report;
 import org.n52.youngs.control.impl.SingleThreadBulkRunner;
 import org.n52.youngs.transform.impl.CswToBuilderMapper;
 import org.n52.youngs.harvest.CswSource;
+import org.n52.youngs.harvest.NamespaceContextImpl;
 import org.n52.youngs.harvest.Source;
 import org.n52.youngs.load.Sink;
 import org.n52.youngs.transform.Mapper;
@@ -47,7 +47,9 @@ public class Main {
                 "gmd:MD_Metadata",
                 "http://www.isotc211.org/2005/gmd");
 
-        MappingConfiguration configuration = new YamlMappingConfiguration(null);
+        MappingConfiguration configuration = new YamlMappingConfiguration(
+                Resources.asByteSource(Resources.getResource("mapping.yml")).openStream(),
+                NamespaceContextImpl.create());
         Mapper mapper = new CswToBuilderMapper(configuration);
 
         String host = "localhost";

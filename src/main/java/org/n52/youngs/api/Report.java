@@ -40,5 +40,7 @@ public interface Report {
      * @return a map from ID to failure reason description.
      */
     public Map<String, String> getFailedIds();
+    
+    public void addMessage(String message);
 
 }

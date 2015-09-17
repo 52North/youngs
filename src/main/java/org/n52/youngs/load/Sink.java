@@ -18,12 +18,20 @@ package org.n52.youngs.load;
 
 import java.util.Collection;
 import org.n52.youngs.api.Record;
+import org.n52.youngs.transform.MappingConfiguration;
 
 /**
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
 public interface Sink {
+    
+    /**
+     * Do whatever is required for the sink to be used, such as testing connections, inserting schemas, ...
+     * 
+     * @return true if the sink is now ready to be used
+    */
+    public boolean prepare(MappingConfiguration mapping);
 
     public boolean store(Record record);
 

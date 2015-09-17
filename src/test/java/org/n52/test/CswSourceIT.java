@@ -29,7 +29,7 @@ import org.n52.youngs.harvest.CswSource;
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public class CswSourceTestIT {
+public class CswSourceIT {
 
     @Test
     public void namespaceParameterCreation() throws Exception {
