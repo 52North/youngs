@@ -21,6 +21,9 @@ This project includes:
   Apache HttpClient under Apache License, Version 2.0
   Apache HttpClient Fluent API under Apache License, Version 2.0
   Apache HttpCore under Apache License, Version 2.0
+  Apache Log4j API under The Apache Software License, Version 2.0
+  Apache Log4j Core under The Apache Software License, Version 2.0
+  Apache Log4j SLF4J Binding under The Apache Software License, Version 2.0
   ASM Commons under BSD
   ASM Core under BSD
   elasticsearch under The Apache Software License, Version 2.0
@@ -45,6 +48,7 @@ This project includes:
   OGC Filter 1.1.0 under BSD-Style License
   OGC GML 3.1.1 under BSD-Style License
   OGC OWS 1.0.0 under BSD-Style License
+  Saxon-HE under Mozilla Public License Version 2.0
   SLF4J API Module under MIT License
   SnakeYAML under Apache License Version 2.0
   Spatial4J under The Apache Software License, Version 2.0

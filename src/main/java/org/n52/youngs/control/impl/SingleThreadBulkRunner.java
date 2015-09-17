@@ -112,7 +112,7 @@ public class SingleThreadBulkRunner implements Runner {
             long recordsLeft = source.getRecordCount() - counter;
             long size = Math.min(recordsLeft, bulkSize);
 
-            log.debug("Requesting {} of {} records starting at {}", size, source.getRecordCount(), counter);
+            log.info("Requesting {} of {} records from {} starting at {}", size, source.getRecordCount(), source.getEndpoint(), counter);
             Collection<Record> records = source.getRecords(counter, size);
             log.debug("Mapping {} retrieved records.", records.size());
 

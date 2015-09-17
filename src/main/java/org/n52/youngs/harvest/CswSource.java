@@ -28,7 +28,6 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -112,7 +111,7 @@ public class CswSource implements Source {
 
     @Override
     public URL getEndpoint() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.url;
     }
 
     @Override
@@ -150,7 +149,7 @@ public class CswSource implements Source {
         recordsRequest.append("&").append(parameters);
 
         try {
-            log.debug("Requesting records: {}", recordsRequest);
+            log.trace("GetRecords request: {}", recordsRequest);
             InputStream response = Request.Get(recordsRequest.toString()).execute().returnContent().asStream();
 
             JAXBElement<GetRecordsResponseType> jaxb_response = unmarshaller.unmarshal(new StreamSource(response), GetRecordsResponseType.class);
@@ -227,6 +226,7 @@ public class CswSource implements Source {
                 log.error("Could not retrieve record count using url {}", hitsRequest, e);
             }
 
+            // FIXME inproper use of supplier
             recordCount = Optional.of(count);
 
             return count;
