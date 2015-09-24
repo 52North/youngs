@@ -18,7 +18,6 @@ package org.n52.youngs.transform.impl;
 
 import com.github.autermann.yaml.Yaml;
 import com.github.autermann.yaml.YamlNode;
-import com.github.autermann.yaml.YamlNodeFactory;
 import com.google.common.base.Joiner;
 import org.n52.youngs.transform.MappingEntry;
 import com.google.common.collect.Lists;
@@ -30,14 +29,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.logging.Level;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import org.n52.youngs.harvest.NamespaceContextImpl;
 import org.n52.youngs.transform.MappingConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,13 +51,17 @@ public class YamlMappingConfiguration implements MappingConfiguration {
 
     private String xPathVersion;
 
-    private double version;
+    private int version;
 
     private String name;
 
     private static XPathFactory factory = XPathFactory.newInstance();
 
     private Optional<XPathExpression> applicability;
+
+    private final String type;
+
+    private final String index;
 
     public YamlMappingConfiguration(File file, NamespaceContext nsContext) throws FileNotFoundException {
         this(new FileInputStream(file), nsContext);
@@ -79,8 +80,10 @@ public class YamlMappingConfiguration implements MappingConfiguration {
 
         // read the entries from the config file
         this.name = configurationNodes.path("name").asTextValue(DEFAULT_NAME);
-        this.version = configurationNodes.path("version").asDoubleValue(DEFAULT_VERSION);
+        this.version = configurationNodes.path("version").asIntValue(DEFAULT_VERSION);
         this.xPathVersion = configurationNodes.path("xpathversion").asTextValue(DEFAULT_XPATH_VERSION);
+        this.type = configurationNodes.path("type").asTextValue(DEFAULT_TYPE);
+        this.index = configurationNodes.path("index").asTextValue(DEFAULT_INDEX);
 
         XPath path = factory.newXPath();
         path.setNamespaceContext(nsContext);
@@ -110,13 +113,23 @@ public class YamlMappingConfiguration implements MappingConfiguration {
     }
 
     @Override
-    public double getVersion() {
+    public int getVersion() {
         return this.version;
     }
 
     @Override
     public String getXPathVersion() {
         return this.xPathVersion;
+    }
+
+    @Override
+    public String getType() {
+        return this.type;
+    }
+
+    @Override
+    public String getIndex() {
+        return index;
     }
 
     @Override
@@ -133,7 +146,7 @@ public class YamlMappingConfiguration implements MappingConfiguration {
             log.warn("Error executing applicability xpath on document, returning FALSE: {}", doc, e);
             return false;
         }
-        
+
         return result;
     }
 

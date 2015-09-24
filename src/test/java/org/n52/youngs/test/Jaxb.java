@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.n52.test;
+package org.n52.youngs.test;
 
 import com.google.common.io.ByteSource;
 import com.google.common.io.Resources;
@@ -42,9 +42,9 @@ import org.n52.youngs.harvest.NamespaceContextImpl;
 
 /**
  * http://www.ogcnetwork.net/jaxb4ogc
- * 
+ *
  * http://confluence.highsource.org/display/OGCS/Reference
- * 
+ *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
 public class Jaxb {
@@ -74,7 +74,7 @@ public class Jaxb {
         GetRecordsResponseType value = unmarshalled.getValue();
 
         assertThat("response version is 2.0.2", value.getVersion(), is(equalTo("2.0.2")));
-        assertThat("10 records are returned", value.getSearchResults().getNumberOfRecordsReturned().intValue(), 
+        assertThat("10 records are returned", value.getSearchResults().getNumberOfRecordsReturned().intValue(),
                 is(equalTo(10)));
     }
 

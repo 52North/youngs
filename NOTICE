@@ -15,8 +15,12 @@ limitations under the License.
 
 This project includes:
 
+  52°North Iceland under The Apache Software License, Version 2.0
+  52°North Iceland Statistics under The Apache Software License, Version 2.0
   ANTLR 3 Runtime under BSD licence
+  AOP alliance under Public Domain
   Apache Commons Codec under The Apache Software License, Version 2.0
+  Apache Commons Compress under The Apache Software License, Version 2.0
   Apache Commons Logging under The Apache Software License, Version 2.0
   Apache HttpClient under Apache License, Version 2.0
   Apache HttpClient Fluent API under Apache License, Version 2.0
@@ -26,10 +30,17 @@ This project includes:
   Apache Log4j SLF4J Binding under The Apache Software License, Version 2.0
   ASM Commons under BSD
   ASM Core under BSD
+  ClassLoader leak prevention under Apache 2
+  Commons IO under The Apache Software License, Version 2.0
   elasticsearch under The Apache Software License, Version 2.0
   Guava: Google Core Libraries for Java under The Apache Software License, Version 2.0
   Hamcrest All under New BSD License
   Hamcrest Core under New BSD License
+  Jackson-annotations under The Apache Software License, Version 2.0
+  Jackson-core under The Apache Software License, Version 2.0
+  jackson-databind under The Apache Software License, Version 2.0
+  Javassist under MPL 1.1 or LGPL 2.1 or Apache License 2.0
+  javax.inject under The Apache Software License, Version 2.0
   JAXB2 Basics - Runtime under BSD-Style License
   Joda-Time under Apache 2
   JUnit under Eclipse Public License 1.0
@@ -49,10 +60,18 @@ This project includes:
   OGC Filter 1.1.0 under BSD-Style License
   OGC GML 3.1.1 under BSD-Style License
   OGC OWS 1.0.0 under BSD-Style License
+  Reflections under WTFPL or The New BSD License
   Saxon-HE under Mozilla Public License Version 2.0
+  servlet-api under CDDL 1.1 or GPL2 w/ CPE
   SLF4J API Module under MIT License
   SnakeYAML under Apache License Version 2.0
   Spatial4J under The Apache Software License, Version 2.0
+  Spring AOP under The Apache Software License, Version 2.0
+  Spring Beans under The Apache Software License, Version 2.0
+  Spring Context under The Apache Software License, Version 2.0
+  Spring Core under The Apache Software License, Version 2.0
+  Spring Expression Language (SpEL) under The Apache Software License, Version 2.0
+  Spring Web under The Apache Software License, Version 2.0
   StAX API under The Apache Software License, Version 2.0
   W3C XLink 1.0 under BSD-Style License
   YAML API under Apache License, Version 2.0

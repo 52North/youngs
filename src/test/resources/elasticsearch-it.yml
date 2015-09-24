@@ -1,0 +1,21 @@
+cluster:
+    name: elasticsearch
+    info:
+        update:
+            interval: 5m
+
+node:
+    name: "integration tests"
+
+index :
+    store:
+        type: memory
+
+http.cors.enabled: true
+
+cluster:
+    routing:
+        allocation:
+            disk:
+                watermark:
+                    low: 500mb

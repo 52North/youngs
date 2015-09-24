@@ -48,7 +48,7 @@ public class Main {
                 "http://www.isotc211.org/2005/gmd");
 
         MappingConfiguration configuration = new YamlMappingConfiguration(
-                Resources.asByteSource(Resources.getResource("mapping.yml")).openStream(),
+                Resources.asByteSource(Resources.getResource("mappings/geoss-dab.yml")).openStream(),
                 NamespaceContextImpl.create());
         Mapper mapper = new CswToBuilderMapper(configuration);
 

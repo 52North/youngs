@@ -33,7 +33,7 @@ public class ReportImpl implements Report {
     private final Collection<String> added = Lists.newArrayList();
 
     private final Map<String, String> failed = Maps.newHashMap();
-    
+
     private final Map<LocalTime, String> messages = Maps.newHashMap();
 
     @Override
@@ -78,16 +78,16 @@ public class ReportImpl implements Report {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        
+
         sb.append("### Report ###\n");
         sb.append(" Added: ").append(getNumberOfRecordsAdded()).append("\n");
         sb.append(" Failed: ").append(getNumberOfRecordsFailed()).append("\n").append("\n");
         sb.append(" Added IDs: ").append(Joiner.on(",").join(added)).append("\n");
         sb.append(" Faild IDs: ").append(Joiner.on(",").withKeyValueSeparator(": ").join(failed)).append("\n");
-        
+
         return sb.toString();
     }
-    
-    
+
+
 
 }

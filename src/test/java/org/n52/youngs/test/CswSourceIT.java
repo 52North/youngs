@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.n52.test;
+package org.n52.youngs.test;
 
 import com.google.common.collect.ImmutableList;
 import java.net.URL;

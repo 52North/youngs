@@ -31,17 +31,25 @@ public interface MappingConfiguration {
 
     public static final String DEFAULT_XPATH_VERSION = XPATH_20;
 
-    public static final double DEFAULT_VERSION = 1.0d;
+    public static final int DEFAULT_VERSION = 1;
 
     public static final String DEFAULT_NAME = "<unnamed>";
-    
+
     public static final String DEFAULT_APPLICABILITY_PATH = "true()";
+
+    public static final String DEFAULT_TYPE = "record";
+
+    public static final String DEFAULT_INDEX = "elasticsearch";
 
     public Collection<MappingEntry> getEntries();
 
     public String getName();
 
-    public double getVersion();
+    public int getVersion();
+
+    public String getIndex();
+
+    public String getType();
 
     public String getXPathVersion();
 

@@ -24,7 +24,7 @@ import org.n52.youngs.load.SinkRecord;
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
 public interface Mapper {
-    
+
     public MappingConfiguration getMapper();
 
     public SinkRecord map(SourceRecord record);

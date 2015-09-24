@@ -14,33 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.n52.youngs.api;
-
-import java.util.Collection;
-import java.util.Map;
+package org.n52.youngs.exception;
 
 /**
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public interface Report {
+public class SinkError extends Error {
 
-    public int getNumberOfRecordsAdded();
+    private static final long serialVersionUID = -5813801023326552216L;
 
-    public int getNumberOfRecordsFailed();
+    public SinkError() {
+        //
+    }
 
-    public void addSuccessfulRecord(String id);
+    public SinkError(String format, Object... args) {
+        super(String.format(format, args));
+    }
 
-    public void addFailedRecord(String id, String reason);
+    public SinkError(Throwable exception) {
+        super(exception);
+    }
 
-    public Collection<String> getAddedIds();
-
-    /**
-     *
-     * @return a map from ID to failure reason description.
-     */
-    public Map<String, String> getFailedIds();
-
-    public void addMessage(String message);
+    public SinkError(String message, Throwable exception) {
+        super(message, exception);
+    }
 
 }

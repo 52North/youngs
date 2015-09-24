@@ -102,7 +102,7 @@ public class SingleThreadBulkRunner implements Runner {
 
         log.info("Starting harvest from {} to {} with {}", source, sink, mapper);
         Report report = new ReportImpl();
-        
+
         boolean prepareSink = sink.prepare(mapper.getMapper());
         if(!prepareSink) {
             String msg = "The sink could not be prepared. Stopping load, please check the logs.";
@@ -110,7 +110,7 @@ public class SingleThreadBulkRunner implements Runner {
             report.addMessage(msg);
             return report;
         }
-        
+
         final Stopwatch timer = Stopwatch.createStarted();
 
         ExecutorService executor = Executors.newSingleThreadExecutor();

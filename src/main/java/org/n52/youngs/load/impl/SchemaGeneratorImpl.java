@@ -14,33 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.n52.youngs.api;
+package org.n52.youngs.load.impl;
 
-import java.util.Collection;
-import java.util.Map;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.n52.youngs.load.SchemaGenerator;
+import org.n52.youngs.transform.MappingConfiguration;
 
 /**
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public interface Report {
+public class SchemaGeneratorImpl implements SchemaGenerator {
 
-    public int getNumberOfRecordsAdded();
+    public SchemaGeneratorImpl() {
+        //
+    }
 
-    public int getNumberOfRecordsFailed();
-
-    public void addSuccessfulRecord(String id);
-
-    public void addFailedRecord(String id, String reason);
-
-    public Collection<String> getAddedIds();
-
-    /**
-     *
-     * @return a map from ID to failure reason description.
-     */
-    public Map<String, String> getFailedIds();
-
-    public void addMessage(String message);
+    @Override
+    public XContentBuilder generate(MappingConfiguration mapping) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 
 }
