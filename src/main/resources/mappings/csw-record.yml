@@ -1,0 +1,49 @@
+---
+
+name: "CSW Record Mapping"
+version: 1.0
+xpathversion: "2.0"
+applicable:
+    xpath: "boolean(//*[local-name()='Record']) and boolean(namespace-uri(//*[local-name()='Record']) = 'http://www.opengis.net/cat/csw/2.0.2')"
+type: "record"
+#index: ""
+mappings:
+    id:
+        xpath: "//dc:identifier"
+        fieldName: "id"
+        isoqueryable: false
+    title:
+        xpath: "//dc:title"
+        fieldName: "title"
+        isoqueryable: true
+    type:
+        xpath: "//dc:type"
+        fieldName: "type"
+        isoqueryable: false
+    format:
+        xpath: "//dc:format"
+        fieldName: "format"
+        isoqueryable: false
+    subject:
+        xpath: "//dc:subject"
+        fieldName: "subject"
+        isoqueryable: true
+    subjScheme:
+        xpath: "//dc:subject/@scheme"
+        fieldName: "subjectScheme"
+        isoqueryable: true
+    abstract:
+        xpath: "//dc:abstract"
+        fieldName: "abstract"
+        isoqueryable: false
+    rel:
+        xpath: "//dc:relation"
+        fieldName: "relation"
+        isoqueryable: false
+    date:
+        xpath: "//dc:date"
+        fieldName: "abstract"
+        isoqueryable: true
+        type: date
+    # add bbox mapping!
+        

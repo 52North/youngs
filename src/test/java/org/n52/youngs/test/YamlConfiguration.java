@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-${currentYearDynamic} 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2015 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@ package org.n52.youngs.test;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Iterator;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -105,8 +106,20 @@ public class YamlConfiguration {
     @Test
     public void testEntries() throws IOException {
         Collection<MappingEntry> entries = config.getEntries();
-
         assertThat("all entries are loaded", entries.size(), is(equalTo(3)));
+
+        Iterator<MappingEntry> iter = entries.iterator();
+        MappingEntry first = iter.next();
+        assertThat("first entry fieldname", first.getFieldName(), is(equalTo("id")));
+        assertThat("first entry isoqueryable", first.isIsoQueryable(), is(equalTo(false)));
+        assertThat("first entry xpath", first.getXPath(), is(equalTo("//fileIdentifier")));
+
+        iter.next();
+        MappingEntry third = iter.next();
+        assertThat("third entry fieldname", third.getFieldName(), is(equalTo("language")));
+        assertThat("third entry isoqueryable", third.isIsoQueryable(), is(equalTo(true)));
+        assertThat("third entry isoqueryable name", third.getIsoQueryableName(), is(equalTo("language")));
+        assertThat("third entry xpath", third.getXPath(), is(equalTo("//gmi:MI_Metadata/language")));
     }
 
 }

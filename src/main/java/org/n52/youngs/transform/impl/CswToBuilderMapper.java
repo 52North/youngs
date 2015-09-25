@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-${currentYearDynamic} 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2015 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,7 @@
 package org.n52.youngs.transform.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Objects;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
@@ -30,6 +31,7 @@ import org.n52.youngs.harvest.SourceRecord;
 import org.n52.youngs.harvest.NodeSourceRecord;
 import org.n52.youngs.transform.Mapper;
 import org.n52.youngs.transform.MappingConfiguration;
+import org.n52.youngs.transform.MappingEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -90,23 +92,30 @@ public class CswToBuilderMapper implements Mapper {
         xPath.setNamespaceContext(nc);
 
         XContentBuilder builder = XContentFactory.jsonBuilder()
+                .humanReadable(true)
+                .prettyPrint()
                 .startObject();
-//                .field("user", "kimchy")
-//                .field("postDate", new Date())
-//                .field("message", "trying out Elasticsearch")
 
         // evaluate xpaths and save the results in the builder
-        mapper.getEntries().forEach(entry -> {
+        Collection<MappingEntry> entries = mapper.getEntries();
+        log.trace("Mapping node {} using {} entries", node, entries.size());
+
+        entries.forEach(entry -> {
             try {
                 String value = xPath.evaluate(entry.getXPath(), node);
-                builder.field(entry.getFieldName(), value);
-                log.trace("Added field {} = {}", entry.getFieldName(), value);
+                if (!value.isEmpty()) {
+                    builder.field(entry.getFieldName(), value);
+                    log.trace("Added field {} = {}", entry.getFieldName(), value);
+                }
+                log.trace("Not adding empty field {}", entry.getFieldName());
             } catch (XPathExpressionException | IOException e) {
                 log.warn("Error selecting fields from node", e);
             }
         });
 
         builder.endObject();
+        builder.close();
+
         log.trace("Created content:\n{}", builder.string());
 
         return builder;

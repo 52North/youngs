@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-${currentYearDynamic} 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2015 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,9 +44,10 @@ public class ElasticsearchSinkIT {
 
     private final String type = "record";
 
+    // set to (true); to run focussed test methods
     @ClassRule
-    public static ElasticsearchServer server = new ElasticsearchServer();
-    
+    public static ElasticsearchServer server = new ElasticsearchServer(true); // ();
+
     @Before
     public void createSink() {
         sink = new ElasticsearchRemoteHttpSink("localhost", 9300, "elasticsearch", index, type);

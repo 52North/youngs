@@ -14,12 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.n52.youngs.api;
+package org.n52.youngs.exception;
 
 /**
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public interface Record {
-    //
+public class MappingError extends Error {
+
+    private static final long serialVersionUID = -6044547563266735706L;
+
+    public MappingError() {
+        //
+    }
+
+    public MappingError(Throwable cause, String format, Object... args) {
+        super(String.format(format, args), cause);
+    }
+
+    public MappingError(String format, Object... args) {
+        super(String.format(format, args));
+    }
+
+    public MappingError(Throwable exception) {
+        super(exception);
+    }
+
+    public MappingError(String message, Throwable exception) {
+        super(message, exception);
+    }
+
 }

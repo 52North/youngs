@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-${currentYearDynamic} 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2015 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,6 +26,10 @@ public class SinkError extends Error {
 
     public SinkError() {
         //
+    }
+
+    public SinkError(Throwable cause, String format, Object... args) {
+        super(String.format(format, args), cause);
     }
 
     public SinkError(String format, Object... args) {

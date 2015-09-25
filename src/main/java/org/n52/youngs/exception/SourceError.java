@@ -14,12 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.n52.youngs.api;
+package org.n52.youngs.exception;
 
 /**
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public interface Record {
-    //
+public class SourceError extends Error {
+
+    private static final long serialVersionUID = -6044547563266735706L;
+
+    public SourceError() {
+        //
+    }
+
+    public SourceError(Throwable cause, String format, Object... args) {
+        super(String.format(format, args), cause);
+    }
+
+    public SourceError(String format, Object... args) {
+        super(String.format(format, args));
+    }
+
+    public SourceError(Throwable exception) {
+        super(exception);
+    }
+
+    public SourceError(String message, Throwable exception) {
+        super(message, exception);
+    }
+
 }

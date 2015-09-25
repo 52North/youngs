@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-${currentYearDynamic} 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2015 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,9 +37,9 @@ public class ElasticsearchServer extends ExternalResource {
 
     private static final Boolean START_ES_DEFAULT = false;
 
-    public static final String INDEX = "elastic-csw-entries";
+    public static final String INDEX = "elasticsearch";
 
-    public static final String TYPE = "catalogentry";
+    public static final String TYPE = "testrecord";
 
     public static String cluster = null;
 
@@ -54,7 +54,7 @@ public class ElasticsearchServer extends ExternalResource {
     public ElasticsearchServer() {
         this(START_ES_DEFAULT);
     }
-    
+
     public ElasticsearchServer(boolean startEs) {
         this.startElasticsearch = startEs;
     }

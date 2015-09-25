@@ -7,17 +7,17 @@ applicable:
     xpath: "boolean(//*[local-name()='MD_Metadata']) and boolean(namespace-uri(//*[local-name()='MD_Metadata']) = 'http://www.isotc211.org/2005/gmd')"
 type: "testrecord"
 mappings:
-    - id:
+    id:
         xpath: "//fileIdentifier"
         fieldName: "id"
         isoqueryable: false
-    - title:
+    title:
         xpath: "//"
         fieldName: "title"
         isoqueryable: false
-    - language:
+    lang:
         xpath: "//gmi:MI_Metadata/language"
-        fieldName: "title"
+        fieldName: "language"
         isoqueryable: true
         isoqueryableName: language
         

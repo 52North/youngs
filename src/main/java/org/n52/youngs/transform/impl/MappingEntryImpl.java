@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-${currentYearDynamic} 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2015 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,9 +33,9 @@ public class MappingEntryImpl implements MappingEntry {
 
     private Optional<String> isoQueryableName = Optional.empty();
 
-    public MappingEntryImpl(String xPath, String dBName, boolean isoQueryable, String isoQueryableName) {
-        this(xPath, dBName, isoQueryable);
-        this.isoQueryableName = Optional.of(isoQueryableName);
+    public MappingEntryImpl(String xPath, String fieldName, boolean isoQueryable, String isoQueryableName) {
+        this(xPath, fieldName, isoQueryable);
+        this.isoQueryableName = Optional.ofNullable(isoQueryableName);
     }
 
     public MappingEntryImpl(String xPath, String fieldName, boolean isoQueryable) {

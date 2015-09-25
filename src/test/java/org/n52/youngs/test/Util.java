@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-${currentYearDynamic} 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2015 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,10 +17,13 @@
 package org.n52.youngs.test;
 
 import com.google.common.collect.Lists;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
@@ -30,6 +33,9 @@ import javax.xml.transform.stream.StreamSource;
 import net.opengis.csw.v_2_0_2.GetRecordsResponseType;
 import org.n52.youngs.api.Record;
 import org.n52.youngs.harvest.NodeSourceRecord;
+import org.n52.youngs.harvest.SourceRecord;
+import org.n52.youngs.load.impl.BuilderRecord;
+import org.n52.youngs.transform.Mapper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -63,6 +69,23 @@ public class Util {
         is.setCharacterStream(new StringReader(xmlString));
         Document doc = db.parse(is);
         return doc;
+    }
+
+    public static String sourceRecordsToString(Collection<Record> records, Mapper mapper) {
+        return records.stream()
+                .map(r -> (SourceRecord) r)
+                .map(mapper::map)
+                .map(r -> (BuilderRecord) r)
+                .map(BuilderRecord::getBuilder)
+                .map((xContentBuilder) -> {
+                    try {
+                        return xContentBuilder.string();
+                    } catch (IOException ex) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining("\n\n"));
     }
 
 }

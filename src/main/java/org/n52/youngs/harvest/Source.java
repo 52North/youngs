@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-${currentYearDynamic} 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2015 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
  */
 package org.n52.youngs.harvest;
 
+import com.google.common.collect.ImmutableList;
 import java.net.URL;
 import java.util.Collection;
 import org.n52.youngs.api.Record;
@@ -26,8 +27,18 @@ import org.n52.youngs.api.Record;
  */
 public interface Source {
 
+    public static final String DEFAULT_TYPE_NAME = "csw:Record";
+
+    public static final Collection<String> DEFAULT_NAMESPACES = ImmutableList.of("http://www.opengis.net/cat/csw/2.0.2");
+
+    public static final String DEFAULT_OUTPUT_SCHEMA = "http://www.opengis.net/cat/csw/2.0.2";
+
     public URL getEndpoint();
 
+    /**
+     *
+     * @return the number of records found in a source, or Long.MIN_VALUE if there were errors.
+    */
     public long getRecordCount();
 
     public Collection<Record> getRecords();

@@ -14,12 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.n52.youngs.api;
+package org.n52.youngs.impl;
+
+import com.google.common.collect.ImmutableMap;
+import java.util.Map;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 
 /**
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public interface Record {
-    //
+public class ContextHelper {
+
+    private static final Map<String, String> namespaceToContextPath = ImmutableMap.of(
+            "http://www.opengis.net/cat/csw/2.0.2", "net.opengis.csw.v_2_0_2");
+
+    public static JAXBContext getContextForNamespace(String namespace) throws JAXBException {
+        String contextPath = namespaceToContextPath.get(namespace);
+        return JAXBContext.newInstance(contextPath);
+    }
+
 }

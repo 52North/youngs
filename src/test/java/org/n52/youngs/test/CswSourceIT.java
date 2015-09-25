@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-${currentYearDynamic} 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2015 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,7 +33,8 @@ public class CswSourceIT {
 
     @Test
     public void namespaceParameterCreation() throws Exception {
-        CswSource source = new CswSource(new URL("http://api.eurogeoss-broker.eu/dab/services/cswiso"), (Collection<String>) ImmutableList.of("http://www.opengis.net/cat/csw/2.0.2"), "csw:Record", "http://www.opengis.net/cat/csw/2.0.2");
+        CswSource source = new CswSource(new URL("http://api.eurogeoss-broker.eu/dab/services/cswiso"),
+                (Collection<String>) ImmutableList.of("http://www.opengis.net/cat/csw/2.0.2"), "csw:Record", "http://www.opengis.net/cat/csw/2.0.2");
 
         long count = source.getRecordCount();
         Assert.assertThat("record count is higher than last manual check", count, is(greaterThan(900000l)));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-${currentYearDynamic} 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2015 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,6 +29,7 @@ public interface Sink {
     /**
      * Do whatever is required for the sink to be used, such as testing connections, inserting schemas, ...
      *
+     * @param mapping the mapping that contains the configuration for the sink, such as data types and field names
      * @return true if the sink is now ready to be used
     */
     public boolean prepare(MappingConfiguration mapping);

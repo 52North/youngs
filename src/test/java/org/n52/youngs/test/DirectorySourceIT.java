@@ -14,43 +14,59 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.n52.youngs.control;
+package org.n52.youngs.test;
 
 import com.google.common.io.Resources;
-import java.util.Collections;
-import org.n52.youngs.load.impl.ElasticsearchRemoteHttpSink;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.n52.youngs.api.Record;
 import org.n52.youngs.api.Report;
+import org.n52.youngs.control.Runner;
 import org.n52.youngs.control.impl.SingleThreadBulkRunner;
-import org.n52.youngs.transform.impl.CswToBuilderMapper;
-import org.n52.youngs.harvest.CswSource;
+import org.n52.youngs.harvest.DirectorySource;
 import org.n52.youngs.harvest.NamespaceContextImpl;
-import org.n52.youngs.harvest.Source;
 import org.n52.youngs.load.Sink;
+import org.n52.youngs.load.impl.ElasticsearchRemoteHttpSink;
 import org.n52.youngs.transform.Mapper;
 import org.n52.youngs.transform.MappingConfiguration;
+import org.n52.youngs.transform.impl.CswToBuilderMapper;
 import org.n52.youngs.transform.impl.YamlMappingConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public class Main {
+public class DirectorySourceIT {
 
-    private static final Logger log = LoggerFactory.getLogger(Main.class);
+    private static Path baseDirectory;
 
-    public static void main(String[] args) throws Exception {
-        // http://api.eurogeoss-broker.eu/dab/services/cswiso?service=CSW&version=2.0.2&request=GetCapabilities
-        Source source = new CswSource("http://api.eurogeoss-broker.eu/dab/services/cswiso",
-                Collections.singleton("http://www.isotc211.org/2005/gmd"),
-                "gmd:MD_Metadata",
-                "http://www.isotc211.org/2005/gmd");
+    private static Mapper cswMapper;
 
-        MappingConfiguration configuration = new YamlMappingConfiguration(
-                Resources.asByteSource(Resources.getResource("mappings/geoss-dab.yml")).openStream(),
+    @ClassRule
+    public static ElasticsearchServer server = new ElasticsearchServer(true);
+
+    @BeforeClass
+    public static void baseDir() throws URISyntaxException, IOException {
+        baseDirectory = Paths.get(Resources.getResource("records").toURI());
+
+        MappingConfiguration cswConfiguration = new YamlMappingConfiguration(
+                Resources.asByteSource(Resources.getResource("mappings/csw-record.yml")).openStream(),
                 NamespaceContextImpl.create());
-        Mapper mapper = new CswToBuilderMapper(configuration);
+        cswMapper = new CswToBuilderMapper(cswConfiguration);
+    }
+
+    @Test
+    public void testCswRecordsDirectory() throws IOException {
+        DirectorySource source = new DirectorySource(baseDirectory.resolve("csw"));
 
         String host = "localhost";
         String cluster = "elasticsearch";
@@ -63,10 +79,10 @@ public class Main {
                 .setBulkSize(12)
                 .setRecordsLimit(50)
                 .harvest(source)
-                .transform(mapper);
+                .transform(cswMapper);
         Report report = runner.load(sink);
 
-        log.info("Done: {}", report);
+        assertThat("all records added", report.getNumberOfRecordsAdded(), is(equalTo(12)));
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-${currentYearDynamic} 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2015 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,6 @@
 package org.n52.youngs.harvest;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import java.io.IOException;
@@ -41,6 +40,7 @@ import net.opengis.csw.v_2_0_2.GetRecordsResponseType;
 import org.apache.http.client.fluent.Request;
 import org.elasticsearch.common.collect.Lists;
 import org.n52.youngs.api.Record;
+import org.n52.youngs.impl.ContextHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -52,12 +52,6 @@ import org.w3c.dom.Node;
 public class CswSource implements Source {
 
     private static final Logger log = LoggerFactory.getLogger(CswSource.class);
-
-    private static final String DEFAULT_TYPE_NAME = "csw:Record";
-
-    private static final Collection<String> DEFAULT_NAMESPACES = ImmutableList.of("http://www.opengis.net/cat/csw/2.0.2");
-
-    private static final String DEFAULT_OUTPUT_SCHEMA = "http://www.opengis.net/cat/csw/2.0.2";
 
     private final URL url;
 
@@ -105,7 +99,7 @@ public class CswSource implements Source {
     }
 
     private void init() throws JAXBException {
-        context = JAXBContext.newInstance("net.opengis.csw.v_2_0_2");
+        context = ContextHelper.getContextForNamespace(this.outputSchema);
         unmarshaller = context.createUnmarshaller();
     }
 
@@ -152,7 +146,8 @@ public class CswSource implements Source {
             log.trace("GetRecords request: {}", recordsRequest);
             InputStream response = Request.Get(recordsRequest.toString()).execute().returnContent().asStream();
 
-            JAXBElement<GetRecordsResponseType> jaxb_response = unmarshaller.unmarshal(new StreamSource(response), GetRecordsResponseType.class);
+            JAXBElement<GetRecordsResponseType> jaxb_response = unmarshaller.unmarshal(new StreamSource(response),
+                    GetRecordsResponseType.class);
             BigInteger numberOfRecordsReturned = jaxb_response.getValue().getSearchResults().getNumberOfRecordsReturned();
             log.trace("Got response with {} records", numberOfRecordsReturned);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-${currentYearDynamic} 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2015 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@ package org.n52.youngs.transform.impl;
 
 import com.github.autermann.yaml.Yaml;
 import com.github.autermann.yaml.YamlNode;
+import com.github.autermann.yaml.nodes.YamlMapNode;
 import com.google.common.base.Joiner;
 import org.n52.youngs.transform.MappingEntry;
 import com.google.common.collect.Lists;
@@ -28,13 +29,16 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import org.n52.youngs.exception.MappingError;
 import org.n52.youngs.transform.MappingConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,12 +69,13 @@ public class YamlMappingConfiguration implements MappingConfiguration {
 
     public YamlMappingConfiguration(File file, NamespaceContext nsContext) throws FileNotFoundException {
         this(new FileInputStream(file), nsContext);
-        log.info("Created configuration from file {} with {} entries.", file, entries.size());
+        log.info("Created configuration from file {}", file);
     }
 
     public YamlMappingConfiguration(String fileName, NamespaceContext nsContext) throws IOException {
         this(Resources.asByteSource(Resources.getResource(fileName)).openStream(),
                 nsContext);
+        log.info("Created configuration from filename {}", fileName);
     }
 
     public YamlMappingConfiguration(InputStream input, NamespaceContext nsContext) {
@@ -94,16 +99,33 @@ public class YamlMappingConfiguration implements MappingConfiguration {
             log.error("Could not compile applicability xpath, will always evalute to true", e);
         }
 
+        YamlMapNode mappingsNode = configurationNodes.path("mappings").asMap();
+        this.entries = mappingsNode.entries().stream()
+                .map(entry -> {
+                    MappingEntry e = createEntry(entry.getKey().asTextValue(),
+                            entry.getValue());
+                    return e;
+                })
+                .collect(Collectors.toList());
+
         log.info("Created configuration from stream {} with {} entries", input, entries.size());
+    }
+
+    private MappingEntry createEntry(String id, YamlNode node) {
+        log.trace("Parsing mapping '{}'", id);
+        if (node instanceof YamlMapNode) {
+            YamlMapNode mapNode = (YamlMapNode) node;
+            return new MappingEntryImpl(mapNode.path("xpath").asTextValue(),
+                    mapNode.path("fieldName").asTextValue(),
+                    mapNode.path("isoqueryable").asBooleanValue(false),
+                    mapNode.path("isoqueryableName").asTextValue(null));
+        }
+        throw new MappingError("The provided node class %s is not supported in the mapping '{}': %s",
+                node.getClass().toString(), id, node.toString());
     }
 
     @Override
     public Collection<MappingEntry> getEntries() {
-        entries.add(new MappingEntryImpl("//gmd:MD_Metadata/gmd:fileIdentifier/gco:CharacterString", "id", false));
-        entries.add(new MappingEntryImpl("//gmd:MD_Metadata/gmd:language/gmd:LanguageCode/@codeListValue", "language", false));
-        entries.add(new MappingEntryImpl("//gmd:MD_Metadata/gmd:metadataStandardName/gco:CharacterString", "mdStandardName", false));
-        entries.add(new MappingEntryImpl("//gmd:MD_Metadata/gmd:metadataStandardVersion/gco:CharacterString", "mdStandardVersion", false));
-
         return entries;
     }
 
