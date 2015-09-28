@@ -23,6 +23,7 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.n52.youngs.api.Record;
+import org.n52.youngs.load.SchemaGenerator;
 import org.n52.youngs.load.Sink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,8 @@ public abstract class ElasticsearchSink implements Sink {
 
     private final String type;
 
+    protected SchemaGenerator schemaGenerator = new SchemaGeneratorImpl();
+
     public ElasticsearchSink(String cluster, String index, String type) {
         this.cluster = cluster;
         this.index = index;
@@ -48,6 +51,10 @@ public abstract class ElasticsearchSink implements Sink {
     }
 
     public abstract Client getClient();
+
+    protected String getCluster() {
+        return cluster;
+    }
 
     @Override
     public boolean store(Record record) {
@@ -74,6 +81,11 @@ public abstract class ElasticsearchSink implements Sink {
     public void store(Collection<Record> records) {
         // TODO evaluate parallelStream()
         records.stream().forEach(this::store);
+    }
+
+    public ElasticsearchSink setSchemaGenerator(SchemaGenerator sg) {
+        this.schemaGenerator = sg;
+        return this;
     }
 
 }

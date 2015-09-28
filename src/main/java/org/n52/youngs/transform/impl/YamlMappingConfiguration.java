@@ -48,6 +48,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.n52.youngs.exception.MappingError;
 import org.n52.youngs.impl.NamespaceContextImpl;
+import org.n52.youngs.impl.XPathHelper;
 import org.n52.youngs.transform.MappingConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,19 +63,19 @@ public class YamlMappingConfiguration implements MappingConfiguration {
 
     List<MappingEntry> entries = Lists.newArrayList();
 
-    private String xPathVersion;
+    private String xpathVersion = DEFAULT_XPATH_VERSION;
 
     private int version;
 
-    private String name;
+    private String name = DEFAULT_NAME;
 
-    private static XPathFactory xpathFactory = XPathFactory.newInstance();
+    private XPathFactory xpathFactory;
 
-    private Optional<XPathExpression> applicability;
+    private Optional<XPathExpression> applicabilityExpression;
 
-    private String type;
+    private String type = DEFAULT_TYPE;
 
-    private String index;
+    private String index = DEFAULT_INDEX;
 
     private boolean indexCreationEnabled;
 
@@ -82,18 +83,20 @@ public class YamlMappingConfiguration implements MappingConfiguration {
 
     private Optional<String> indexCreationRequest = Optional.empty();
 
-    public YamlMappingConfiguration(File file, NamespaceContext nsContext) throws FileNotFoundException {
-        this(new FileInputStream(file), nsContext);
+    public YamlMappingConfiguration(File file, NamespaceContext nsContext, XPathFactory factory) throws FileNotFoundException {
+        this(new FileInputStream(file), nsContext, factory);
         log.info("Created configuration from file {}", file);
     }
 
-    public YamlMappingConfiguration(String fileName, NamespaceContext nsContext) throws IOException {
+    public YamlMappingConfiguration(String fileName, NamespaceContext nsContext, XPathFactory factory) throws IOException {
         this(Resources.asByteSource(Resources.getResource(fileName)).openStream(),
-                nsContext);
+                nsContext, factory);
         log.info("Created configuration from filename {}", fileName);
     }
 
-    public YamlMappingConfiguration(InputStream input, NamespaceContext nsContext) {
+    public YamlMappingConfiguration(InputStream input, NamespaceContext nsContext, XPathFactory factory) {
+        this.xpathFactory = factory;
+
         Yaml yaml = new Yaml();
         YamlNode configurationNodes = yaml.load(input);
         log.trace("Read configuration file with the root elements {}", Joiner.on(" ").join(configurationNodes));
@@ -103,12 +106,14 @@ public class YamlMappingConfiguration implements MappingConfiguration {
         log.info("Created configuration from stream {} with {} entries", input, entries.size());
     }
 
-    public YamlMappingConfiguration(String fileName) throws IOException {
-        this(Resources.asByteSource(Resources.getResource(fileName)).openStream());
+    public YamlMappingConfiguration(String fileName, XPathFactory factory) throws IOException {
+        this(Resources.asByteSource(Resources.getResource(fileName)).openStream(), factory);
         log.info("Created configuration from filename {}", fileName);
     }
 
-    public YamlMappingConfiguration(InputStream input) {
+    public YamlMappingConfiguration(InputStream input, XPathFactory factory) {
+        this.xpathFactory = factory;
+
         Yaml yaml = new Yaml();
         YamlNode configurationNodes = yaml.load(input);
         log.trace("Read configuration file with the root elements {}", Joiner.on(" ").join(configurationNodes));
@@ -141,12 +146,11 @@ public class YamlMappingConfiguration implements MappingConfiguration {
         // read the entries from the config file
         this.name = configurationNodes.path("name").asTextValue(DEFAULT_NAME);
         this.version = configurationNodes.path("version").asIntValue(DEFAULT_VERSION);
-        this.xPathVersion = configurationNodes.path("xpathversion").asTextValue(DEFAULT_XPATH_VERSION);
         this.type = configurationNodes.path("type").asTextValue(DEFAULT_TYPE);
-        this.index = configurationNodes.path("index").asTextValue(DEFAULT_INDEX);
-
-        if (configurationNodes.hasNotNull("index")) {
+        this.xpathVersion = configurationNodes.path("xpathversion").asTextValue(DEFAULT_XPATH_VERSION);
+        if (configurationNodes.has("index")) {
             YamlNode indexField = configurationNodes.get("index");
+            this.index = indexField.path("name").asTextValue(DEFAULT_INDEX);
             this.indexCreationEnabled = indexField.path("create").asBooleanValue(DEFAULT_INDEX_CREATION);
             this.dynamicMappingEnabled = indexField.path("dynamic_mapping").asBooleanValue(DEFAULT_DYNAMIC_MAPPING);
             if (indexField.hasNotNull("settings")) {
@@ -154,11 +158,17 @@ public class YamlMappingConfiguration implements MappingConfiguration {
             }
         }
 
-        XPath path = xpathFactory.newXPath();
-        path.setNamespaceContext(nsContext);
+        XPathHelper xph = new XPathHelper();
+        if (!xph.isVersionSupported(xpathFactory, xpathVersion)) {
+            throw new MappingError("Provided factory {} does not support version {}", xpathFactory, xpathVersion);
+        }
+
+        log.debug("Using XPathFactory {}", xpathFactory);
+
         try {
-            String applicabilityXPath = configurationNodes.path("applicable.xpath").asTextValue(DEFAULT_APPLICABILITY_PATH);
-            applicability = Optional.of(path.compile(applicabilityXPath));
+            XPath path = newXPath(nsContext);
+            String applicabilityXPathString = configurationNodes.path("applicable.xpath").asTextValue(DEFAULT_APPLICABILITY_PATH);
+            applicabilityExpression = Optional.of(path.compile(applicabilityXPathString));
         } catch (XPathExpressionException e) {
             log.error("Could not compile applicability xpath, will always evalute to true", e);
         }
@@ -186,8 +196,7 @@ public class YamlMappingConfiguration implements MappingConfiguration {
             YamlMapNode mapNode = (YamlMapNode) node;
             Map<String, Object> indexProperties = createIndexProperties(id, node);
 
-            XPath xPath = xpathFactory.newXPath();
-            xPath.setNamespaceContext(nsContext);
+            XPath xPath = newXPath(nsContext);
             String expression = mapNode.path("xpath").asTextValue();
             try {
                 XPathExpression compiledExpression = xPath.compile(expression);
@@ -203,6 +212,12 @@ public class YamlMappingConfiguration implements MappingConfiguration {
         }
         throw new MappingError("The provided node class %s is not supported in the mapping '{}': %s",
                 node.getClass().toString(), id, node.toString());
+    }
+
+    private XPath newXPath(NamespaceContext nsContext) {
+        XPath xPath = xpathFactory.newXPath();
+        xPath.setNamespaceContext(nsContext);
+        return xPath;
     }
 
     private Map<String, Object> createIndexProperties(String id, YamlNode node) {
@@ -259,7 +274,7 @@ public class YamlMappingConfiguration implements MappingConfiguration {
 
     @Override
     public String getXPathVersion() {
-        return this.xPathVersion;
+        return this.xpathVersion;
     }
 
     @Override
@@ -274,16 +289,17 @@ public class YamlMappingConfiguration implements MappingConfiguration {
 
     @Override
     public boolean isApplicable(Document doc) {
-        if (!this.applicability.isPresent()) {
+        if (!this.applicabilityExpression.isPresent()) {
             log.debug("No applicability xpath provided, returning TRUE.");
             return true;
         }
 
         boolean result;
         try {
-            result = (boolean) this.applicability.get().evaluate(doc, XPathConstants.BOOLEAN);
+            XPathExpression expr = this.applicabilityExpression.get();
+            result = (boolean) expr.evaluate(doc, XPathConstants.BOOLEAN);
         } catch (XPathExpressionException | RuntimeException e) {
-            log.warn("Error executing applicability xpath on document, returning FALSE: {}", doc, e);
+            log.warn("Error executing applicability xpath on document, returning false: {}", doc, e);
             return false;
         }
 

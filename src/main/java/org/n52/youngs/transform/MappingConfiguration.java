@@ -17,6 +17,7 @@
 package org.n52.youngs.transform;
 
 import java.util.Collection;
+import org.n52.youngs.api.XPathConstants;
 import org.w3c.dom.Document;
 
 /**
@@ -25,11 +26,7 @@ import org.w3c.dom.Document;
  */
 public interface MappingConfiguration {
 
-    public static final String XPATH_10 = "1.0";
-
-    public static final String XPATH_20 = "2.0";
-
-    public static final String DEFAULT_XPATH_VERSION = XPATH_20;
+    public static final String DEFAULT_XPATH_VERSION = XPathConstants.XPATH_20;
 
     public static final int DEFAULT_VERSION = 1;
 

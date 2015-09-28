@@ -1,0 +1,6 @@
+---
+
+name: testxpath
+xpathversion: 1.0
+applicable:
+    xpath: "boolean(//*)"

@@ -16,9 +16,20 @@
  */
 package org.n52.youngs.load.impl;
 
+import com.google.common.collect.Maps;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Map.Entry;
+import static javax.management.Query.value;
 import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
+import org.n52.youngs.exception.SinkError;
 import org.n52.youngs.load.SchemaGenerator;
 import org.n52.youngs.transform.MappingConfiguration;
+import org.n52.youngs.transform.MappingEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -26,13 +37,30 @@ import org.n52.youngs.transform.MappingConfiguration;
  */
 public class SchemaGeneratorImpl implements SchemaGenerator {
 
+    private static final Logger log = LoggerFactory.getLogger(SchemaGeneratorImpl.class);
+
     public SchemaGeneratorImpl() {
         //
     }
 
     @Override
-    public XContentBuilder generate(MappingConfiguration mapping) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Map<String, Object> generate(MappingConfiguration mapping) {
+        Map<String, Object> schema = Maps.newHashMap();
+        schema.put("dynamic", mapping.isDynamicMappingEnabled());
+
+        Map<String, Object> fields = Maps.newHashMap();
+        mapping.getEntries().forEach((MappingEntry entry) -> {
+            Map<String, Object> properties = Maps.newHashMap();
+            for (Entry<String, Object> entryProps : entry.getIndexProperties().entrySet()) {
+                properties.put(entryProps.getKey(), entryProps.getValue());
+            }
+            fields.put(entry.getFieldName(), properties);
+        });
+        schema.put("properties", fields);
+
+        log.info("Created {} schema with {} fields", mapping.isDynamicMappingEnabled() ? "dynamic" : "", fields.size());
+        log.debug("Created schema with {} first level elements: {}", schema.size(), Arrays.deepToString(schema.entrySet().toArray()));
+        return schema;
     }
 
 }

@@ -5,9 +5,6 @@ version: 42
 xpathversion: 2.0
 applicable:
     xpath: "boolean(//*[local-name()='MD_Metadata']) and boolean(namespace-uri(//*[local-name()='MD_Metadata']) = 'http://www.isotc211.org/2005/gmd')"
-type: testrecord
-defaults:
-    store: &STORE true
 namespaces:
     gmd: http://www.isotc211.org/2005/gmd
     gco: http://www.isotc211.org/2005/gco
@@ -27,10 +24,12 @@ namespaces:
     dct: http://purl.org/dc/terms/
     inspire_ds: http://inspire.ec.europa.eu/schemas/inspire_ds/1.0
     inspire_c: http://inspire.ec.europa.eu/schemas/common/1.0
+type: testrecord
+defaults:
+    store: &STORE true
 index:
     create: true
-    # only for testing parser:
-    dynamic_mapping: true
+    name: testindex
     settings: |
         index:
             number_of_shards: 1 
@@ -60,8 +59,8 @@ mappings:
             type: string
             index_name: title
             boost: 10
-            copy_to: autocomplete_field
-            term_vector: yes
+            #copy_to: autocomplete_field
+            term_vector: "yes"
     lang:
         xpath: "//gmi:MI_Metadata/gmd:language"
         isoqueryable: true
@@ -69,9 +68,11 @@ mappings:
         properties:
             index_name: language
             null_value: "N/A"
+            type: string
     date:
         xpath: "//*"
         properties:
+            type: date
             # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
             format: YYYY-MM-DD
             ignore_malformed: true

@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import org.n52.youngs.api.Record;
 import org.n52.youngs.api.Report;
 import org.n52.youngs.control.Runner;
+import org.n52.youngs.exception.SinkError;
 import org.n52.youngs.harvest.Source;
 import org.n52.youngs.harvest.SourceRecord;
 import org.n52.youngs.impl.ReportImpl;
@@ -103,14 +104,20 @@ public class SingleThreadBulkRunner implements Runner {
         log.info("Starting harvest from {} to {} with {}", source, sink, mapper);
         Report report = new ReportImpl();
 
-        boolean prepareSink = sink.prepare(mapper.getMapper());
-        if(!prepareSink) {
-            String msg = "The sink could not be prepared. Stopping load, please check the logs.";
-            log.error(msg);
-            report.addMessage(msg);
+        try {
+            boolean prepareSink = sink.prepare(mapper.getMapper());
+            if (!prepareSink) {
+                String msg = "The sink could not be prepared. Stopping load, please check the logs.";
+                log.error(msg);
+                report.addMessage(msg);
+                return report;
+            }
+
+        } catch (SinkError e) {
+            log.error("Problem preparing sink", e);
+            report.addMessage(String.format("Problem preparing sink: %s", e.getMessage()));
             return report;
         }
-
         final Stopwatch timer = Stopwatch.createStarted();
 
         ExecutorService executor = Executors.newSingleThreadExecutor();

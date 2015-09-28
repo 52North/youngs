@@ -25,6 +25,7 @@ import org.n52.youngs.transform.impl.CswToBuilderMapper;
 import org.n52.youngs.harvest.CswSource;
 import org.n52.youngs.impl.NamespaceContextImpl;
 import org.n52.youngs.harvest.Source;
+import org.n52.youngs.impl.XPathHelper;
 import org.n52.youngs.load.Sink;
 import org.n52.youngs.transform.Mapper;
 import org.n52.youngs.transform.MappingConfiguration;
@@ -50,7 +51,7 @@ public class Main {
 
         MappingConfiguration configuration = new YamlMappingConfiguration(
                 Resources.asByteSource(Resources.getResource("mappings/geoss-dab.yml")).openStream(),
-                NamespaceContextImpl.create());
+                NamespaceContextImpl.create(), new XPathHelper().newXPathFactory());
         Mapper mapper = new CswToBuilderMapper(configuration);
 
         String host = "localhost";

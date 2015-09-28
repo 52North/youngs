@@ -22,6 +22,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.XPathFactoryConfigurationException;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -31,6 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.n52.youngs.exception.MappingError;
 import org.n52.youngs.impl.NamespaceContextImpl;
+import org.n52.youngs.impl.XPathHelper;
 import org.n52.youngs.transform.MappingConfiguration;
 import org.n52.youngs.transform.MappingEntry;
 import org.n52.youngs.transform.impl.YamlMappingConfiguration;
@@ -45,9 +48,11 @@ public class YamlConfigurationTest {
 
     private YamlMappingConfiguration config;
 
+    private XPathHelper helper = new XPathHelper();
+
     @Before
     public void loadFile() throws IOException {
-        config = new YamlMappingConfiguration("mappings/testmapping.yml");
+        config = new YamlMappingConfiguration("mappings/testmapping.yml", helper.newXPathFactory());
     }
 
     @Test
@@ -60,26 +65,27 @@ public class YamlConfigurationTest {
     @Test
     public void testConfigMetadataVersionParsing() throws IOException {
         YamlMappingConfiguration c = new YamlMappingConfiguration("mappings/testmapping-double-version-number.yml",
-                NamespaceContextImpl.create());
+                NamespaceContextImpl.create(), helper.newXPathFactory());
         assertThat("version is correct", c.getVersion(), is(equalTo(2)));
     }
 
     @Test
     public void testConfigMetadataVersionString() throws IOException {
         YamlMappingConfiguration c = new YamlMappingConfiguration("mappings/testmapping-string-version-number.yml",
-                NamespaceContextImpl.create());
+                NamespaceContextImpl.create(), helper.newXPathFactory());
         assertThat("version is correct", c.getVersion(), is(equalTo(1)));
     }
 
     @Test
     public void testDefaultMetadata() throws Exception {
-        YamlMappingConfiguration otherConfig = new YamlMappingConfiguration("mappings/testmapping-empty.yml", NamespaceContextImpl.create());
+        YamlMappingConfiguration otherConfig = new YamlMappingConfiguration("mappings/testmapping-empty.yml",
+                NamespaceContextImpl.create(), helper.newXPathFactory());
 
         assertThat("name is correct", otherConfig.getName(), is(equalTo(MappingConfiguration.DEFAULT_NAME)));
         assertThat("version is correct", otherConfig.getVersion(), is(equalTo(MappingConfiguration.DEFAULT_VERSION)));
         assertThat("XPath version is correct", otherConfig.getXPathVersion(), is(equalTo(MappingConfiguration.DEFAULT_XPATH_VERSION)));
     }
-
+    
     @Test
     public void testApplicabilityMatching() throws Exception {
         Document document = Util.getDocument("<testdoc xmlns=\"http://www.isotc211.org/2005/gmd\">"
@@ -112,7 +118,8 @@ public class YamlConfigurationTest {
 
     @Test
     public void testApplicabilityInvalidPath() throws Exception {
-        YamlMappingConfiguration otherConfig = new YamlMappingConfiguration("mappings/testmapping-invalidXPath.yml", NamespaceContextImpl.create());
+        YamlMappingConfiguration otherConfig = new YamlMappingConfiguration("mappings/testmapping-invalidXPath.yml",
+                NamespaceContextImpl.create(), helper.newXPathFactory());
 
         Document document = Util.getDocument("<testdoc/>");
 
@@ -122,12 +129,13 @@ public class YamlConfigurationTest {
 
     @Test
     public void testApplicabilityMissing() throws Exception {
-        YamlMappingConfiguration otherConfig = new YamlMappingConfiguration("mappings/testmapping-empty.yml", NamespaceContextImpl.create());
+        YamlMappingConfiguration otherConfig = new YamlMappingConfiguration("mappings/testmapping-empty.yml",
+                NamespaceContextImpl.create(), helper.newXPathFactory());
 
         Document document = Util.getDocument("<testdoc/>");
 
         assertThat("is always applicable", otherConfig.isApplicable(document), is(true));
-        assertThat("is always applicable", otherConfig.isApplicable(null), is(true));
+        assertThat("is always applicable, but not for 'null'", otherConfig.isApplicable(null), is(false));
     }
 
     @Test
@@ -182,13 +190,15 @@ public class YamlConfigurationTest {
     @Test(expected = MappingError.class)
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testMissingNamespaces() throws Exception {
-        new YamlMappingConfiguration("mappings/testmapping-empty.yml");
+        new YamlMappingConfiguration("mappings/testmapping-empty.yml", helper.newXPathFactory());
     }
 
     @Test
     public void testIndexSettings() throws IOException {
+        assertThat("name is correct", config.getIndex(), is("testindex"));
+        assertThat("type is correct", config.getType(), is("testrecord"));
         assertThat("create is true", config.isIndexCreationEnabled(), is(true));
-        assertThat("dynamic mapping false", config.isDynamicMappingEnabled(), is(true));
+        assertThat("dynamic mapping false", config.isDynamicMappingEnabled(), is(false));
         assertThat("index request is provided", config.hasIndexCreationRequest(), is(true));
         assertThat("index request correct", config.getIndexCreationRequest(), allOf(
                 containsString("number_of_shards: 1"),
@@ -198,7 +208,28 @@ public class YamlConfigurationTest {
     @Test(expected = MappingError.class)
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testEmbeddedNamespaceContextMissingNS() throws IOException {
-        new YamlMappingConfiguration("mappings/testmapping-missing-ns.yml");
+        new YamlMappingConfiguration("mappings/testmapping-missing-ns.yml", helper.newXPathFactory());
+    }
+
+    @Test
+    public void testXpath10VersionSupportedJava() throws XPathExpressionException, IOException, XPathFactoryConfigurationException {
+        YamlMappingConfiguration c10 = new YamlMappingConfiguration("mappings/testmapping-xpath10.yml",
+                NamespaceContextImpl.create(), XPathFactory.newInstance());
+        assertThat("mapping configuration was loaded", c10.getName(), is("testxpath"));
+    }
+
+    @Test(expected = MappingError.class)
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
+    public void testXpath20VersionNOTSupportedJava() throws XPathExpressionException, IOException, XPathFactoryConfigurationException {
+        new YamlMappingConfiguration("mappings/testmapping-xpath20.yml",
+                NamespaceContextImpl.create(), XPathFactory.newInstance());
+    }
+
+    @Test
+    public void testXpath20VersionSupportedWithHelper() throws XPathExpressionException, IOException, XPathFactoryConfigurationException {
+        YamlMappingConfiguration c10 = new YamlMappingConfiguration("mappings/testmapping-xpath20.yml",
+                NamespaceContextImpl.create(), helper.newXPathFactory());
+        assertThat("mapping configuration was loaded", c10.getName(), is("testxpath"));
     }
 
 }

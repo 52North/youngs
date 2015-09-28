@@ -16,7 +16,7 @@
  */
 package org.n52.youngs.load;
 
-import org.elasticsearch.common.xcontent.XContentBuilder;
+import java.util.Map;
 import org.n52.youngs.transform.MappingConfiguration;
 
 /**
@@ -25,6 +25,6 @@ import org.n52.youngs.transform.MappingConfiguration;
  */
 public interface SchemaGenerator {
 
-    XContentBuilder generate(MappingConfiguration mapping);
+    Map<String, Object> generate(MappingConfiguration mapping);
 
 }

@@ -53,6 +53,7 @@ import org.n52.youngs.harvest.DirectorySource;
 import org.n52.youngs.impl.NamespaceContextImpl;
 import org.n52.youngs.harvest.NodeSourceRecord;
 import org.n52.youngs.harvest.SourceRecord;
+import org.n52.youngs.impl.XPathHelper;
 import org.n52.youngs.load.SinkRecord;
 import org.n52.youngs.load.impl.BuilderRecord;
 import org.n52.youngs.transform.Mapper;
@@ -76,7 +77,7 @@ public class DirectorySourceTest {
 
         MappingConfiguration cswConfiguration = new YamlMappingConfiguration(
                 Resources.asByteSource(Resources.getResource("mappings/csw-record.yml")).openStream(),
-                NamespaceContextImpl.create());
+                NamespaceContextImpl.create(), new XPathHelper().newXPathFactory());
         cswMapper = new CswToBuilderMapper(cswConfiguration);
     }
 

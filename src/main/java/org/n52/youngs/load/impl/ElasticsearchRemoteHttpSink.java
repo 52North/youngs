@@ -16,10 +16,10 @@
  */
 package org.n52.youngs.load.impl;
 
-import org.n52.youngs.load.SchemaGenerator;
 import com.google.common.collect.Maps;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -37,7 +37,6 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.joda.time.DateTimeZone;
 import org.n52.iceland.exception.ConfigurationError;
 import org.n52.iceland.statistics.api.mappings.MetadataDataMapping;
@@ -69,7 +68,7 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
         this.port = port;
 
         Settings settings = ImmutableSettings.settingsBuilder()
-                .put("cluster.name", cluster).build();
+                .put("cluster.name", getCluster()).build();
         this.client = new TransportClient(settings).addTransportAddress(
                 new InetSocketTransportAddress(this.host, this.port));
     }
@@ -81,33 +80,43 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
 
     @Override
     public boolean prepare(MappingConfiguration mapping) {
-        IndicesAdminClient indices = getClient().admin().indices();
-
-        String indexId = mapping.getIndex();
-        if (indices.prepareExists(indexId).get().isExists()) {
-            log.info("Index {} already exists, updating the mapping ...", indexId);
-            return updateMapping(indexId, mapping);
-        } else {
-            log.info("Index {} does not exist, creating it ...", indexId);
-            return createMapping(mapping, indexId);
+        if(mapping.isIndexCreationEnabled()) {
+            log.info("Index creation is disabled, stopping preparations!");
+            return false;
+        }
+        
+        try {
+            IndicesAdminClient indices = getClient().admin().indices();
+            String indexId = mapping.getIndex();
+            if (indices.prepareExists(indexId).get().isExists()) {
+                log.info("Index {} already exists, updating the mapping ...", indexId);
+                return updateMapping(indexId, mapping);
+            } else {
+                log.info("Index {} does not exist, creating it ...", indexId);
+                return createMapping(mapping, indexId);
+            }
+        } catch (RuntimeException e) {
+            throw new SinkError(e, "Problem preparing sink: %s", e.getMessage());
         }
     }
 
     protected boolean createMapping(MappingConfiguration mapping, String indexId) {
         IndicesAdminClient indices = getClient().admin().indices();
 
-        SchemaGenerator generator = new SchemaGeneratorImpl();
-        XContentBuilder schema = generator.generate(mapping);
+        Map<String, Object> schema = schemaGenerator.generate(mapping);
+        log.trace("Built schema creation request:\n{}", Arrays.toString(schema.entrySet().toArray()));
 
         // create metadata mapping and schema mapping
         CreateIndexResponse response = indices.prepareCreate(indexId)
                 .addMapping(MetadataDataMapping.METADATA_TYPE_NAME, getMetadataSchema())
-                .addMapping(mapping.getType(), schema)
+                .addMapping(mapping.getType(), schema) // first level elements are "dynamic" and "properties"?
+                .setSettings(mapping.getIndexCreationRequest())
                 .get();
-        log.debug("Created indices: {}", response);
+        log.debug("Created indices: {}, acknowledged: {}", response, response.isAcknowledged());
 
         Map<String, Object> mdRecord = createMetadataRecord(mapping.getVersion(), mapping.getName());
         IndexResponse mdResponse = client.prepareIndex(indexId, MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID).setSource(mdRecord).get();
+        log.debug("Saved mapping metadata '{}': {}", mdResponse.isCreated(), Arrays.toString(mdRecord.entrySet().toArray()));
 
         return (mdResponse.isCreated() && response.isAcknowledged());
     }
@@ -123,11 +132,9 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
                     version, mapping.getVersion());
         }
 
-        SchemaGenerator generator = new SchemaGeneratorImpl();
-        XContentBuilder schema = generator.generate(mapping);
+        Map<String, Object> schema = schemaGenerator.generate(mapping);
 
         UpdateResponse update = client.prepareUpdate(indexId, mapping.getType(), "1").setDoc(schema).get();
-
         Map<String, Object> updatedMetadata = createUpdatedMetadata(indexId);
         UpdateResponse mdUpdate = client.prepareUpdate(indexId, MetadataDataMapping.METADATA_TYPE_NAME, "1").setDoc(updatedMetadata).get();
 
@@ -188,7 +195,6 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
 
         properties.put("properties", mappings);
         return properties;
-
     }
 
     private void resolveParameterField(AbstractEsParameter value, Map<String, Object> map) {

@@ -73,12 +73,6 @@ public class ElasticsearchServer extends ExternalResource {
             embeddedNode.start();
             client = embeddedNode.client();
             System.out.println(String.format("### Elasticsearch server '%s' started ###", cluster));
-            System.out.println(String.format("### Elasticsearch server at '%s:%s' ###",
-                    settings.get("network.host"),
-                    settings.get("transport.http.port")));
-//        client.admin().indices().prepareDelete(AbstractStatisticsBase.ES_INDEX).get();
-
-            // TODO feed data
         }
     }
 
