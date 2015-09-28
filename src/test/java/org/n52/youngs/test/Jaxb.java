@@ -38,7 +38,7 @@ import static org.hamcrest.Matchers.isEmptyString;
 import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
-import org.n52.youngs.harvest.NamespaceContextImpl;
+import org.n52.youngs.impl.NamespaceContextImpl;
 
 /**
  * http://www.ogcnetwork.net/jaxb4ogc

@@ -41,6 +41,14 @@ public interface MappingConfiguration {
 
     public static final String DEFAULT_INDEX = "elasticsearch";
 
+    public static final boolean DEFAULT_INDEX_CREATION = false;
+
+    public static final boolean DEFAULT_DYNAMIC_MAPPING = false;
+
+    /**
+     *
+     * @return a sorted list of mapping entries, ordered by the field name
+    */
     public Collection<MappingEntry> getEntries();
 
     public String getName();
@@ -54,5 +62,13 @@ public interface MappingConfiguration {
     public String getXPathVersion();
 
     public boolean isApplicable(Document doc);
+
+    public boolean isIndexCreationEnabled();
+
+    public boolean isDynamicMappingEnabled();
+
+    public boolean hasIndexCreationRequest();
+
+    public String getIndexCreationRequest();
 
 }

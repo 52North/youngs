@@ -30,12 +30,14 @@ This project includes:
   Apache Log4j SLF4J Binding under The Apache Software License, Version 2.0
   ASM Commons under BSD
   ASM Core under BSD
+  ASM helper Minidev under The Apache Software License, Version 2.0
   ClassLoader leak prevention under Apache 2
   Commons IO under The Apache Software License, Version 2.0
   elasticsearch under The Apache Software License, Version 2.0
   Guava: Google Core Libraries for Java under The Apache Software License, Version 2.0
   Hamcrest All under New BSD License
   Hamcrest Core under New BSD License
+  Hamcrest library under New BSD License
   Jackson-annotations under The Apache Software License, Version 2.0
   Jackson-core under The Apache Software License, Version 2.0
   jackson-databind under The Apache Software License, Version 2.0
@@ -43,6 +45,9 @@ This project includes:
   javax.inject under The Apache Software License, Version 2.0
   JAXB2 Basics - Runtime under BSD-Style License
   Joda-Time under Apache 2
+  Json Path under The Apache Software License, Version 2.0
+  JSON Small and Fast Parser under The Apache Software License, Version 2.0
+  JsonPath Assert under The Apache Software License, Version 2.0
   JUnit under Eclipse Public License 1.0
   Lucene Common Analyzers under Apache 2
   Lucene Core under Apache 2

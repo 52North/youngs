@@ -16,7 +16,14 @@
  */
 package org.n52.youngs.transform.impl;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.Maps;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 import org.n52.youngs.transform.MappingEntry;
 
 /**
@@ -25,33 +32,34 @@ import org.n52.youngs.transform.MappingEntry;
  */
 public class MappingEntryImpl implements MappingEntry {
 
-    private final String xPath;
-
-    private final String fieldName;
+    private final XPathExpression xPath;
 
     private final boolean isoQueryable;
 
     private Optional<String> isoQueryableName = Optional.empty();
 
-    public MappingEntryImpl(String xPath, String fieldName, boolean isoQueryable, String isoQueryableName) {
-        this(xPath, fieldName, isoQueryable);
+    private final Map<String, Object> indexProperties = Maps.newHashMap();
+
+    public MappingEntryImpl(XPathExpression xPath, boolean isoQueryable, String isoQueryableName,
+            Map<String, Object> indexProperties) {
+        this(xPath, isoQueryable, indexProperties);
         this.isoQueryableName = Optional.ofNullable(isoQueryableName);
     }
 
-    public MappingEntryImpl(String xPath, String fieldName, boolean isoQueryable) {
+    public MappingEntryImpl(XPathExpression xPath, boolean isoQueryable, Map<String, Object> indexProperties) {
         this.xPath = xPath;
-        this.fieldName = fieldName;
         this.isoQueryable = isoQueryable;
+        this.indexProperties.putAll(indexProperties);
     }
 
     @Override
-    public String getXPath() {
+    public XPathExpression getXPath() {
         return xPath;
     }
 
     @Override
     public String getFieldName() {
-        return fieldName;
+        return (String) indexProperties.get(INDEX_NAME);
     }
 
     @Override
@@ -62,6 +70,32 @@ public class MappingEntryImpl implements MappingEntry {
     @Override
     public String getIsoQueryableName() {
         return isoQueryableName.get();
+    }
+
+    public MappingEntryImpl addIndexProperty(String key, Object value) {
+        this.indexProperties.put(key, value);
+        return this;
+    }
+
+    @Override
+    public Map<String, Object> getIndexProperties() {
+        return this.indexProperties;
+    }
+
+    @Override
+    public Object getIndexPropery(String name) {
+        return this.indexProperties.get(name);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("xpath", xPath)
+                .add("isoQueryable", isoQueryable)
+                .add("isoName", isoQueryableName)
+                .add("properties", Arrays.deepToString(indexProperties.entrySet().toArray()))
+                .omitNullValues()
+                .toString();
     }
 
 }

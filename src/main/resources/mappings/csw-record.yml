@@ -5,7 +5,11 @@ version: 1.0
 xpathversion: "2.0"
 applicable:
     xpath: "boolean(//*[local-name()='Record']) and boolean(namespace-uri(//*[local-name()='Record']) = 'http://www.opengis.net/cat/csw/2.0.2')"
-type: "record"
+type: record
+namespaces:
+    xlink: http://www.w3.org/1999/xlink
+    csw: http://www.opengis.net/cat/csw/2.0.2
+    dc: http://purl.org/dc/elements/1.1/
 #index: ""
 mappings:
     id:
@@ -42,8 +46,11 @@ mappings:
         isoqueryable: false
     date:
         xpath: "//dc:date"
-        fieldName: "abstract"
         isoqueryable: true
-        type: date
+        properties:
+            index_name: true
+            # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
+            format: "YYY-MM-DD'Z'"
+            ignore_malformed: true
     # add bbox mapping!
         

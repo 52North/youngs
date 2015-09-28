@@ -10,25 +10,15 @@ defaults:
     store: &STORE true
 namespaces:
     gmd: http://www.isotc211.org/2005/gmd
-    gco: http://www.isotc211.org/2005/gco
-    eum: http://www.eumetsat.int/2008/gmi
     gmi: http://www.isotc211.org/2005/gmi
     ogc: http://www.opengis.net/ogc
     xlink: http://www.w3.org/1999/xlink
-    fn: http://www.w3.org/TR/xpath-functions
-    str: http://exslt.org/strings
-    xdt: http://www.w3.org/2005/02/xpath-datatypes
-    xsi: http://www.w3.org/2001/XMLSchema-instance
-    xs: http://www.w3.org/2001/XMLSchema
     ows: http://www.opengis.net/ows
     csw: http://www.opengis.net/cat/csw/2.0.2
-    srv: http://www.isotc211.org/2005/srv
     dc: http://purl.org/dc/elements/1.1/
     dct: http://purl.org/dc/terms/
-    inspire_ds: http://inspire.ec.europa.eu/schemas/inspire_ds/1.0
-    inspire_c: http://inspire.ec.europa.eu/schemas/common/1.0
 index:
-    create: true
+    create: false
     # only for testing parser:
     dynamic_mapping: true
     settings: |

@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.n52.youngs.harvest;
+package org.n52.youngs.impl;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -74,6 +76,13 @@ public class NamespaceContextImpl implements NamespaceContext {
                 put("dct", "http://purl.org/dc/terms/").
                 put("inspire_ds", "http://inspire.ec.europa.eu/schemas/inspire_ds/1.0").
                 put("inspire_c", "http://inspire.ec.europa.eu/schemas/common/1.0").build());
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("namespaces", Arrays.deepToString(prefixToNamespace.entrySet().toArray()))
+                .toString();
     }
 
 }

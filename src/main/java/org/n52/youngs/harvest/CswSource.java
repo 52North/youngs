@@ -69,13 +69,15 @@ public class CswSource implements Source {
 
     private Unmarshaller unmarshaller;
 
-    public CswSource(String url) throws MalformedURLException, JAXBException {
-        this(url, DEFAULT_NAMESPACES, DEFAULT_TYPE_NAME, DEFAULT_OUTPUT_SCHEMA);
+    private NamespaceContext namespaceContext;
+
+    public CswSource(String url, NamespaceContext nsContext) throws MalformedURLException, JAXBException {
+        this(url, DEFAULT_NAMESPACES, nsContext, DEFAULT_TYPE_NAME, DEFAULT_OUTPUT_SCHEMA);
     }
 
-    public CswSource(String url, Collection<String> namespaces, String typeName,
-            String outputSchema) throws MalformedURLException, JAXBException {
-        this(new URL(url), namespaces, typeName, outputSchema);
+    public CswSource(String url, Collection<String> namespaces, NamespaceContext nsContext,
+            String typeName, String outputSchema) throws MalformedURLException, JAXBException {
+        this(new URL(url), namespaces, nsContext, typeName, outputSchema);
     }
 
     public CswSource(URL url, String namespacesParameter, String typeName,
@@ -88,12 +90,13 @@ public class CswSource implements Source {
         init();
     }
 
-    public CswSource(URL url, Collection<String> namespaces, String typeName,
-            String outputSchema) throws JAXBException {
+    public CswSource(URL url, Collection<String> namespaces, NamespaceContext nsContext,
+            String typeName, String outputSchema) throws JAXBException {
         this.url = url;
         this.typeNames = typeName;
         this.namespaces = Optional.of(namespaces);
         this.outputSchema = outputSchema;
+        this.namespaceContext = nsContext;
 
         init();
     }
@@ -169,7 +172,7 @@ public class CswSource implements Source {
 
     private String getNamespacesParameter() {
         return namespacesParameter.orElseGet(new NamespacesParameterSupplier(
-                namespaces.orElse(DEFAULT_NAMESPACES)));
+                namespaces.orElse(DEFAULT_NAMESPACES), namespaceContext));
     }
 
     private String getTypeNamesParameter() {
@@ -235,17 +238,19 @@ public class CswSource implements Source {
 
         private final Collection<String> namespaces;
 
-        public NamespacesParameterSupplier(Collection<String> namespaces) {
+        private final NamespaceContext namespaceContext;
+
+        public NamespacesParameterSupplier(Collection<String> namespaces,  NamespaceContext namespaceContext) {
             this.namespaces = namespaces;
+            this.namespaceContext = namespaceContext;
         }
 
         @Override
         public String get() {
             StringBuilder sb = new StringBuilder();
-            NamespaceContext nc = NamespaceContextImpl.create();
 
             sb.append("xmlns(");
-            Map<String, String> ns = Maps.uniqueIndex(namespaces, nc::getPrefix);
+            Map<String, String> ns = Maps.uniqueIndex(namespaces, namespaceContext::getPrefix);
             Joiner.on(";").withKeyValueSeparator("=").appendTo(sb, ns);
             sb.append(")");
 

@@ -19,13 +19,9 @@ package org.n52.youngs.transform.impl;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Objects;
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
-import org.n52.youngs.harvest.NamespaceContextImpl;
 import org.n52.youngs.load.impl.BuilderRecord;
 import org.n52.youngs.harvest.SourceRecord;
 import org.n52.youngs.harvest.NodeSourceRecord;
@@ -46,14 +42,8 @@ public class CswToBuilderMapper implements Mapper {
 
     private final MappingConfiguration mapper;
 
-    private final XPathFactory factory;
-
-    private final NamespaceContext nc;
-
     public CswToBuilderMapper(MappingConfiguration mapper) {
         this.mapper = mapper;
-        factory = XPathFactory.newInstance();
-        nc = NamespaceContextImpl.create();
     }
 
     @Override
@@ -88,9 +78,6 @@ public class CswToBuilderMapper implements Mapper {
     }
 
     private XContentBuilder mapNodeToBuilder(final Node node) throws IOException {
-        XPath xPath = factory.newXPath();
-        xPath.setNamespaceContext(nc);
-
         XContentBuilder builder = XContentFactory.jsonBuilder()
                 .humanReadable(true)
                 .prettyPrint()
@@ -102,7 +89,7 @@ public class CswToBuilderMapper implements Mapper {
 
         entries.forEach(entry -> {
             try {
-                String value = xPath.evaluate(entry.getXPath(), node);
+                String value = entry.getXPath().evaluate(node);
                 if (!value.isEmpty()) {
                     builder.field(entry.getFieldName(), value);
                     log.trace("Added field {} = {}", entry.getFieldName(), value);

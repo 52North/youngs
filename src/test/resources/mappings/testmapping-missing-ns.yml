@@ -1,0 +1,29 @@
+---
+
+name: test
+applicable:
+    xpath: "boolean(//*[local-name()='MD_Metadata']) and boolean(namespace-uri(//*[local-name()='MD_Metadata']) = 'http://www.isotc211.org/2005/gmd')"
+namespaces:
+    gmd: http://www.isotc211.org/2005/gmd
+index:
+    create: true
+    # only for testing parser:
+    dynamic_mapping: true
+    settings: |
+        index:
+            number_of_shards: 1 
+            number_of_replicas: 1
+#    settings: |
+#        '"settings" : {
+#            "index" : {
+#                "number_of_shards" : 3,
+#                "number_of_replicas" : 2
+#            }
+#        }'
+mappings:
+    id:
+        xpath: "//gmd:fileIdentifier"
+    title:
+        xpath: "//dc:title"
+    lang:
+        xpath: "//gmi:MI_Metadata/language"

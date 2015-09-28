@@ -50,7 +50,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.n52.youngs.api.Record;
 import org.n52.youngs.harvest.DirectorySource;
-import org.n52.youngs.harvest.NamespaceContextImpl;
+import org.n52.youngs.impl.NamespaceContextImpl;
 import org.n52.youngs.harvest.NodeSourceRecord;
 import org.n52.youngs.harvest.SourceRecord;
 import org.n52.youngs.load.SinkRecord;

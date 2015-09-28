@@ -33,7 +33,7 @@ import org.n52.youngs.api.Report;
 import org.n52.youngs.control.Runner;
 import org.n52.youngs.control.impl.SingleThreadBulkRunner;
 import org.n52.youngs.harvest.DirectorySource;
-import org.n52.youngs.harvest.NamespaceContextImpl;
+import org.n52.youngs.impl.NamespaceContextImpl;
 import org.n52.youngs.load.Sink;
 import org.n52.youngs.load.impl.ElasticsearchRemoteHttpSink;
 import org.n52.youngs.transform.Mapper;

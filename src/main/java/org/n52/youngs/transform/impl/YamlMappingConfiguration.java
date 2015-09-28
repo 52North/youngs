@@ -18,10 +18,15 @@ package org.n52.youngs.transform.impl;
 
 import com.github.autermann.yaml.Yaml;
 import com.github.autermann.yaml.YamlNode;
+import com.github.autermann.yaml.nodes.YamlBooleanNode;
+import com.github.autermann.yaml.nodes.YamlDecimalNode;
+import com.github.autermann.yaml.nodes.YamlIntegralNode;
 import com.github.autermann.yaml.nodes.YamlMapNode;
+import com.github.autermann.yaml.nodes.YamlTextNode;
 import com.google.common.base.Joiner;
 import org.n52.youngs.transform.MappingEntry;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,7 +34,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.xml.namespace.NamespaceContext;
@@ -39,6 +47,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.n52.youngs.exception.MappingError;
+import org.n52.youngs.impl.NamespaceContextImpl;
 import org.n52.youngs.transform.MappingConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +60,7 @@ public class YamlMappingConfiguration implements MappingConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(YamlMappingConfiguration.class);
 
-    Collection<MappingEntry> entries = Lists.newArrayList();
+    List<MappingEntry> entries = Lists.newArrayList();
 
     private String xPathVersion;
 
@@ -59,13 +68,19 @@ public class YamlMappingConfiguration implements MappingConfiguration {
 
     private String name;
 
-    private static XPathFactory factory = XPathFactory.newInstance();
+    private static XPathFactory xpathFactory = XPathFactory.newInstance();
 
     private Optional<XPathExpression> applicability;
 
-    private final String type;
+    private String type;
 
-    private final String index;
+    private String index;
+
+    private boolean indexCreationEnabled;
+
+    private boolean dynamicMappingEnabled;
+
+    private Optional<String> indexCreationRequest = Optional.empty();
 
     public YamlMappingConfiguration(File file, NamespaceContext nsContext) throws FileNotFoundException {
         this(new FileInputStream(file), nsContext);
@@ -83,6 +98,46 @@ public class YamlMappingConfiguration implements MappingConfiguration {
         YamlNode configurationNodes = yaml.load(input);
         log.trace("Read configuration file with the root elements {}", Joiner.on(" ").join(configurationNodes));
 
+        parse(configurationNodes, nsContext);
+
+        log.info("Created configuration from stream {} with {} entries", input, entries.size());
+    }
+
+    public YamlMappingConfiguration(String fileName) throws IOException {
+        this(Resources.asByteSource(Resources.getResource(fileName)).openStream());
+        log.info("Created configuration from filename {}", fileName);
+    }
+
+    public YamlMappingConfiguration(InputStream input) {
+        Yaml yaml = new Yaml();
+        YamlNode configurationNodes = yaml.load(input);
+        log.trace("Read configuration file with the root elements {}", Joiner.on(" ").join(configurationNodes));
+
+        NamespaceContext nsContext = parseNamespaceContext(configurationNodes);
+        parse(configurationNodes, nsContext);
+
+        log.info("Created configuration from stream {} with {} entries", input, entries.size());
+    }
+
+    private NamespaceContext parseNamespaceContext(YamlNode configurationNodes) {
+        if (configurationNodes.hasNotNull("namespaces")) {
+            Map<String, String> nsMap = Maps.newHashMap();
+
+            final YamlMapNode valueMap = configurationNodes.path("namespaces").asMap();
+            valueMap.entries().stream().forEach(
+                    (Entry<YamlNode, YamlNode> e) -> {
+                        nsMap.put(e.getKey().asTextValue(), e.getValue().asTextValue());
+                    });
+
+            NamespaceContext nsc = new NamespaceContextImpl(nsMap);
+            log.trace("Created namespace context from mapping configuration: {}", nsc);
+            return nsc;
+        } else {
+            throw new MappingError("Mapping must containg 'namespaces' map or namespaces must be provided in constructor.");
+        }
+    }
+
+    private void parse(YamlNode configurationNodes, NamespaceContext nsContext) {
         // read the entries from the config file
         this.name = configurationNodes.path("name").asTextValue(DEFAULT_NAME);
         this.version = configurationNodes.path("version").asIntValue(DEFAULT_VERSION);
@@ -90,7 +145,16 @@ public class YamlMappingConfiguration implements MappingConfiguration {
         this.type = configurationNodes.path("type").asTextValue(DEFAULT_TYPE);
         this.index = configurationNodes.path("index").asTextValue(DEFAULT_INDEX);
 
-        XPath path = factory.newXPath();
+        if (configurationNodes.hasNotNull("index")) {
+            YamlNode indexField = configurationNodes.get("index");
+            this.indexCreationEnabled = indexField.path("create").asBooleanValue(DEFAULT_INDEX_CREATION);
+            this.dynamicMappingEnabled = indexField.path("dynamic_mapping").asBooleanValue(DEFAULT_DYNAMIC_MAPPING);
+            if (indexField.hasNotNull("settings")) {
+                this.indexCreationRequest = Optional.of(indexField.get("settings").asTextValue());
+            }
+        }
+
+        XPath path = xpathFactory.newXPath();
         path.setNamespaceContext(nsContext);
         try {
             String applicabilityXPath = configurationNodes.path("applicable.xpath").asTextValue(DEFAULT_APPLICABILITY_PATH);
@@ -99,29 +163,83 @@ public class YamlMappingConfiguration implements MappingConfiguration {
             log.error("Could not compile applicability xpath, will always evalute to true", e);
         }
 
-        YamlMapNode mappingsNode = configurationNodes.path("mappings").asMap();
-        this.entries = mappingsNode.entries().stream()
-                .map(entry -> {
-                    MappingEntry e = createEntry(entry.getKey().asTextValue(),
-                            entry.getValue());
-                    return e;
-                })
-                .collect(Collectors.toList());
+        if (configurationNodes.hasNotNull("mappings")) {
+            YamlMapNode mappingsNode = configurationNodes.path("mappings").asMap();
+            this.entries = Lists.newArrayList();
+            for (Entry<YamlNode, YamlNode> entry : mappingsNode.entries()) { // use old-style lood to forward exception
+                MappingEntry e = createEntry(entry.getKey().asTextValue(),
+                        entry.getValue(), nsContext);
+                log.trace("Created entry: {}", e);
+                this.entries.add(e);
+            }
 
-        log.info("Created configuration from stream {} with {} entries", input, entries.size());
+            // sort list by field name
+            Collections.sort(entries, (me1, me2) -> {
+                return me1.getFieldName().compareTo(me2.getFieldName());
+            });
+        }
     }
 
-    private MappingEntry createEntry(String id, YamlNode node) {
+    private MappingEntry createEntry(String id, YamlNode node, NamespaceContext nsContext) throws MappingError {
         log.trace("Parsing mapping '{}'", id);
         if (node instanceof YamlMapNode) {
             YamlMapNode mapNode = (YamlMapNode) node;
-            return new MappingEntryImpl(mapNode.path("xpath").asTextValue(),
-                    mapNode.path("fieldName").asTextValue(),
-                    mapNode.path("isoqueryable").asBooleanValue(false),
-                    mapNode.path("isoqueryableName").asTextValue(null));
+            Map<String, Object> indexProperties = createIndexProperties(id, node);
+
+            XPath xPath = xpathFactory.newXPath();
+            xPath.setNamespaceContext(nsContext);
+            String expression = mapNode.path("xpath").asTextValue();
+            try {
+                XPathExpression compiledExpression = xPath.compile(expression);
+                return new MappingEntryImpl(compiledExpression,
+                        mapNode.path("isoqueryable").asBooleanValue(false),
+                        mapNode.path("isoqueryableName").asTextValue(null),
+                        indexProperties);
+            } catch (XPathExpressionException e) {
+                log.error("Could not create XPath for provided expression '{}'", expression, e);
+                throw new MappingError(e, "Could not create XPath for provided expression '%s' in field %s",
+                        expression, id);
+            }
         }
         throw new MappingError("The provided node class %s is not supported in the mapping '{}': %s",
                 node.getClass().toString(), id, node.toString());
+    }
+
+    private Map<String, Object> createIndexProperties(String id, YamlNode node) {
+        Map<String, Object> props = Maps.newHashMap();
+
+        if (node.hasNotNull("properties")) {
+            final YamlMapNode valueMap = node.path("properties").asMap();
+            Map<YamlNode, YamlNode> indexProperties = valueMap.entries().stream().collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+
+            indexProperties.forEach((YamlNode k, YamlNode v) -> {
+                log.trace("Adding property {} = {}, type: {}", k, v, v.getClass());
+                String key = k.asTextValue();
+                Optional<Object> value = Optional.empty();
+                if (v instanceof YamlBooleanNode) {
+                    value = Optional.of(v.asBooleanValue());
+                } else if (v instanceof YamlTextNode) {
+                    value = Optional.of(v.asTextValue());
+                } else if (v instanceof YamlDecimalNode) {
+                    value = Optional.of(v.asDoubleValue());
+                } else if (v instanceof YamlIntegralNode) {
+                    value = Optional.of(v.asLongValue());
+                }
+
+                if (value.isPresent()) {
+                    props.put(key, value.get());
+                } else {
+                    log.error("Could not parse property {}={} because of unhandled type {}", k, v, v.getClass());
+                }
+            });
+        }
+
+        // handle defaulting to parent node name for id
+        if (!props.containsKey(MappingEntry.INDEX_NAME)) {
+            props.put(MappingEntry.INDEX_NAME, id);
+        }
+
+        return props;
     }
 
     @Override
@@ -170,6 +288,26 @@ public class YamlMappingConfiguration implements MappingConfiguration {
         }
 
         return result;
+    }
+
+    @Override
+    public boolean isIndexCreationEnabled() {
+        return indexCreationEnabled;
+    }
+
+    @Override
+    public boolean isDynamicMappingEnabled() {
+        return dynamicMappingEnabled;
+    }
+
+    @Override
+    public boolean hasIndexCreationRequest() {
+        return indexCreationRequest.isPresent();
+    }
+
+    @Override
+    public String getIndexCreationRequest() {
+        return indexCreationRequest.get();
     }
 
 }
