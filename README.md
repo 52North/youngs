@@ -126,6 +126,11 @@ mappings:
 ```
 
 
+### General notes
+
+* If an XPath expression yields multiple results, the corresponding field will contain an array.
+ 
+
 ### Schema creation and insertion
 
 Youngs will create an Elasticsearch schema based on the mapping file and insert the schema into an Elasticsearch node before inserting the records. This can be controlled in the mappings file:
@@ -144,8 +149,8 @@ After insertion, you can inspect the inserted schema using the [Mapping API](htt
 
 Youngs creates a second type `mt` to hold metadata for when and which mapping was inserted.
 
-* `curl -XGET 'http://localhost:9200/testindex/_mapping/mt'` shows the metadata of the currently inserted schema (just change index name as neccessary)
-* `curl -XGET 'http://localhost:9200/testindex/_mapping/mt'` shows the mapping for the metadata schema
+* `curl -XGET 'http://localhost:9200/<indexname>/mt/1'` shows the metadata of the currently inserted schema (just change index name as neccessary)
+* `curl -XGET 'http://localhost:9200/<indexname>/_mapping/mt'` shows the mapping for the metadata schema
 
 
 ## Development

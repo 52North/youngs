@@ -33,6 +33,8 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.update.UpdateResponse;
@@ -133,22 +135,36 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
 
     protected boolean updateMapping(String indexId, MappingConfiguration mapping) throws SinkError {
         double version = getCurrentVersion(indexId);
-        log.info("Existing mapping version is {}", version);
+        log.info("Existing mapping version is {}, vs. c version {}", version, mapping.getVersion());
         if (version < 0) {
-            throw new ConfigurationError("Database inconsistency. Metadata version not found in type %s", MetadataDataMapping.METADATA_TYPE_NAME);
+            throw new SinkError("Database inconsistency. Metadata version not found in type %s", MetadataDataMapping.METADATA_TYPE_NAME);
         }
         if (version != mapping.getVersion()) {
             throw new SinkError("Database schema version inconsistency. Version numbers don't match. Database version number %d != mapping version number %d",
                     version, mapping.getVersion());
         }
 
+        // schema can be updated
         Map<String, Object> schema = schemaGenerator.generate(mapping);
 
-        UpdateResponse update = client.prepareUpdate(indexId, mapping.getType(), "1").setDoc(schema).get();
-        Map<String, Object> updatedMetadata = createUpdatedMetadata(indexId);
-        UpdateResponse mdUpdate = client.prepareUpdate(indexId, MetadataDataMapping.METADATA_TYPE_NAME, "1").setDoc(updatedMetadata).get();
+        PutMappingRequestBuilder request = client.admin().indices()
+                .preparePutMapping(indexId)
+                .setType(mapping.getType())
+                .setSource(schema);
+        PutMappingResponse updateMappingResponse = request.get();
+        log.info("Update mapping of type {} acknowledged: {}", mapping.getType(), updateMappingResponse.isAcknowledged());
+        if (!updateMappingResponse.isAcknowledged()) {
+            log.error("Problem updating mapping for type {}", mapping.getType());
+        }
 
-        return (mdUpdate.isCreated() && update.isCreated());
+        Map<String, Object> updatedMetadata = createUpdatedMetadata(indexId);
+        UpdateResponse mdUpdate = client.prepareUpdate(indexId, MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID)
+                .setDoc(updatedMetadata).get();
+        log.info("Update metadata record created: {}, exists: {} | id = {} @ {}/{}",
+                mdUpdate.isCreated(), mdUpdate.getId(), mdUpdate.getIndex(), mdUpdate.getType());
+
+        return (mdUpdate.getId().equals(MetadataDataMapping.METADATA_ROW_ID) 
+                && updateMappingResponse.isAcknowledged());
     }
 
     private double getCurrentVersion(String indexId) {

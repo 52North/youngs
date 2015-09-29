@@ -27,22 +27,28 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.NamespaceContext;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.stream.StreamSource;
+import net.opengis.csw.v_2_0_2.AbstractRecordType;
 import net.opengis.csw.v_2_0_2.GetRecordsResponseType;
 import org.apache.http.client.fluent.Request;
 import org.elasticsearch.common.collect.Lists;
-import org.n52.youngs.api.Record;
 import org.n52.youngs.impl.ContextHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
@@ -126,6 +132,47 @@ public class CswSource implements Source {
         log.debug("Requesting {} records from catalog starting at {}", maxRecords, startPosition);
         Collection<SourceRecord> records = Lists.newArrayList();
 
+        String recordsRequest = createRequest(startPosition, maxRecords);
+        log.trace("GetRecords request: {}", recordsRequest);
+
+        try {
+            InputStream response = Request.Get(recordsRequest).execute().returnContent().asStream();
+
+            JAXBElement<GetRecordsResponseType> jaxb_response = unmarshaller.unmarshal(new StreamSource(response),
+                    GetRecordsResponseType.class);
+            BigInteger numberOfRecordsReturned = jaxb_response.getValue().getSearchResults().getNumberOfRecordsReturned();
+            log.debug("Got response with {} records", numberOfRecordsReturned);
+
+            List<Object> nodes = jaxb_response.getValue().getSearchResults().getAny();
+            if (!nodes.isEmpty()) {
+                log.trace("Found {} \"any\" nodes.", nodes.size());
+                nodes.stream()
+                        .filter(n -> n instanceof Node)
+                        .map(n -> (Node) n)
+                        .map(n -> new NodeSourceRecord(n))
+                        .forEach(records::add);
+            }
+
+            List<JAXBElement<? extends AbstractRecordType>> jaxb_records = jaxb_response.getValue().getSearchResults().getAbstractRecord();
+            if (!jaxb_records.isEmpty()) {
+                log.trace("Found {} \"AbstractRecordType\" records.", jaxb_records.size());
+                DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                jaxb_records.stream()
+                        .map(type -> {
+                            return getNode(type, context, db);
+                        })
+                        .filter(Objects::nonNull)
+                        .map(n -> new NodeSourceRecord(n))
+                        .forEach(records::add);
+            }
+        } catch (IOException | JAXBException | ParserConfigurationException e) {
+            log.error("Could not retrieve records using url {}", recordsRequest, e);
+        }
+
+        return records;
+    }
+
+    private String createRequest(long startPosition, long maxRecords) {
         // http://api.eurogeoss-broker.eu/dab/services/cswiso?service=CSW&version=2.0.2&request=GetRecords&namespace=xmlns(gmd=http://www.isotc211.org/2005/gmd)&typeNames=gmd:MD_Metadata&ElementSetName=full&resultType=results&maxRecords=10&outputSchema=http://www.isotc211.org/2005/gmd
         StringBuilder recordsRequest = new StringBuilder();
         recordsRequest.append(url);
@@ -142,32 +189,24 @@ public class CswSource implements Source {
         String parameters = Joiner.on("&").withKeyValueSeparator("=").join(
                 ImmutableMap.of("namespace", getNamespacesParameter(),
                         "typeNames", getTypeNamesParameter(),
-                        "outputSchema", getOutputSchemaParameter()));
+                        "outputSchema", getOutputSchemaParameter(),
+                        "startPosition", startPosition,
+                        "maxRecords", maxRecords));
         recordsRequest.append("&").append(parameters);
+        return recordsRequest.toString();
+    }
 
+    private Node getNode(JAXBElement<? extends AbstractRecordType> record, JAXBContext context, DocumentBuilder db) {
         try {
-            log.trace("GetRecords request: {}", recordsRequest);
-            InputStream response = Request.Get(recordsRequest.toString()).execute().returnContent().asStream();
-
-            JAXBElement<GetRecordsResponseType> jaxb_response = unmarshaller.unmarshal(new StreamSource(response),
-                    GetRecordsResponseType.class);
-            BigInteger numberOfRecordsReturned = jaxb_response.getValue().getSearchResults().getNumberOfRecordsReturned();
-            log.trace("Got response with {} records", numberOfRecordsReturned);
-
-            List<Object> nodes = jaxb_response.getValue().getSearchResults().getAny();
-
-            nodes.stream()
-                    .filter(n -> n instanceof Node)
-                    .map(n -> (Node) n)
-                    .map(n -> new NodeSourceRecord(n))
-                    .forEach(records::add);
-        } catch (IOException e) {
-            log.error("Could not retrieve record count using url {}", recordsRequest, e);
-        } catch (JAXBException ex) {
-            java.util.logging.Logger.getLogger(CswSource.class.getName()).log(Level.SEVERE, null, ex);
+            Document document = db.newDocument();
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.marshal(record, document);
+            Element elem = document.getDocumentElement();
+            return elem;
+        } catch (JAXBException e) {
+            log.warn("Error getting node from record {}: {} > {}", record, e, e.getMessage());
+            return null;
         }
-
-        return records;
     }
 
     private String getNamespacesParameter() {
@@ -240,7 +279,7 @@ public class CswSource implements Source {
 
         private final NamespaceContext namespaceContext;
 
-        public NamespacesParameterSupplier(Collection<String> namespaces,  NamespaceContext namespaceContext) {
+        public NamespacesParameterSupplier(Collection<String> namespaces, NamespaceContext namespaceContext) {
             this.namespaces = namespaces;
             this.namespaceContext = namespaceContext;
         }

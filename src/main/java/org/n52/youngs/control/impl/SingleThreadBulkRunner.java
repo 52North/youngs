@@ -65,7 +65,9 @@ public class SingleThreadBulkRunner implements Runner {
 
     private Sink sink;
 
-    private final boolean testRun = true;
+    private final boolean testRun = false;
+    
+    private long startPosition = 1;
 
     public SingleThreadBulkRunner() {
         //
@@ -73,6 +75,11 @@ public class SingleThreadBulkRunner implements Runner {
 
     public SingleThreadBulkRunner setBulkSize(long bulkSize) {
         this.bulkSize = bulkSize;
+        return this;
+    }
+    
+    public SingleThreadBulkRunner setStartPosition(long startPosition) {
+        this.startPosition = startPosition;
         return this;
     }
 
@@ -100,9 +107,9 @@ public class SingleThreadBulkRunner implements Runner {
         this.sink = sink;
         Objects.nonNull(source);
         Objects.nonNull(mapper);
-        Objects.nonNull(sink);
+        Objects.nonNull(this.sink);
 
-        log.info("Starting harvest from {} to {} with {}", source, sink, mapper);
+        log.info("Starting harvest from {} to {} with {}", source, this.sink, mapper);
         Report report = new ReportImpl();
 
         try {
@@ -119,28 +126,44 @@ public class SingleThreadBulkRunner implements Runner {
             report.addMessage(String.format("Problem preparing sink: %s", e.getMessage()));
             return report;
         }
+
         final Stopwatch timer = Stopwatch.createStarted();
-
         ExecutorService executor = Executors.newSingleThreadExecutor();
+        long counter = startPosition;
+        long limit = Math.min(recordsLimit + startPosition, source.getRecordCount());
 
-        long counter = 1;
-
-        while (counter <= Math.min(recordsLimit, source.getRecordCount())) {
-            long recordsLeft = source.getRecordCount() - counter;
+        while (counter <= limit) {
+            long recordsLeft = limit - counter;
             long size = Math.min(recordsLeft, bulkSize);
+            log.info("Requesting {} of {} records from {} starting at {}",
+                    size, limit, source.getEndpoint(), counter);
 
-            log.info("Requesting {} of {} records from {} starting at {}", size, source.getRecordCount(), source.getEndpoint(), counter);
-            Collection<SourceRecord> records = source.getRecords(counter, size);
-            log.debug("Mapping {} retrieved records.", records.size());
+            try {
+                Collection<SourceRecord> records = source.getRecords(counter, size);
 
-            List<SinkRecord> mappedRecords = records.stream()
-                    .map(mapper::map)
-                    .collect(Collectors.toList());
+                log.debug("Mapping {} retrieved records.", records.size());
+                List<SinkRecord> mappedRecords = records.stream()
+                        .map(mapper::map)
+                        .collect(Collectors.toList());
 
-            if (!testRun) {
-                sink.store(mappedRecords);
-            } else {
-                log.info("TESTRUN, created documents are:\n{}", Arrays.toString(mappedRecords.toArray()));
+                log.debug("Storing {} mapped records.", mappedRecords.size());
+                if (!testRun) {
+                    mappedRecords.forEach(record -> {
+                        boolean result = sink.store(record);
+                        if (result) {
+                            report.addSuccessfulRecord(record.getId());
+                        } else {
+                            report.addFailedRecord(record.getId(), "see Sink log");
+                        }
+                    });
+                } else {
+                    log.info("TESTRUN, created documents are:\n{}", Arrays.toString(mappedRecords.toArray()));
+                }
+
+            } catch (RuntimeException e) {
+                String msg = String.format("Problem processing records %s to %s: %s", counter, size, e.getMessage());
+                log.error(msg, e);
+                report.addMessage(msg);
             }
 
             counter += bulkSize;
@@ -177,9 +200,12 @@ public class SingleThreadBulkRunner implements Runner {
     }
 
     private void updateCompletedPercentage(long counter) {
-        double percentage = (double) counter / source.getRecordCount();
-        this.completedPercentage = Optional.of(percentage);
-        log.info("Completed {}%", String.format("%1$,.5f", this.completedPercentage.get()));
+        double percentageTask = (double) counter / this.recordsLimit * 100;
+        double percentageOverall = (double) counter / source.getRecordCount() * 100;
+        this.completedPercentage = Optional.of(percentageTask);
+        log.info("Completed {}% of task [which is {}% overall]",
+                String.format("%1$,.5f", this.completedPercentage.get()),
+                String.format("%1$,.5f", percentageOverall));
     }
 
 }

@@ -44,14 +44,17 @@ public class Main {
     public static void main(String[] args) throws Exception {
         // http://api.eurogeoss-broker.eu/dab/services/cswiso?service=CSW&version=2.0.2&request=GetCapabilities
         Source source = new CswSource("http://api.eurogeoss-broker.eu/dab/services/cswiso",
-                Collections.singleton("http://www.isotc211.org/2005/gmd"),
+//                Collections.singleton("http://www.isotc211.org/2005/gmd"),
+                Collections.singleton("http://www.opengis.net/cat/csw/2.0.2"),
                 NamespaceContextImpl.create(),
-                "gmd:MD_Metadata",
-                "http://www.isotc211.org/2005/gmd");
+//                "gmd:MD_Metadata",
+//                "http://www.isotc211.org/2005/gmd");
+                "csw:Record",
+                "http://www.opengis.net/cat/csw/2.0.2");
 
         MappingConfiguration configuration = new YamlMappingConfiguration(
-                Resources.asByteSource(Resources.getResource("mappings/geoss-dab.yml")).openStream(),
-                NamespaceContextImpl.create(), new XPathHelper().newXPathFactory());
+                Resources.asByteSource(Resources.getResource("mappings/csw-record.yml")).openStream(),
+                new XPathHelper().newXPathFactory());
         Mapper mapper = new CswToBuilderMapper(configuration);
 
         String host = "localhost";
@@ -62,13 +65,14 @@ public class Main {
         Sink sink = new ElasticsearchRemoteHttpSink(host, port, cluster, index, type);
 
         Runner runner = new SingleThreadBulkRunner()
-                .setBulkSize(12)
-                .setRecordsLimit(50)
+                .setBulkSize(20)
+                .setRecordsLimit(2000)
+                .setStartPosition(100)
                 .harvest(source)
                 .transform(mapper);
         Report report = runner.load(sink);
 
-        log.info("Done: {}", report);
+        log.info("Done:\n{}", report);
     }
 
 }
