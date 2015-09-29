@@ -19,12 +19,12 @@ package org.n52.youngs.load.impl;
 import java.security.InvalidParameterException;
 import java.util.Collection;
 import java.util.Objects;
+import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.n52.youngs.api.Record;
 import org.n52.youngs.load.SchemaGenerator;
 import org.n52.youngs.load.Sink;
+import org.n52.youngs.load.SinkRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,30 +57,37 @@ public abstract class ElasticsearchSink implements Sink {
     }
 
     @Override
-    public boolean store(Record record) {
+    public boolean store(SinkRecord record) {
+        log.trace("Storing record: {}", record);
         Objects.nonNull(record);
 
         if (record instanceof BuilderRecord) {
             BuilderRecord builderRecord = (BuilderRecord) record;
-
-            XContentBuilder builder = builderRecord.getBuilder();
-
             Client client = getClient();
 
             log.trace("Indexing record: {}", record);
-            IndexResponse response = client.prepareIndex(index, type).setSource(builder).execute().actionGet();
-            log.trace("Got index reponse: {}", response);
+            IndexRequestBuilder request = client.prepareIndex(index, type)
+                    .setSource(builderRecord.getBuilder());
+            if (record.hasId()) {
+                request.setId(builderRecord.getId());
+            }
+
+            IndexResponse response = request.execute().actionGet();
+            log.trace("Created [{}] with id {} @ {}/{}, version {}", response.isCreated(),
+                    response.getId(), response.getIndex(), response.getType(), response.getVersion());
 
             return true;
         } else {
-            throw new InvalidParameterException("The provided record is not supported");
+            throw new InvalidParameterException(
+                    String.format("The provided record class '%s' is not supported", record.getClass()));
         }
     }
 
     @Override
-    public void store(Collection<Record> records) {
+    public boolean store(Collection<SinkRecord> records) {
         // TODO evaluate parallelStream()
-        records.stream().forEach(this::store);
+        long addedRecords = records.stream().map(this::store).filter(b -> b).count();
+        return addedRecords == records.size();
     }
 
     public ElasticsearchSink setSchemaGenerator(SchemaGenerator sg) {

@@ -16,9 +16,14 @@
  */
 package org.n52.youngs.transform.impl;
 
+import com.google.common.collect.Sets;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
@@ -31,6 +36,7 @@ import org.n52.youngs.transform.MappingEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -62,9 +68,9 @@ public class CswToBuilderMapper implements Mapper {
         if (source instanceof NodeSourceRecord) {
             try {
                 NodeSourceRecord object = (NodeSourceRecord) source;
-                XContentBuilder builder = mapNodeToBuilder(object.getRecord());
+                IdAndBuilder mappedRecord = mapNodeToBuilder(object.getRecord());
 
-                record = new BuilderRecord(builder);
+                record = new BuilderRecord(mappedRecord.id, mappedRecord.builder);
                 return record;
             } catch (IOException e) {
                 log.warn("Error mapping the source {}", source, e);
@@ -77,7 +83,7 @@ public class CswToBuilderMapper implements Mapper {
         return record;
     }
 
-    private XContentBuilder mapNodeToBuilder(final Node node) throws IOException {
+    private IdAndBuilder mapNodeToBuilder(final Node node) throws IOException {
         XContentBuilder builder = XContentFactory.jsonBuilder()
                 .humanReadable(true)
                 .prettyPrint()
@@ -87,14 +93,68 @@ public class CswToBuilderMapper implements Mapper {
         Collection<MappingEntry> entries = mapper.getEntries();
         log.trace("Mapping node {} using {} entries", node, entries.size());
 
+        String id = null;
+        try {
+            Optional<MappingEntry> idEntry = entries.stream().filter(MappingEntry::isIdentifier).findFirst();
+            if (idEntry.isPresent()) {
+                id = idEntry.get().getXPath().evaluate(node);
+                log.trace("Found id for node: {}", id);
+            }
+        } catch (XPathExpressionException e) {
+            log.warn("Error selecting id field from node", e);
+        }
+
         entries.forEach(entry -> {
+            log.trace("Applying field mapping '{}' to {}", entry.getFieldName(), node);
+
             try {
-                String value = entry.getXPath().evaluate(node);
-                if (!value.isEmpty()) {
-                    builder.field(entry.getFieldName(), value);
-                    log.trace("Added field {} = {}", entry.getFieldName(), value);
+                Object evalutationResult = entry.getXPath().evaluate(node, XPathConstants.NODESET);
+                if (evalutationResult instanceof String) {
+                    String valueString = (String) evalutationResult;
+                    if (!valueString.isEmpty()) {
+                        builder.field(entry.getFieldName(), valueString);
+                        log.trace("Added field {} = {}", entry.getFieldName(), valueString);
+                    }
+                } else if (evalutationResult instanceof NodeList) {
+                    NodeList nodeList = (NodeList) evalutationResult;
+                    Optional<Object> value = Optional.empty();
+
+                    if (nodeList.getLength() < 1) {
+                        log.debug("Evaluation returned no results for entry {} in {}", entry.getFieldName(), node);
+                    } else {
+                        Set<String> contents = Sets.newHashSet();
+                        for (int i = 0; i < nodeList.getLength(); i++) {
+                            Node n = nodeList.item(i);
+                            String textContent = n.getTextContent();
+                            if (!textContent.isEmpty()) {
+                                contents.add(textContent);
+                            }
+                        }
+
+                        log.trace("{} evaluation result(s): {} = {}", contents.size(),
+                                entry.getFieldName(), Arrays.toString(contents.toArray()));
+
+                        if (contents.size() == 1) {
+                            value = Optional.of(contents.iterator().next());
+                            log.trace("Adding field {} = '{}'", entry.getFieldName(), value.get());
+                        }
+                        if (contents.size() > 1) {
+                            value = Optional.of(contents.toArray());
+                            log.trace("Adding array field ({} values) {} = {}", contents.size(), entry.getFieldName(),
+                                    Arrays.toString(contents.toArray()));
+                        }
+                    }
+
+                    if (value.isPresent()) {
+                        builder.field(entry.getFieldName(), value.get());
+                    }
+                    else {
+                        log.trace("No result found for field {} in {}", entry.getFieldName(), node);
+                    }
+                } else {
+                    log.debug("Unsupported evalutation result: {}", evalutationResult);
                 }
-                log.trace("Not adding empty field {}", entry.getFieldName());
+
             } catch (XPathExpressionException | IOException e) {
                 log.warn("Error selecting fields from node", e);
             }
@@ -103,10 +163,22 @@ public class CswToBuilderMapper implements Mapper {
         builder.endObject();
         builder.close();
 
-        log.trace("Created content:\n{}", builder.string());
+        log.trace("Created content for id '{}':\n{}", id, builder.string());
 
-        return builder;
+        return new IdAndBuilder(id, builder);
+    }
 
+    private static class IdAndBuilder {
+
+        protected final String id;
+
+        protected final XContentBuilder builder;
+
+        public IdAndBuilder(String id, XContentBuilder builder) {
+            Objects.nonNull(builder);
+            this.id = id;
+            this.builder = builder;
+        }
     }
 
 }

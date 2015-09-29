@@ -30,14 +30,9 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.hamcrest.CoreMatchers;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -45,7 +40,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.n52.youngs.api.Record;
@@ -54,7 +48,6 @@ import org.n52.youngs.impl.NamespaceContextImpl;
 import org.n52.youngs.harvest.NodeSourceRecord;
 import org.n52.youngs.harvest.SourceRecord;
 import org.n52.youngs.impl.XPathHelper;
-import org.n52.youngs.load.SinkRecord;
 import org.n52.youngs.load.impl.BuilderRecord;
 import org.n52.youngs.transform.Mapper;
 import org.n52.youngs.transform.MappingConfiguration;
@@ -107,7 +100,7 @@ public class DirectorySourceTest {
     @Test
     public void testCswRecordsDirectory() throws IOException {
         DirectorySource source = new DirectorySource(baseDirectory.resolve("csw"));
-        Collection<Record> records = source.getRecords();
+        Collection<SourceRecord> records = source.getRecords();
         assertThat("correct number of records returned", records.size(), is(equalTo(12)));
 
         Set<Boolean> isNodeRecord = records.stream().map(r -> {
@@ -115,7 +108,7 @@ public class DirectorySourceTest {
         }).collect(Collectors.toSet());
         assertThat("all records are NodeSourceRecords", isNodeRecord, is(equalTo(Sets.newHashSet(true))));
 
-        Iterator<Record> iter = records.iterator();
+        Iterator<SourceRecord> iter = records.iterator();
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map((SourceRecord) iter.next());
         String mappedRecordString = mappedRecord.getBuilder().string();
 
@@ -125,7 +118,7 @@ public class DirectorySourceTest {
     @Test
     public void testPagination() {
         DirectorySource source = new DirectorySource(baseDirectory.resolve("csw"));
-        Collection<Record> records = source.getRecords(2, 9);
+        Collection<SourceRecord> records = source.getRecords(2, 9);
 
         String allMappedRecordsString = Util.sourceRecordsToString(records, cswMapper);
 
@@ -142,7 +135,7 @@ public class DirectorySourceTest {
     @Test
     public void testPaginationUpperBound() {
         DirectorySource source = new DirectorySource(baseDirectory.resolve("csw"));
-        Collection<Record> records = source.getRecords(12, 100);
+        Collection<SourceRecord> records = source.getRecords(12, 100);
 
         String allMappedRecordsString = Util.sourceRecordsToString(records, cswMapper);
 

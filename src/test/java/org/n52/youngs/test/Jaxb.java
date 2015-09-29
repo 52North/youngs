@@ -63,7 +63,7 @@ public class Jaxb {
 
     @Before
     public void loadResponse() throws IOException {
-        getRecordsResponse = Resources.asByteSource(Resources.getResource("responses/dab-getrecords.xml"));
+        getRecordsResponse = Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml"));
     }
 
     @Test

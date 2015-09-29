@@ -1,22 +1,10 @@
 ---
-
 name: test
-version: 42
-xpathversion: 2.0
-applicable:
-    xpath: "boolean(//*[local-name()='MD_Metadata']) and boolean(namespace-uri(//*[local-name()='MD_Metadata']) = 'http://www.isotc211.org/2005/gmd')"
-type: testrecord
 defaults:
     store: &STORE true
 namespaces:
     gmd: http://www.isotc211.org/2005/gmd
     gmi: http://www.isotc211.org/2005/gmi
-    ogc: http://www.opengis.net/ogc
-    xlink: http://www.w3.org/1999/xlink
-    ows: http://www.opengis.net/ows
-    csw: http://www.opengis.net/cat/csw/2.0.2
-    dc: http://purl.org/dc/elements/1.1/
-    dct: http://purl.org/dc/terms/
 index:
     create: false
     # only for testing parser:
@@ -43,7 +31,7 @@ mappings:
             #index_name: "id"
             boost: 2.0
     title:
-        xpath: "//title"
+        xpath: "//gmd:title"
         isoqueryable: false
         properties:
             store: *STORE

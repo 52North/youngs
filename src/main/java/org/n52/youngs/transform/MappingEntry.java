@@ -23,7 +23,7 @@ import javax.xml.xpath.XPathExpression;
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public interface  MappingEntry {
+public interface MappingEntry {
 
     public static final String INDEX_NAME = "index_name";
 
@@ -38,5 +38,7 @@ public interface  MappingEntry {
     public Map<String, Object> getIndexProperties();
 
     public Object getIndexPropery(String name);
+
+    public boolean isIdentifier();
 
 }

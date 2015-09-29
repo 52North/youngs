@@ -21,31 +21,22 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.commons.io.FileUtils;
-import org.elasticsearch.cluster.settings.Validator;
-import org.elasticsearch.common.collect.Lists;
 import org.n52.youngs.api.Record;
 import org.n52.youngs.exception.SourceError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class DirectorySource implements Source {
@@ -56,7 +47,7 @@ public class DirectorySource implements Source {
 
     private final Path directory;
 
-    private Optional<List<Record>> records = Optional.empty();
+    private Optional<List<SourceRecord>> records = Optional.empty();
 
     private FileFilter filter;
 
@@ -95,13 +86,13 @@ public class DirectorySource implements Source {
     }
 
     @Override
-    public Collection<Record> getRecords() {
+    public Collection<SourceRecord> getRecords() {
         return readRecordsFromDirectory();
     }
 
     @Override
-    public Collection<Record> getRecords(long startPosition, long maxRecords) {
-        List<Record> sorted = readRecordsFromDirectory();
+    public Collection<SourceRecord> getRecords(long startPosition, long maxRecords) {
+        List<SourceRecord> sorted = readRecordsFromDirectory();
         int calculatedEnd = (int) (startPosition + maxRecords);
         return sorted.subList((int) (startPosition - 1), // java starts at 0
                 Math.min(sorted.size(), calculatedEnd)); // end is exclusive
@@ -111,15 +102,15 @@ public class DirectorySource implements Source {
         return this.directory.toFile().listFiles(filter);
     }
 
-    private List<Record> readRecordsFromDirectory() {
+    private List<SourceRecord> readRecordsFromDirectory() {
         if (this.records.isPresent()) {
             return this.records.get();
         }
 
-        List<Record> recs = Arrays.stream(getFiles())
+        List<SourceRecord> recs = Arrays.stream(getFiles())
                 .map(file -> {
                     try {
-                        Record record = readRecordFromFile(file);
+                        SourceRecord record = readRecordFromFile(file);
                         log.trace("Parsed record: {}", record);
                         return record;
                     } catch (SAXException | IOException | ParserConfigurationException e) {
@@ -135,7 +126,7 @@ public class DirectorySource implements Source {
         return this.records.get();
     }
 
-    private Record readRecordFromFile(File f) throws ParserConfigurationException, SAXException, IOException {
+    private SourceRecord readRecordFromFile(File f) throws ParserConfigurationException, SAXException, IOException {
         log.debug("Reading record from file {}", f);
 
         DocumentBuilder documentBuilder = docBuilderFactory.newDocumentBuilder();
@@ -143,7 +134,7 @@ public class DirectorySource implements Source {
 
         Element elem = doc.getDocumentElement();
         elem.normalize();
-        log.trace("Read docuemtn: {}", elem);
+        log.trace("Read document: {}", elem);
 
         NodeSourceRecord record = new NodeSourceRecord(elem);
         return record;

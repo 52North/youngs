@@ -21,7 +21,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathFactoryConfigurationException;
-import net.sf.saxon.lib.NamespaceConstant;
 import org.n52.youngs.api.XPathConstants;
 import org.n52.youngs.transform.impl.YamlMappingConfiguration;
 import org.slf4j.Logger;
@@ -37,7 +36,9 @@ public class XPathHelper {
 
     private static final Logger log = LoggerFactory.getLogger(YamlMappingConfiguration.class);
 
-    private String systemSettingKey = "javax.xml.xpath.XPathFactory:" + NamespaceConstant.OBJECT_MODEL_SAXON;
+    private String systemSettingKey = "javax.xml.xpath.XPathFactory:"
+            //    + NamespaceConstant.OBJECT_MODEL_SAXON;
+            + "http://saxon.sf.net/jaxp/xpath/om";
 
     public XPathHelper() {
         //
@@ -58,7 +59,8 @@ public class XPathHelper {
         setSystemSetting();
         XPathFactory factory = null;
         try {
-            factory = XPathFactory.newInstance(NamespaceConstant.OBJECT_MODEL_SAXON);
+            factory = XPathFactory.newInstance("http://saxon.sf.net/jaxp/xpath/om");
+            //NamespaceConstant.OBJECT_MODEL_SAXON);
         } catch (XPathFactoryConfigurationException e) {
             log.error("Could not create new instance of XPathFactory", e);
         }
@@ -79,7 +81,8 @@ public class XPathHelper {
 
     /**
      * http://docs.oracle.com/javase/8/docs/api/javax/xml/xpath/XPathFactory.html
-     * @return always true if the
+     * @param factory the factory to be checked
+     * @return always true
      */
     public boolean isXPath10Supported(XPathFactory factory) {
         return true;
@@ -87,7 +90,9 @@ public class XPathHelper {
 
     /**
      * see http://stackoverflow.com/questions/7951879/which-version-of-xpath-and-xslt-am-i-using and http://stackoverflow.com/questions/926222/using-saxon-xpath-engine-in-java
-     * @return
+     *
+     * @param factory the factory to be checked
+     * @return true if the provided factory supports XPath 2.0
      */
     public boolean isXPath20Supported(XPathFactory factory) {
         try {

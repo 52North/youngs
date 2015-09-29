@@ -5,7 +5,7 @@ cluster:
             interval: 5m
 
 node:
-    name: "integration tests"
+    name: "Thomas Young"
 
 index :
     store:

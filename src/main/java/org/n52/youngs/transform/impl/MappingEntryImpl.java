@@ -21,9 +21,7 @@ import com.google.common.collect.Maps;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
 import org.n52.youngs.transform.MappingEntry;
 
 /**
@@ -40,16 +38,20 @@ public class MappingEntryImpl implements MappingEntry {
 
     private final Map<String, Object> indexProperties = Maps.newHashMap();
 
+    private Optional<Boolean> identifier = Optional.empty();
+
     public MappingEntryImpl(XPathExpression xPath, boolean isoQueryable, String isoQueryableName,
-            Map<String, Object> indexProperties) {
-        this(xPath, isoQueryable, indexProperties);
+            Map<String, Object> indexProperties, boolean identifier) {
+        this(xPath, isoQueryable, indexProperties, identifier);
         this.isoQueryableName = Optional.ofNullable(isoQueryableName);
     }
 
-    public MappingEntryImpl(XPathExpression xPath, boolean isoQueryable, Map<String, Object> indexProperties) {
+    public MappingEntryImpl(XPathExpression xPath, boolean isoQueryable, Map<String, Object> indexProperties,
+            boolean identifier) {
         this.xPath = xPath;
         this.isoQueryable = isoQueryable;
         this.indexProperties.putAll(indexProperties);
+        this.identifier = Optional.ofNullable(identifier);
     }
 
     @Override
@@ -96,6 +98,11 @@ public class MappingEntryImpl implements MappingEntry {
                 .add("properties", Arrays.deepToString(indexProperties.entrySet().toArray()))
                 .omitNullValues()
                 .toString();
+    }
+
+    @Override
+    public boolean isIdentifier() {
+        return identifier.isPresent() && identifier.get();
     }
 
 }

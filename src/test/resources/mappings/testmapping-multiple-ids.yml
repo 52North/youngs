@@ -1,0 +1,9 @@
+---
+name: test-multiple-ids-error
+mappings:
+    id:
+        xpath: "//fileIdentifier"
+        identifier: true
+    title:
+        xpath: "//title"
+        identifier: true

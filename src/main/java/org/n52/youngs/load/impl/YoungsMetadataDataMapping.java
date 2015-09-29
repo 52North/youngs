@@ -14,18 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.n52.youngs.load;
+package org.n52.youngs.load.impl;
 
-import org.n52.youngs.api.Record;
+import org.n52.iceland.statistics.api.mappings.MetadataDataMapping;
+import org.n52.iceland.statistics.api.parameters.AbstractEsParameter;
+import org.n52.iceland.statistics.api.parameters.Description;
+import org.n52.iceland.statistics.api.parameters.ElasticsearchTypeRegistry;
+import org.n52.iceland.statistics.api.parameters.SingleEsParameter;
 
 /**
+ * @see MetadataDataMapping
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public interface SinkRecord extends Record {
+public class YoungsMetadataDataMapping {
 
-    abstract boolean hasId();
-
-    abstract String getId();
+    public static final AbstractEsParameter METADATA_NAME_FIELD = new SingleEsParameter("mt-name", new Description(
+            Description.InformationOrigin.None, Description.Operation.Metadata, "Name of the used metadata type"), ElasticsearchTypeRegistry.stringField);
 
 }

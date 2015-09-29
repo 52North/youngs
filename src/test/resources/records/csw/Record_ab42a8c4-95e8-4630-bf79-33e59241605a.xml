@@ -6,6 +6,8 @@
     <dc:identifier>urn:uuid:ab42a8c4-95e8-4630-bf79-33e59241605a</dc:identifier>
     <dc:type>http://purl.org/dc/dcmitype/Service</dc:type>
     <dc:subject scheme="http://www.digest.org/2.1">Physiography</dc:subject>
+    <dc:subject scheme="http://www.digest.org/2.1">Otherography</dc:subject>
+    <dc:subject scheme="http://www.digest.org/2.1">Morography</dc:subject>
     <dct:abstract>Suspendisse accumsan molestie lorem. Nullam velit turpis, mattis ut, varius bibendum, laoreet non, quam.</dct:abstract>
     <dc:relation>urn:uuid:88247b56-4cbc-4df9-9860-db3f8042e357</dc:relation>
 </csw:Record>

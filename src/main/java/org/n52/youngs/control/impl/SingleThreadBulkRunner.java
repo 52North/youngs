@@ -35,6 +35,7 @@ import org.n52.youngs.harvest.Source;
 import org.n52.youngs.harvest.SourceRecord;
 import org.n52.youngs.impl.ReportImpl;
 import org.n52.youngs.load.Sink;
+import org.n52.youngs.load.SinkRecord;
 import org.n52.youngs.transform.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,12 +130,10 @@ public class SingleThreadBulkRunner implements Runner {
             long size = Math.min(recordsLeft, bulkSize);
 
             log.info("Requesting {} of {} records from {} starting at {}", size, source.getRecordCount(), source.getEndpoint(), counter);
-            Collection<Record> records = source.getRecords(counter, size);
+            Collection<SourceRecord> records = source.getRecords(counter, size);
             log.debug("Mapping {} retrieved records.", records.size());
 
-            List<Record> mappedRecords = records.stream()
-                    .filter(r -> r instanceof SourceRecord)
-                    .map(r -> (SourceRecord) r)
+            List<SinkRecord> mappedRecords = records.stream()
                     .map(mapper::map)
                     .collect(Collectors.toList());
 

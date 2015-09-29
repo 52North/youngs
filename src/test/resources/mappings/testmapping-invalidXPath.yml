@@ -1,5 +1,2 @@
 ---
-
-applicable:
-    xpath: "in va_lid x-path"
-mappings:
+applicability_xpath: "in va_lid x-path"

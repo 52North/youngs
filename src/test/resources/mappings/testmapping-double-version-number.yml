@@ -1,7 +1,2 @@
 ---
-
-name: test
 version: 2.52
-applicable:
-    xpath: "boolean(//*[local-name()='MD_Metadata']) and boolean(namespace-uri(//*[local-name()='MD_Metadata']) = 'http://www.isotc211.org/2005/gmd')"
-mappings:

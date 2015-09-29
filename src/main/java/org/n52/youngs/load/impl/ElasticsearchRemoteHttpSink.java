@@ -27,7 +27,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.ActionFuture;
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.update.UpdateResponse;
@@ -37,6 +42,7 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.indices.IndexMissingException;
 import org.joda.time.DateTimeZone;
 import org.n52.iceland.exception.ConfigurationError;
 import org.n52.iceland.statistics.api.mappings.MetadataDataMapping;
@@ -71,6 +77,7 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
                 .put("cluster.name", getCluster()).build();
         this.client = new TransportClient(settings).addTransportAddress(
                 new InetSocketTransportAddress(this.host, this.port));
+        log.info("Created new client with settings {}", settings);
     }
 
     @Override
@@ -80,11 +87,11 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
 
     @Override
     public boolean prepare(MappingConfiguration mapping) {
-        if(mapping.isIndexCreationEnabled()) {
+        if (!mapping.isIndexCreationEnabled()) {
             log.info("Index creation is disabled, stopping preparations!");
             return false;
         }
-        
+
         try {
             IndicesAdminClient indices = getClient().admin().indices();
             String indexId = mapping.getIndex();
@@ -107,11 +114,14 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
         log.trace("Built schema creation request:\n{}", Arrays.toString(schema.entrySet().toArray()));
 
         // create metadata mapping and schema mapping
-        CreateIndexResponse response = indices.prepareCreate(indexId)
+        CreateIndexRequestBuilder request = indices.prepareCreate(indexId)
                 .addMapping(MetadataDataMapping.METADATA_TYPE_NAME, getMetadataSchema())
-                .addMapping(mapping.getType(), schema) // first level elements are "dynamic" and "properties"?
-                .setSettings(mapping.getIndexCreationRequest())
-                .get();
+                .addMapping(mapping.getType(), schema);
+        if (mapping.hasIndexCreationRequest()) {
+            request.setSettings(mapping.getIndexCreationRequest());
+        }
+
+        CreateIndexResponse response = request.get();
         log.debug("Created indices: {}, acknowledged: {}", response, response.isAcknowledged());
 
         Map<String, Object> mdRecord = createMetadataRecord(mapping.getVersion(), mapping.getName());
@@ -183,7 +193,6 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
     }
 
     private Map<String, Object> getMetadataSchema() {
-        HashMap<String, Object> properties = Maps.newHashMapWithExpectedSize(1);
         HashMap<String, Object> mappings = Maps.newHashMap();
 
         for (Field field : MetadataDataMapping.class.getDeclaredFields()) {
@@ -193,6 +202,7 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
             }
         }
 
+        HashMap<String, Object> properties = Maps.newHashMapWithExpectedSize(1);
         properties.put("properties", mappings);
         return properties;
     }
@@ -241,12 +251,26 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
         data.put(MetadataDataMapping.METADATA_CREATION_TIME_FIELD.getName(), time);
         data.put(MetadataDataMapping.METADATA_UPDATE_TIME_FIELD.getName(), time);
         data.put(MetadataDataMapping.METADATA_VERSION_FIELD.getName(), version);
-        data.put(MetadataDataMapping.METADATA_NAME_FIELD.getName(), name);
+        data.put(YoungsMetadataDataMapping.METADATA_NAME_FIELD.getName(), name);
         data.put(MetadataDataMapping.METADATA_UUIDS_FIELD.getName(), uuid);
         log.info("Initial metadata is created ceated for type {} with uuid {} @ {}",
                 MetadataDataMapping.METADATA_TYPE_NAME, uuid, time);
 
         return data;
+    }
+
+    @Override
+    public boolean clear(MappingConfiguration mapping) {
+        log.info("Deleting index '{}'", mapping.getIndex());
+        DeleteIndexRequest request = new DeleteIndexRequest(mapping.getIndex());
+        try {
+            DeleteIndexResponse delete = getClient().admin().indices().delete(request).actionGet();
+            log.info("Delete acknowledged: {}", delete.isAcknowledged());
+            return delete.isAcknowledged();
+        } catch (IndexMissingException e) {
+            log.info("Index does not exist, no need to delete: {}", e.getMessage());
+            return true;
+        }
     }
 
 }

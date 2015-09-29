@@ -41,8 +41,8 @@ public interface Source {
     */
     public long getRecordCount();
 
-    public Collection<Record> getRecords();
+    public Collection<SourceRecord> getRecords();
 
-    public Collection<Record> getRecords(long startPosition, long maxRecords);
+    public Collection<SourceRecord> getRecords(long startPosition, long maxRecords);
 
 }

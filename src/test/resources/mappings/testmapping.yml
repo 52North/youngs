@@ -1,5 +1,4 @@
 ---
-
 name: test
 version: 42
 xpathversion: 2.0
@@ -24,12 +23,13 @@ namespaces:
     dct: http://purl.org/dc/terms/
     inspire_ds: http://inspire.ec.europa.eu/schemas/inspire_ds/1.0
     inspire_c: http://inspire.ec.europa.eu/schemas/common/1.0
-type: testrecord
 defaults:
-    store: &STORE true
+    store: &STOREDEFAULT true
 index:
     create: true
     name: testindex
+    type: testrecord
+    #dynamic_mapping: true
     settings: |
         index:
             number_of_shards: 1 
@@ -45,9 +45,10 @@ mappings:
     id:
         xpath: "//gmd:fileIdentifier"
         isoqueryable: false
+        identifier: TRUE
         properties:
             type: string
-            store: *STORE
+            store: *STOREDEFAULT
             index: analyzed
             #index_name: "id"
             boost: 2.0
@@ -55,7 +56,7 @@ mappings:
         xpath: "//title"
         isoqueryable: false
         properties:
-            store: *STORE
+            store: *STOREDEFAULT
             type: string
             index_name: title
             boost: 10

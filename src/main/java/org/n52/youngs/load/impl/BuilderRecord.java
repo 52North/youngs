@@ -16,6 +16,7 @@
  */
 package org.n52.youngs.load.impl;
 
+import java.util.Optional;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.n52.youngs.load.SinkRecord;
 
@@ -27,12 +28,29 @@ public class BuilderRecord implements SinkRecord {
 
     private final XContentBuilder builder;
 
-    public BuilderRecord(XContentBuilder builder) {
+    private Optional<String> id = Optional.empty();
+
+    public BuilderRecord(String id, XContentBuilder builder) {
+        this.id = Optional.ofNullable(id);
         this.builder = builder;
+    }
+
+    public BuilderRecord(XContentBuilder builder) {
+        this(null, builder);
     }
 
     public XContentBuilder getBuilder() {
         return builder;
+    }
+
+    @Override
+    public String getId() {
+        return id.get();
+    }
+
+    @Override
+    public boolean hasId() {
+        return id.isPresent();
     }
 
 }

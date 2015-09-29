@@ -117,14 +117,14 @@ public class CswSource implements Source {
     }
 
     @Override
-    public Collection<Record> getRecords() {
+    public Collection<SourceRecord> getRecords() {
         return getRecords(1, Long.MAX_VALUE);
     }
 
     @Override
-    public Collection<Record> getRecords(long startPosition, long maxRecords) {
+    public Collection<SourceRecord> getRecords(long startPosition, long maxRecords) {
         log.debug("Requesting {} records from catalog starting at {}", maxRecords, startPosition);
-        Collection<Record> records = Lists.newArrayList();
+        Collection<SourceRecord> records = Lists.newArrayList();
 
         // http://api.eurogeoss-broker.eu/dab/services/cswiso?service=CSW&version=2.0.2&request=GetRecords&namespace=xmlns(gmd=http://www.isotc211.org/2005/gmd)&typeNames=gmd:MD_Metadata&ElementSetName=full&resultType=results&maxRecords=10&outputSchema=http://www.isotc211.org/2005/gmd
         StringBuilder recordsRequest = new StringBuilder();

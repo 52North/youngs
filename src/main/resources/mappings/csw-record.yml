@@ -1,56 +1,77 @@
 ---
 
 name: "CSW Record Mapping"
-version: 1.0
-xpathversion: "2.0"
-applicable:
-    xpath: "boolean(//*[local-name()='Record']) and boolean(namespace-uri(//*[local-name()='Record']) = 'http://www.opengis.net/cat/csw/2.0.2')"
-type: record
+version: 1
+xpathversion: 2.0
+applicability_xpath: "boolean(//*[local-name()='Record']) and boolean(namespace-uri(//*[local-name()='Record']) = 'http://www.opengis.net/cat/csw/2.0.2')"
 namespaces:
     xlink: http://www.w3.org/1999/xlink
     csw: http://www.opengis.net/cat/csw/2.0.2
     dc: http://purl.org/dc/elements/1.1/
-#index: ""
+    dct: http://purl.org/dc/terms/
+index:
+    create: true
+    name: csw
+    type: record
 mappings:
     id:
         xpath: "//dc:identifier"
-        fieldName: "id"
-        isoqueryable: false
+        identifier: true
+        properties:
+            type: string
+            boost: 10.0
     title:
         xpath: "//dc:title"
-        fieldName: "title"
-        isoqueryable: true
+        properties:
+            type: string
+            boost: 5.0
     type:
         xpath: "//dc:type"
-        fieldName: "type"
-        isoqueryable: false
+        properties:
+            type: string
+            boost: 2.0
     format:
         xpath: "//dc:format"
-        fieldName: "format"
-        isoqueryable: false
+        properties:
+            type: string
+            boost: 2.0
     subject:
         xpath: "//dc:subject"
-        fieldName: "subject"
-        isoqueryable: true
+        properties:
+            type: string
+            boost: 2.0
     subjScheme:
         xpath: "//dc:subject/@scheme"
-        fieldName: "subjectScheme"
-        isoqueryable: true
+        properties:
+            type: string
+            index_name: subjectScheme
     abstract:
-        xpath: "//dc:abstract"
-        fieldName: "abstract"
-        isoqueryable: false
+        xpath: "//dct:abstract"
+        properties:
+            type: string
+            boost: 4.0
     rel:
         xpath: "//dc:relation"
-        fieldName: "relation"
-        isoqueryable: false
+        properties:
+            type: string
+            boost: 4.0
+    rights:
+        xpath: "//dc:rights"
+        properties:
+            type: string
     date:
         xpath: "//dc:date"
-        isoqueryable: true
         properties:
-            index_name: true
+            type: date
             # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
-            format: "YYY-MM-DD'Z'"
+            format: "YYYY-MM-DD'Z'"
+            ignore_malformed: true
+    modified:
+        xpath: "//dct:modified"
+        properties:
+            type: date
+            # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
+            format: "YYYY-MM-DD'Z'"
             ignore_malformed: true
     # add bbox mapping!
         

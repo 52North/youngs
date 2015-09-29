@@ -17,7 +17,6 @@
 package org.n52.youngs.load;
 
 import java.util.Collection;
-import org.n52.youngs.api.Record;
 import org.n52.youngs.exception.SinkError;
 import org.n52.youngs.transform.MappingConfiguration;
 
@@ -32,11 +31,29 @@ public interface Sink {
      *
      * @param mapping the mapping that contains the configuration for the sink, such as data types and field names
      * @return true if the sink is now ready to be used
-    */
+     */
     public boolean prepare(MappingConfiguration mapping) throws SinkError;
 
-    public boolean store(Record record) throws SinkError;
+    /**
+     * @param record the record to store
+     * @return true if record is stored
+     * @throws SinkError on no-recoverable errors
+     */
+    public boolean store(SinkRecord record) throws SinkError;
 
-    public void store(Collection<Record> records) throws SinkError;
+    /**
+     * @param records the records to store
+     * @return true if _all_ records are stored
+     * @throws SinkError on no-recoverable errors
+     */
+    public boolean store(Collection<SinkRecord> records) throws SinkError;
+
+    /**
+     * remove all traces of any loading that took or might have taken place for the provided mapping
+     *
+     * @param mapping the mapping providing the information that shall be cleared from the sink
+     * @return false if there were problems with clearing, true otherwise
+     */
+    public boolean clear(MappingConfiguration mapping);
 
 }

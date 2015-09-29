@@ -33,6 +33,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -71,13 +72,13 @@ public class YamlMappingConfiguration implements MappingConfiguration {
 
     private XPathFactory xpathFactory;
 
-    private Optional<XPathExpression> applicabilityExpression;
+    private Optional<XPathExpression> applicabilityExpression = Optional.empty();
 
     private String type = DEFAULT_TYPE;
 
     private String index = DEFAULT_INDEX;
 
-    private boolean indexCreationEnabled;
+    private boolean indexCreationEnabled = DEFAULT_INDEX_CREATION;
 
     private boolean dynamicMappingEnabled;
 
@@ -138,6 +139,8 @@ public class YamlMappingConfiguration implements MappingConfiguration {
             log.trace("Created namespace context from mapping configuration: {}", nsc);
             return nsc;
         } else {
+            log.error("No namespace in mapping file, must be either there or provided in constructor. Mapping {}",
+                    configurationNodes.get("name"));
             throw new MappingError("Mapping must containg 'namespaces' map or namespaces must be provided in constructor.");
         }
     }
@@ -146,13 +149,13 @@ public class YamlMappingConfiguration implements MappingConfiguration {
         // read the entries from the config file
         this.name = configurationNodes.path("name").asTextValue(DEFAULT_NAME);
         this.version = configurationNodes.path("version").asIntValue(DEFAULT_VERSION);
-        this.type = configurationNodes.path("type").asTextValue(DEFAULT_TYPE);
         this.xpathVersion = configurationNodes.path("xpathversion").asTextValue(DEFAULT_XPATH_VERSION);
-        if (configurationNodes.has("index")) {
+        if (configurationNodes.hasNotNull("index")) {
             YamlNode indexField = configurationNodes.get("index");
             this.index = indexField.path("name").asTextValue(DEFAULT_INDEX);
             this.indexCreationEnabled = indexField.path("create").asBooleanValue(DEFAULT_INDEX_CREATION);
             this.dynamicMappingEnabled = indexField.path("dynamic_mapping").asBooleanValue(DEFAULT_DYNAMIC_MAPPING);
+            this.type = indexField.path("type").asTextValue(DEFAULT_TYPE);
             if (indexField.hasNotNull("settings")) {
                 this.indexCreationRequest = Optional.of(indexField.get("settings").asTextValue());
             }
@@ -162,12 +165,12 @@ public class YamlMappingConfiguration implements MappingConfiguration {
         if (!xph.isVersionSupported(xpathFactory, xpathVersion)) {
             throw new MappingError("Provided factory {} does not support version {}", xpathFactory, xpathVersion);
         }
-
         log.debug("Using XPathFactory {}", xpathFactory);
 
+        String applicabilityXPathString = configurationNodes
+                .path("applicability_xpath").asTextValue(DEFAULT_APPLICABILITY_PATH);
+        XPath path = newXPath(nsContext);
         try {
-            XPath path = newXPath(nsContext);
-            String applicabilityXPathString = configurationNodes.path("applicable.xpath").asTextValue(DEFAULT_APPLICABILITY_PATH);
             applicabilityExpression = Optional.of(path.compile(applicabilityXPathString));
         } catch (XPathExpressionException e) {
             log.error("Could not compile applicability xpath, will always evalute to true", e);
@@ -183,6 +186,16 @@ public class YamlMappingConfiguration implements MappingConfiguration {
                 this.entries.add(e);
             }
 
+            // ensure not exactly one field is identifier
+            long idCount = this.entries.stream().filter(MappingEntry::isIdentifier).count();
+            if (idCount > 1) {
+                List<String> entriesWithId = this.entries.stream().filter(MappingEntry::isIdentifier)
+                        .map(MappingEntry::getFieldName).collect(Collectors.toList());
+                log.error("Found more than one entries marked as 'identifier': {}", Arrays.toString(entriesWithId.toArray()));
+                throw new MappingError("More than one fields are marked as 'identifier'. Found {} in {}", idCount,
+                        Arrays.toString(entriesWithId.toArray()));
+            }
+
             // sort list by field name
             Collections.sort(entries, (me1, me2) -> {
                 return me1.getFieldName().compareTo(me2.getFieldName());
@@ -194,16 +207,20 @@ public class YamlMappingConfiguration implements MappingConfiguration {
         log.trace("Parsing mapping '{}'", id);
         if (node instanceof YamlMapNode) {
             YamlMapNode mapNode = (YamlMapNode) node;
+
             Map<String, Object> indexProperties = createIndexProperties(id, node);
 
-            XPath xPath = newXPath(nsContext);
+            boolean isIdentifier = mapNode.path("identifier").asBooleanValue(false);
+
             String expression = mapNode.path("xpath").asTextValue();
+            XPath xPath = newXPath(nsContext);
             try {
                 XPathExpression compiledExpression = xPath.compile(expression);
                 return new MappingEntryImpl(compiledExpression,
                         mapNode.path("isoqueryable").asBooleanValue(false),
                         mapNode.path("isoqueryableName").asTextValue(null),
-                        indexProperties);
+                        indexProperties,
+                        isIdentifier);
             } catch (XPathExpressionException e) {
                 log.error("Could not create XPath for provided expression '{}'", expression, e);
                 throw new MappingError(e, "Could not create XPath for provided expression '%s' in field %s",
@@ -247,6 +264,15 @@ public class YamlMappingConfiguration implements MappingConfiguration {
                     log.error("Could not parse property {}={} because of unhandled type {}", k, v, v.getClass());
                 }
             });
+        }
+
+        // make sure index name is a string
+        if (props.containsKey(MappingEntry.INDEX_NAME)) {
+            Object nameObj = props.get(MappingEntry.INDEX_NAME);
+            if (!(nameObj instanceof String)) {
+                log.debug("Index name '{}' of field {} is not a string, falling back to id!", name, id);
+                props.put(MappingEntry.INDEX_NAME, id);
+            }
         }
 
         // handle defaulting to parent node name for id

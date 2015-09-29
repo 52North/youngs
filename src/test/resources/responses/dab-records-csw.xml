@@ -1,0 +1,418 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- http://api.eurogeoss-broker.eu/dab/services/cswiso?service=CSW&version=2.0.2&request=GetRecords&namespace=xmlns%28csw=http://www.opengis.net/cat/csw/2.0.2%29&typeNames=csw:Record&ElementSetName=full&resultType=results&maxRecords=17&startPosition=52&outputSchema=http://www.opengis.net/cat/csw/2.0.2 -->
+<csw:GetRecordsResponse xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:ogc="http://www.opengis.net/ogc" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:ows="http://www.opengis.net/ows" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0.2" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-discovery.xsd">
+    <csw:RequestId/>
+    <csw:SearchStatus timestamp="2015-09-29T06:44:24.618-04:00"/>
+    <csw:SearchResults nextRecord="69" numberOfRecordsMatched="909727" numberOfRecordsReturned="17" recordSchema="http://www.opengis.net/cat/csw/2.0.2">
+        <csw:Record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-publication.xsd">
+            <dc:identifier>urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:METOP:ORBITVIEW</dc:identifier>
+            <dc:title>OrbitView RGB - Metop</dc:title>
+            <dc:type>series</dc:type>
+            <dc:subject>Atmospheric conditions</dc:subject>
+            <dc:subject>Weather</dc:subject>
+            <dc:subject>Atmosphere</dc:subject>
+            <dc:subject>Web Imagery</dc:subject>
+            <dc:subject>geossdatacore</dc:subject>
+            <dc:subject>climatologyMeteorologyAtmosphere</dc:subject>
+            <dc:format/>
+            <dc:relation/>
+            <dct:modified/>
+            <dct:abstract>OrbitView is an RGB (Red, Green, Blue) composite based on Metop AVHRR channels 1, 2 and 4. It is a concatenation of sequential images projected over a blue and white background in a Mercator projection. The product is generated both day and night-time. Note that the image is not calibrated.</dct:abstract>
+            <dc:rights>copyright</dc:rights>
+            <ows:BoundingBox>
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:BoundingBox>
+        </csw:Record>
+        <csw:Record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-publication.xsd">
+            <dc:identifier>urn:x-wmo:md:int.eumetsat::85a12a3e-97bb-48f5-961a-47d977e8852f</dc:identifier>
+            <dc:title>Near Real-Time Absorbing Aerosol Index - Metop</dc:title>
+            <dc:type>series</dc:type>
+            <dc:subject>Atmospheric conditions</dc:subject>
+            <dc:subject>Weather</dc:subject>
+            <dc:subject>Climate</dc:subject>
+            <dc:subject>Aerosol</dc:subject>
+            <dc:subject>Atmosphere</dc:subject>
+            <dc:subject>EUMETCast-Europe</dc:subject>
+            <dc:subject>EUMETCast</dc:subject>
+            <dc:subject>geossdatacore</dc:subject>
+            <dc:subject>climatologyMeteorologyAtmosphere</dc:subject>
+            <dc:format/>
+            <dc:relation/>
+            <dct:modified/>
+            <dct:abstract>The AAI indicates the presence of elevated absorbing aerosols in the atmosphere.</dct:abstract>
+            <dc:rights>copyright</dc:rights>
+            <ows:BoundingBox>
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:BoundingBox>
+        </csw:Record>
+        <csw:Record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-publication.xsd">
+            <dc:identifier>urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:MULT:FDN</dc:identifier>
+            <dc:title>Fire Detection - Multimission - South America</dc:title>
+            <dc:type>series</dc:type>
+            <dc:subject>Atmospheric conditions</dc:subject>
+            <dc:subject>Agriculture</dc:subject>
+            <dc:subject>Biodiversity</dc:subject>
+            <dc:subject>Climate</dc:subject>
+            <dc:subject>Disasters</dc:subject>
+            <dc:subject>Ecosystems</dc:subject>
+            <dc:subject>Energy</dc:subject>
+            <dc:subject>Health</dc:subject>
+            <dc:subject>Fire</dc:subject>
+            <dc:subject>Land</dc:subject>
+            <dc:subject>GEONETCast-Americas</dc:subject>
+            <dc:subject>EUMETCast</dc:subject>
+            <dc:subject>EUMETCast-Europe</dc:subject>
+            <dc:subject>EUMETCast-Africa</dc:subject>
+            <dc:subject>EUMETCast-Americas</dc:subject>
+            <dc:subject>geossdatacore</dc:subject>
+            <dc:subject>climatologyMeteorologyAtmosphere</dc:subject>
+            <dc:format/>
+            <dc:relation/>
+            <dct:modified/>
+            <dct:abstract>A DevCoCast product, the Fire Detection Product represents a set of products such as fire occurrence in individual states, occurrence in the South American countries, maps of fire risk, and smoke estimate and dispersion. Fire maps are derived from the NOAA 3.7um thermal band, MODIS and GOES thermal bands (especially band 2 on GOES and bands 20 and 21 on MODIS). Maps of Fire Risk are derived from the number of days without precipitation, air relative humidity, air temperature, distance of fire spots, and class of vegetation (predicted fire risk maps uses forecast modeling). Smoke estimate and dispersion products show carbon monoxide and other pollutants emitted by the fire spots. The model receives as input the AVHRR, GOES and MODIS fire observations and takes into account the type of vegetation being burned.</dct:abstract>
+            <dc:rights>copyright</dc:rights>
+            <ows:BoundingBox>
+                <ows:LowerCorner>-82.0 -55.0</ows:LowerCorner>
+                <ows:UpperCorner>-34.0 10.0</ows:UpperCorner>
+            </ows:BoundingBox>
+        </csw:Record>
+        <csw:Record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-publication.xsd">
+            <dc:identifier>urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:METEOSAT:OSIDSSI</dc:identifier>
+            <dc:title>Daily Shortwave Solar Irradiance - MSG</dc:title>
+            <dc:type>series</dc:type>
+            <dc:subject>Atmospheric conditions</dc:subject>
+            <dc:subject>Water</dc:subject>
+            <dc:subject>Weather</dc:subject>
+            <dc:subject>Radiation</dc:subject>
+            <dc:subject>Ocean</dc:subject>
+            <dc:subject>EUMETSAT Data Centre</dc:subject>
+            <dc:subject>EUMETCast-Europe</dc:subject>
+            <dc:subject>EUMETCast-Africa</dc:subject>
+            <dc:subject>EUMETCast-Americas</dc:subject>
+            <dc:subject>EUMETCast</dc:subject>
+            <dc:subject>geossdatacore</dc:subject>
+            <dc:subject>climatologyMeteorologyAtmosphere</dc:subject>
+            <dc:format/>
+            <dc:relation/>
+            <dct:modified/>
+            <dct:abstract>Estimation of the solar irradiance reaching the Earth surface, derived from the geostationary satellite Meteosat, derived at present from the 0.6µm visible channel of SEVIRI, produced by remapping over a 0.05° regular grid and expressed in W/m2. The daily value is the integration of all the hourly values in the UT day.</dct:abstract>
+            <dc:rights>copyright</dc:rights>
+            <ows:BoundingBox>
+                <ows:LowerCorner>-60.0 -60.0</ows:LowerCorner>
+                <ows:UpperCorner>60.0 60.0</ows:UpperCorner>
+            </ows:BoundingBox>
+        </csw:Record>
+        <csw:Record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-publication.xsd">
+            <dc:identifier>urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:METOP:SEM</dc:identifier>
+            <dc:title>SEM GDS level 0 - Metop</dc:title>
+            <dc:type>series</dc:type>
+            <dc:subject>Atmospheric conditions</dc:subject>
+            <dc:subject>Weather</dc:subject>
+            <dc:subject>Level 1 Data</dc:subject>
+            <dc:subject>Atmosphere</dc:subject>
+            <dc:subject>EUMETSAT Data Centre</dc:subject>
+            <dc:subject>geossdatacore</dc:subject>
+            <dc:subject>climatologyMeteorologyAtmosphere</dc:subject>
+            <dc:format/>
+            <dc:relation/>
+            <dct:modified/>
+            <dct:abstract>The Space Environmental Monitor (SEM-2) is a multi-channel, charged-particle spectrometer that provides measurements to determine the intensity of the Earth's radiation belts and the flux of charged particles at the satellite altitude. It provides knowledge of solar terrestrial phenomena and also provides warnings of solar wind occurrences that may impair long-range communication, high-altitude operations, damage to satellite circuits and solar panels, or cause changes in drag and magnetic torque on satellites.</dct:abstract>
+            <dc:rights>copyright</dc:rights>
+            <ows:BoundingBox>
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:BoundingBox>
+        </csw:Record>
+        <csw:Record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-publication.xsd">
+            <dc:identifier>urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:METOP:IASIL1C-RED</dc:identifier>
+            <dc:title>IASI GDS Level 1C - reduced spectral samples - Metop</dc:title>
+            <dc:type>series</dc:type>
+            <dc:subject>Atmospheric conditions</dc:subject>
+            <dc:subject>Weather</dc:subject>
+            <dc:subject>Level 1 Data</dc:subject>
+            <dc:subject>Atmosphere</dc:subject>
+            <dc:subject>GTS</dc:subject>
+            <dc:subject>EUMETCast-Europe</dc:subject>
+            <dc:subject>EUMETCast</dc:subject>
+            <dc:subject>geossdatacore</dc:subject>
+            <dc:subject>climatologyMeteorologyAtmosphere</dc:subject>
+            <dc:format/>
+            <dc:relation/>
+            <dct:modified/>
+            <dct:abstract>This product covers the reduced spectral samples (366 channels). The main objective of the Infrared Atmospheric Sounding Interferometer (IASI) is to provide high resolution atmospheric emission spectra to derive temperature and humidity profiles with high spectral and vertical resolution and accuracy. Additionally it is used for the determination of trace gases such as ozone, nitrous oxide, carbon dioxide and methane, as well as land and sea surface temperature, emissivity and cloud properties. The IASI L1c product contains infra-red radiance spectra at 0.5cm-1 resolution. The EUMETCast product has for each sounder pixel 8461 spectral samples covering the range between 645.0 cm-1 and 2760 cm-1.</dct:abstract>
+            <dc:rights>copyright</dc:rights>
+            <ows:BoundingBox>
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:BoundingBox>
+        </csw:Record>
+        <csw:Record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-publication.xsd">
+            <dc:identifier>urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:METEOSAT:OSIDDLI</dc:identifier>
+            <dc:title>Daily Downward Longwave Irradiance - MSG</dc:title>
+            <dc:type>series</dc:type>
+            <dc:subject>Atmospheric conditions</dc:subject>
+            <dc:subject>Water</dc:subject>
+            <dc:subject>Weather</dc:subject>
+            <dc:subject>Radiation</dc:subject>
+            <dc:subject>Ocean</dc:subject>
+            <dc:subject>EUMETSAT Data Centre</dc:subject>
+            <dc:subject>EUMETCast-Europe</dc:subject>
+            <dc:subject>EUMETCast-Africa</dc:subject>
+            <dc:subject>EUMETCast-Americas</dc:subject>
+            <dc:subject>EUMETCast</dc:subject>
+            <dc:subject>geossdatacore</dc:subject>
+            <dc:subject>climatologyMeteorologyAtmosphere</dc:subject>
+            <dc:format/>
+            <dc:relation/>
+            <dct:modified/>
+            <dct:abstract>Estimation of the Downward Longwave Irradiance reaching the Earth surface, derived from the geostationary satellite Meteosat, derived at present from the 0.6µm visible channel of SEVIRI, produced by remapping over a 0.05° regular grid and expressed in W/m2. Algorithm is a bulk parameterization that uses NWP model outputs to calculate a clear sky Downward Longwave Irradiance (DLI), corrected according to satellite derived cloud information. The daily value is the integration of all the hourly values in the UT day.</dct:abstract>
+            <dc:rights>copyright</dc:rights>
+            <ows:BoundingBox>
+                <ows:LowerCorner>-60.0 -60.0</ows:LowerCorner>
+                <ows:UpperCorner>60.0 60.0</ows:UpperCorner>
+            </ows:BoundingBox>
+        </csw:Record>
+        <csw:Record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-publication.xsd">
+            <dc:identifier>urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:METOP:NAP</dc:identifier>
+            <dc:title>Near Real-Time Absorbing Aerosol Index from the GOME-2 PMD</dc:title>
+            <dc:type>series</dc:type>
+            <dc:subject>Atmospheric conditions</dc:subject>
+            <dc:subject>Atmosphere</dc:subject>
+            <dc:subject>Aerosol</dc:subject>
+            <dc:subject>Climate</dc:subject>
+            <dc:subject>SAF Archive &amp; FTP</dc:subject>
+            <dc:subject>EUMETCast</dc:subject>
+            <dc:subject>EUMETCast-Europe</dc:subject>
+            <dc:subject>geossdatacore</dc:subject>
+            <dc:subject>climatologyMeteorologyAtmosphere</dc:subject>
+            <dc:format/>
+            <dc:relation/>
+            <dct:modified/>
+            <dct:abstract>The AAI indicates the presence of elevated absorbing aerosols in the atmosphere</dct:abstract>
+            <dc:rights>copyright</dc:rights>
+            <ows:BoundingBox>
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:BoundingBox>
+        </csw:Record>
+        <csw:Record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-publication.xsd">
+            <dc:identifier>urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:METOP:NHP</dc:identifier>
+            <dc:title>High Resolution GOME-2 Vertical Ozone Profiles - Metop</dc:title>
+            <dc:type>series</dc:type>
+            <dc:subject>Atmospheric conditions</dc:subject>
+            <dc:subject>Atmosphere</dc:subject>
+            <dc:subject>Trace Gases</dc:subject>
+            <dc:subject>Climate</dc:subject>
+            <dc:subject>weather</dc:subject>
+            <dc:subject>EUMETCast</dc:subject>
+            <dc:subject>EUMETCast-Europe</dc:subject>
+            <dc:subject>EUMETSAT Data Centre</dc:subject>
+            <dc:subject>geossdatacore</dc:subject>
+            <dc:subject>climatologyMeteorologyAtmosphere</dc:subject>
+            <dc:format/>
+            <dc:relation/>
+            <dct:modified/>
+            <dct:abstract>Vertical ozone profiles from GOME-2 in High Resolution in DU per layer (40 layers) on a 80x40 km surface footprint.</dct:abstract>
+            <dc:rights>copyright</dc:rights>
+            <ows:BoundingBox>
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:BoundingBox>
+        </csw:Record>
+        <csw:Record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-publication.xsd">
+            <dc:identifier>urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:METOP:NOP</dc:identifier>
+            <dc:title>Near Real-Time Ozone Profiles - Metop</dc:title>
+            <dc:type>series</dc:type>
+            <dc:subject>Atmospheric conditions</dc:subject>
+            <dc:subject>Weather</dc:subject>
+            <dc:subject>Climate</dc:subject>
+            <dc:subject>Atmosphere</dc:subject>
+            <dc:subject>Trace Gases</dc:subject>
+            <dc:subject>SAF Archive &amp; FTP</dc:subject>
+            <dc:subject>EUMETCast-Europe</dc:subject>
+            <dc:subject>EUMETCast-Africa</dc:subject>
+            <dc:subject>EUMETCast</dc:subject>
+            <dc:subject>geossdatacore</dc:subject>
+            <dc:subject>climatologyMeteorologyAtmosphere</dc:subject>
+            <dc:format/>
+            <dc:relation/>
+            <dct:modified/>
+            <dct:abstract>The Near Real-Time (NRT) Ozone Profile (NOP) product provides ozone profiles reported as partial columns, in Dobson Units, between 41 pressure levels logarithmically spaced between and including surface pressure and 0.1 hPa. For cloudy and partially cloudy scenes, the cloud-top pressure replaces the nearest pressure level. Geographical coverage, spatial resolution and temporal frequencies of the GOME-2 Ozone Profile Product are determined by the instrument. This product is not archived. For an archived version, please refer to the Offline Ozone Profile.</dct:abstract>
+            <dc:rights>copyright</dc:rights>
+            <ows:BoundingBox>
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:BoundingBox>
+        </csw:Record>
+        <csw:Record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-publication.xsd">
+            <dc:identifier>urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:METOP:NRP</dc:identifier>
+            <dc:title>Near Real-Time Refractivity Profile - Metop</dc:title>
+            <dc:type>series</dc:type>
+            <dc:subject>Atmospheric conditions</dc:subject>
+            <dc:subject>Weather</dc:subject>
+            <dc:subject>Climate</dc:subject>
+            <dc:subject>Humidity</dc:subject>
+            <dc:subject>Atmosphere</dc:subject>
+            <dc:subject>SAF Archive &amp; FTP</dc:subject>
+            <dc:subject>GTS</dc:subject>
+            <dc:subject>EUMETCast-Europe</dc:subject>
+            <dc:subject>EUMETCast</dc:subject>
+            <dc:subject>geossdatacore</dc:subject>
+            <dc:subject>climatologyMeteorologyAtmosphere</dc:subject>
+            <dc:format/>
+            <dc:relation/>
+            <dct:modified/>
+            <dct:abstract>The refractive index of the atmosphere as function of height at tangent point. Given in refractivity units (N)</dct:abstract>
+            <dc:rights>copyright</dc:rights>
+            <ows:BoundingBox>
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:BoundingBox>
+        </csw:Record>
+        <csw:Record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-publication.xsd">
+            <dc:identifier>urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:METOP:NTO</dc:identifier>
+            <dc:title>Near Real-Time Total Column - Metop</dc:title>
+            <dc:type>series</dc:type>
+            <dc:subject>Atmospheric conditions</dc:subject>
+            <dc:subject>Weather</dc:subject>
+            <dc:subject>Climate</dc:subject>
+            <dc:subject>Atmosphere</dc:subject>
+            <dc:subject>Trace Gases</dc:subject>
+            <dc:subject>SAF Archive &amp; FTP</dc:subject>
+            <dc:subject>EUMETCast-Europe</dc:subject>
+            <dc:subject>EUMETCast-Africa</dc:subject>
+            <dc:subject>EUMETCast</dc:subject>
+            <dc:subject>geossdatacore</dc:subject>
+            <dc:subject>climatologyMeteorologyAtmosphere</dc:subject>
+            <dc:format/>
+            <dc:relation/>
+            <dct:modified/>
+            <dct:abstract>The Near Real Time Total Column (NTO) product provides information about total columns of three type of trace gases in the atmosphere: O3 (Ozone), NO2 (Nitrogen Dioxide) as well as tropospheric NO2, and SO2 (Sulphur Dioxide). The product is disseminated as one file containing the total column ozone, the total column NO2, the tropospheric NO2 and the total column SO2. For an archived version, please refer to the Offline Total Column Product.</dct:abstract>
+            <dc:rights>copyright</dc:rights>
+            <ows:BoundingBox>
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:BoundingBox>
+        </csw:Record>
+        <csw:Record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-publication.xsd">
+            <dc:identifier>urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:MFG:CDS-IODC</dc:identifier>
+            <dc:title>Climate Data Set - MFG - Indian Ocean</dc:title>
+            <dc:type>series</dc:type>
+            <dc:subject>Atmospheric conditions</dc:subject>
+            <dc:subject>Climate</dc:subject>
+            <dc:subject>Atmosphere</dc:subject>
+            <dc:subject>Cloud</dc:subject>
+            <dc:subject>Temperature</dc:subject>
+            <dc:subject>EUMETSAT Data Centre</dc:subject>
+            <dc:subject>geossdatacore</dc:subject>
+            <dc:subject>climatologyMeteorologyAtmosphere</dc:subject>
+            <dc:format/>
+            <dc:relation/>
+            <dct:modified/>
+            <dct:abstract>Reduced resolution scene identification information, including temperature calibration data, cloud amount, sun and satellite position angles. The data may support product development for application areas such as agrometeorology and hydrology. Although historically branded as Climate Data Set the quality of the data may not be sufficient for use in climate research and climate change and variability monitoring.</dct:abstract>
+            <dc:rights>copyright</dc:rights>
+            <ows:BoundingBox>
+                <ows:LowerCorner>-22.0 -81.0</ows:LowerCorner>
+                <ows:UpperCorner>142.0 81.0</ows:UpperCorner>
+            </ows:BoundingBox>
+        </csw:Record>
+        <csw:Record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-publication.xsd">
+            <dc:identifier>urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:MSG:GNWCCMa</dc:identifier>
+            <dc:title>Geostationary Nowcasting Cloudmask - MSG - 0 degree</dc:title>
+            <dc:type>series</dc:type>
+            <dc:subject>Atmospheric conditions</dc:subject>
+            <dc:subject>Atmosphere</dc:subject>
+            <dc:subject>Cloud</dc:subject>
+            <dc:subject>Weather</dc:subject>
+            <dc:subject>Disasters</dc:subject>
+            <dc:subject>Climate</dc:subject>
+            <dc:subject>EUMETCast</dc:subject>
+            <dc:subject>EUMETCast-Europe</dc:subject>
+            <dc:subject>EUMETCast-Africa</dc:subject>
+            <dc:subject>geossdatacore</dc:subject>
+            <dc:subject>climatologyMeteorologyAtmosphere</dc:subject>
+            <dc:format/>
+            <dc:relation/>
+            <dct:modified/>
+            <dct:abstract>Cloudmask including dust flag and volcanic ash flag produced with NWC-SAF Geo software package.</dct:abstract>
+            <dc:rights>copyright</dc:rights>
+            <ows:BoundingBox>
+                <ows:LowerCorner>-60.0 -60.0</ows:LowerCorner>
+                <ows:UpperCorner>60.0 60.0</ows:UpperCorner>
+            </ows:BoundingBox>
+        </csw:Record>
+        <csw:Record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-publication.xsd">
+            <dc:identifier>urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:MSG:GNWCCTH</dc:identifier>
+            <dc:title>Geostationary Nowcasting Cloud Top Temperature and Height - MSG - 0 degree</dc:title>
+            <dc:type>series</dc:type>
+            <dc:subject>Atmospheric conditions</dc:subject>
+            <dc:subject>Atmosphere</dc:subject>
+            <dc:subject>Cloud</dc:subject>
+            <dc:subject>Weather</dc:subject>
+            <dc:subject>Disasters</dc:subject>
+            <dc:subject>Climate</dc:subject>
+            <dc:subject>EUMETCast</dc:subject>
+            <dc:subject>EUMETCast-Europe</dc:subject>
+            <dc:subject>EUMETCast-Africa</dc:subject>
+            <dc:subject>geossdatacore</dc:subject>
+            <dc:subject>climatologyMeteorologyAtmosphere</dc:subject>
+            <dc:format/>
+            <dc:relation/>
+            <dct:modified/>
+            <dct:abstract>Cloud top temperature, height, and pressure produced with NWC-SAF Geo software package, PGE03.</dct:abstract>
+            <dc:rights>copyright</dc:rights>
+            <ows:BoundingBox>
+                <ows:LowerCorner>-60.0 -60.0</ows:LowerCorner>
+                <ows:UpperCorner>60.0 60.0</ows:UpperCorner>
+            </ows:BoundingBox>
+        </csw:Record>
+        <csw:Record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-publication.xsd">
+            <dc:identifier>urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:GOES:GOESE1</dc:identifier>
+            <dc:title>Image data (Hourly) - GOES East</dc:title>
+            <dc:type>series</dc:type>
+            <dc:subject>Atmospheric conditions</dc:subject>
+            <dc:subject>Weather</dc:subject>
+            <dc:subject>Level 1 Data</dc:subject>
+            <dc:subject>EUMETCast-Europe</dc:subject>
+            <dc:subject>EUMETCast</dc:subject>
+            <dc:subject>Direct</dc:subject>
+            <dc:subject>geossdatacore</dc:subject>
+            <dc:subject>climatologyMeteorologyAtmosphere</dc:subject>
+            <dc:format/>
+            <dc:relation/>
+            <dct:modified/>
+            <dct:abstract>Image data in the form of Low Rate transmissions, in 4 spectral channels: IR 3.9, IR 10.7, VIS 007, WV 6.6. Note: For the VIS channel 007 slots there are no data between 03.00 - 09.00 UTC due to under illumination.</dct:abstract>
+            <dc:rights>copyright</dc:rights>
+            <ows:BoundingBox>
+                <ows:LowerCorner>-110.0 20.0</ows:LowerCorner>
+                <ows:UpperCorner>-28.0 65.0</ows:UpperCorner>
+            </ows:BoundingBox>
+        </csw:Record>
+        <csw:Record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-publication.xsd">
+            <dc:identifier>urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:GOES:GOESE3</dc:identifier>
+            <dc:title>Image data (3-hourly) - GOES East</dc:title>
+            <dc:type>series</dc:type>
+            <dc:subject>Atmospheric conditions</dc:subject>
+            <dc:subject>Weather</dc:subject>
+            <dc:subject>Level 1 Data</dc:subject>
+            <dc:subject>Direct</dc:subject>
+            <dc:subject>EUMETCast-Europe</dc:subject>
+            <dc:subject>EUMETCast-Africa</dc:subject>
+            <dc:subject>EUMETCast-Americas</dc:subject>
+            <dc:subject>EUMETCast</dc:subject>
+            <dc:subject>geossdatacore</dc:subject>
+            <dc:subject>climatologyMeteorologyAtmosphere</dc:subject>
+            <dc:format/>
+            <dc:relation/>
+            <dct:modified/>
+            <dct:abstract>Image data in the form of Low Rate transmissions, in 4 spectral channels: IR 3.9, IR 10.7, VIS 007, WV 6.6. Note: For the VIS channel 007 slots there are no data between 03.00 - 09.00 UTC due to under illumination.</dct:abstract>
+            <dc:rights>copyright</dc:rights>
+            <ows:BoundingBox>
+                <ows:LowerCorner>-165.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>15.0 90.0</ows:UpperCorner>
+            </ows:BoundingBox>
+        </csw:Record>
+    </csw:SearchResults>
+</csw:GetRecordsResponse>
