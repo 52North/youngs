@@ -59,19 +59,26 @@ mappings:
         xpath: "//dc:rights"
         properties:
             type: string
+    # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
     date:
         xpath: "//dc:date"
         properties:
             type: date
-            # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
             format: "YYYY-MM-DD'Z'"
             ignore_malformed: true
     modified:
         xpath: "//dct:modified"
         properties:
             type: date
-            # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
             format: "YYYY-MM-DD'Z'"
             ignore_malformed: true
+    created_on:
+        xpath: "current-dateTime()"
+        properties:
+            type: date
+    used_mapping:
+        xpath: "string('CSW Record Mapping version 1')"
+        properties:
+            type: date
     # add bbox mapping!
         

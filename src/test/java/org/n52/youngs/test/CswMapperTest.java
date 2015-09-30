@@ -18,18 +18,15 @@ package org.n52.youngs.test;
 
 import com.google.common.io.Resources;
 import java.io.IOException;
-import org.hamcrest.CoreMatchers;
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
-import org.hamcrest.Matchers;
-import static org.hamcrest.Matchers.equalToIgnoringWhiteSpace;
 import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 import org.n52.youngs.harvest.SourceRecord;
 import org.n52.youngs.impl.XPathHelper;
 import org.n52.youngs.load.impl.BuilderRecord;
-import org.n52.youngs.transform.MappingConfiguration;
 import org.n52.youngs.transform.impl.CswToBuilderMapper;
 import org.n52.youngs.transform.impl.YamlMappingConfiguration;
 import static org.n52.youngs.util.JsonMatchers.hasJsonPath;
@@ -74,6 +71,57 @@ public class CswMapperTest {
 //                equalToIgnoringWhiteSpace("[ \"Otherography\", \"Physiography\", \"Morography\" ]"));
         assertThat("Mapped record contains all subjects", mappedRecordString,
                 containsString("[ \"Otherography\", \"Physiography\", \"Morography\" ]"));
+    }
+
+    @Test
+    public void stringResultsAdded() throws Exception {
+        YamlMappingConfiguration c = new YamlMappingConfiguration(
+                Resources.asByteSource(Resources.getResource("mappings/testmapping-xpath-values.yml")).openStream(),
+                new XPathHelper().newXPathFactory());
+        CswToBuilderMapper m = new CswToBuilderMapper(c);
+
+        SourceRecord record = Util.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
+        BuilderRecord mappedRecord = (BuilderRecord) m.map(record);
+        String mappedRecordString = mappedRecord.getBuilder().string();
+
+//        assertThat("Mapped record contains all subjects", mappedRecordString,
+//                equalToIgnoringWhiteSpace("[ \"Otherography\", \"Physiography\", \"Morography\" ]"));
+        assertThat("Mapped record contains used_mapping field", mappedRecordString,
+                containsString("used_mapping"));
+        assertThat("Mapped record contains used_mapping field value", mappedRecordString,
+                containsString("testmapping 1"));
+    }
+
+    @Test
+    public void datetimeResultsAdded() throws Exception {
+        YamlMappingConfiguration c = new YamlMappingConfiguration(
+                Resources.asByteSource(Resources.getResource("mappings/testmapping-xpath-values.yml")).openStream(),
+                new XPathHelper().newXPathFactory());
+        CswToBuilderMapper m = new CswToBuilderMapper(c);
+
+        SourceRecord record = Util.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
+        BuilderRecord mappedRecord = (BuilderRecord) m.map(record);
+        String mappedRecordString = mappedRecord.getBuilder().string();
+
+        assertThat("Mapped record contains created_on field", mappedRecordString,
+                containsString("created_on"));
+    }
+
+    @Test
+    public void fulltextResultsAdded() throws Exception {
+        YamlMappingConfiguration c = new YamlMappingConfiguration(
+                Resources.asByteSource(Resources.getResource("mappings/testmapping-xpath-values.yml")).openStream(),
+                new XPathHelper().newXPathFactory());
+        CswToBuilderMapper m = new CswToBuilderMapper(c);
+
+        SourceRecord record = Util.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
+        BuilderRecord mappedRecord = (BuilderRecord) m.map(record);
+        String mappedRecordString = mappedRecord.getBuilder().string();
+
+        assertThat("Mapped record contains full_text field", mappedRecordString,
+                containsString("full_text"));
+        assertThat("Mapped record contains fields that are not covered by mapping", mappedRecordString,
+                allOf(containsString("Physiography"), containsString("molestie lorem")));
     }
 
 }

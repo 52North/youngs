@@ -27,11 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
@@ -46,7 +44,6 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.indices.IndexMissingException;
 import org.joda.time.DateTimeZone;
-import org.n52.iceland.exception.ConfigurationError;
 import org.n52.iceland.statistics.api.mappings.MetadataDataMapping;
 import org.n52.iceland.statistics.api.parameters.AbstractEsParameter;
 import org.n52.iceland.statistics.api.parameters.ObjectEsParameter;
@@ -163,7 +160,7 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
         log.info("Update metadata record created: {}, exists: {} | id = {} @ {}/{}",
                 mdUpdate.isCreated(), mdUpdate.getId(), mdUpdate.getIndex(), mdUpdate.getType());
 
-        return (mdUpdate.getId().equals(MetadataDataMapping.METADATA_ROW_ID) 
+        return (mdUpdate.getId().equals(MetadataDataMapping.METADATA_ROW_ID)
                 && updateMappingResponse.isAcknowledged());
     }
 

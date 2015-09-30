@@ -1,0 +1,24 @@
+---
+name: test
+version: 42
+xpathversion: 2.0
+namespaces:
+    test: http://test
+mappings:
+    id:
+        xpath: "//fileIdentifier"
+        isoqueryable: false
+        identifier: TRUE
+    created_on:
+        xpath: "current-dateTime()"
+        properties:
+            type: date
+    used_mapping:
+        xpath: "string('testmapping 1')"
+        properties:
+            type: date
+    full_text:
+        xpath: "//*"
+        properties:
+            type: string
+        

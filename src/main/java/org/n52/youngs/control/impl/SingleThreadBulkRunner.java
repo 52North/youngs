@@ -66,7 +66,7 @@ public class SingleThreadBulkRunner implements Runner {
     private Sink sink;
 
     private final boolean testRun = false;
-    
+
     private long startPosition = 1;
 
     public SingleThreadBulkRunner() {
@@ -77,7 +77,7 @@ public class SingleThreadBulkRunner implements Runner {
         this.bulkSize = bulkSize;
         return this;
     }
-    
+
     public SingleThreadBulkRunner setStartPosition(long startPosition) {
         this.startPosition = startPosition;
         return this;

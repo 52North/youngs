@@ -71,10 +71,9 @@ mappings:
             null_value: "N/A"
             type: string
     date:
-        xpath: "//*"
+        xpath: "//date"
         properties:
             type: date
             # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
             format: YYYY-MM-DD
             ignore_malformed: true
-        

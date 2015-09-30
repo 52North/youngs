@@ -42,13 +42,46 @@ public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) throws Exception {
+
+        Report report = dabCsw();
+
+        log.info("Done:\n{}", report);
+    }
+
+    public static Report dabGmd() throws Exception {
+        Source source = new CswSource("http://api.eurogeoss-broker.eu/dab/services/cswiso",
+                Collections.singleton("http://www.isotc211.org/2005/gmd"),
+                NamespaceContextImpl.create(),
+                "gmd:MD_Metadata",
+                "http://www.isotc211.org/2005/gmd");
+
+        MappingConfiguration configuration = new YamlMappingConfiguration(
+                Resources.asByteSource(Resources.getResource("mappings/csw-record.yml")).openStream(),
+                new XPathHelper().newXPathFactory());
+        Mapper mapper = new CswToBuilderMapper(configuration);
+
+        String host = "localhost";
+        String cluster = "elasticsearch";
+        String index = "csw";
+        String type = "record";
+        int port = 9300;
+        Sink sink = new ElasticsearchRemoteHttpSink(host, port, cluster, index, type);
+
+        Runner runner = new SingleThreadBulkRunner()
+                .setBulkSize(20)
+                .setRecordsLimit(2000)
+                .setStartPosition(100)
+                .harvest(source)
+                .transform(mapper);
+        Report report = runner.load(sink);
+        return report;
+    }
+
+    public static Report dabCsw() throws Exception {
         // http://api.eurogeoss-broker.eu/dab/services/cswiso?service=CSW&version=2.0.2&request=GetCapabilities
         Source source = new CswSource("http://api.eurogeoss-broker.eu/dab/services/cswiso",
-//                Collections.singleton("http://www.isotc211.org/2005/gmd"),
                 Collections.singleton("http://www.opengis.net/cat/csw/2.0.2"),
                 NamespaceContextImpl.create(),
-//                "gmd:MD_Metadata",
-//                "http://www.isotc211.org/2005/gmd");
                 "csw:Record",
                 "http://www.opengis.net/cat/csw/2.0.2");
 
@@ -71,8 +104,7 @@ public class Main {
                 .harvest(source)
                 .transform(mapper);
         Report report = runner.load(sink);
-
-        log.info("Done:\n{}", report);
+        return report;
     }
 
 }
