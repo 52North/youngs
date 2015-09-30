@@ -1,0 +1,38 @@
+---
+name: test
+xpathversion: 2.0
+applicability_xpath: "boolean(//*[local-name()='MD_Metadata']) and boolean(namespace-uri(//*[local-name()='MD_Metadata']) = 'http://www.isotc211.org/2005/gmd')"
+namespaces:
+    gmd: http://www.isotc211.org/2005/gmd
+    gco: http://www.isotc211.org/2005/gco
+    gml: http://www.opengis.net/gml
+index:
+    create: true
+    name: csw
+    type: isorecord
+mappings:
+    id:
+        xpath: "//gmd:fileIdentifier/gco:CharacterString"
+        identifier: true
+        properties:
+            store: yes
+            type: string
+            boost: 10.0
+    language:
+        xpath: "//gmd:language/gmd:LanguageCode/@codeListValue"
+    # https://www.elastic.co/guide/en/elasticsearch/reference/1.4/mapping-geo-shape-type.html#_envelope
+    bbox:
+        xpath: "//gmd:extent/gmd:EX_Extent/gmd:geographicElement"
+        coordinates: "concat('[ [', 
+            normalize-space(//gmd:EX_GeographicBoundingBox/gmd:northBoundLatitude/gco:Decimal/text()), ', ', 
+            normalize-space(//gmd:EX_GeographicBoundingBox/gmd:westBoundLongitude/gco:Decimal/text()), '], [', 
+            normalize-space(//gmd:EX_GeographicBoundingBox/gmd:southBoundLatitude/gco:Decimal/text()), ', ', 
+            normalize-space(//gmd:EX_GeographicBoundingBox/gmd:eastBoundLongitude/gco:Decimal/text()), '] ]')"
+        field_type: envelope
+        properties:
+            store: yes
+            index_name: location
+            type: geo_shape
+            tree: quadtree
+            precision: 1m
+        

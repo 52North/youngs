@@ -18,6 +18,7 @@ package org.n52.youngs.test;
 
 import com.google.common.io.Resources;
 import java.io.IOException;
+import java.util.Collection;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -35,7 +36,7 @@ import static org.n52.youngs.util.JsonMatchers.hasJsonPath;
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public class CswMapperTest {
+public class CswToBuilderMapperTest {
 
     private YamlMappingConfiguration cswConfiguration;
 
@@ -50,15 +51,25 @@ public class CswMapperTest {
     }
 
     @Test
-    public void singleElementsAreParsed() throws Exception {
-        SourceRecord record = Util.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
+    public void singleElementsAreParsedWithoutSlashText() throws Exception {
+        SourceRecord record = Util.getSourceRecordFromFile("records/csw/Record_829babb0-b2f1-49e1-8cd5-7b489fe71a1e.xml");
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 
         assertThat("Mapped record contains identifier", mappedRecordString,
-                hasJsonPath("id", is("urn:uuid:ab42a8c4-95e8-4630-bf79-33e59241605a")));
+                hasJsonPath("id", is("urn:uuid:829babb0-b2f1-49e1-8cd5-7b489fe71a1e")));
         assertThat("Mapped record contains type", mappedRecordString,
-                hasJsonPath("type", is("http://purl.org/dc/dcmitype/Service")));
+                hasJsonPath("type", is("http://purl.org/dc/dcmitype/Image")));
+    }
+
+    @Test
+    public void singleElementsAreParsedWithSlashText() throws Exception {
+        SourceRecord record = Util.getSourceRecordFromFile("records/csw/Record_829babb0-b2f1-49e1-8cd5-7b489fe71a1e.xml");
+        BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
+        String mappedRecordString = mappedRecord.getBuilder().string();
+
+        assertThat("Mapped record contains format", mappedRecordString,
+                hasJsonPath("format", is("image/jp2")));
     }
 
     @Test
@@ -122,6 +133,22 @@ public class CswMapperTest {
                 containsString("full_text"));
         assertThat("Mapped record contains fields that are not covered by mapping", mappedRecordString,
                 allOf(containsString("Physiography"), containsString("molestie lorem")));
+    }
+
+    @Test
+    public void bbox() throws Exception {
+        YamlMappingConfiguration c = new YamlMappingConfiguration(
+                Resources.asByteSource(Resources.getResource("mappings/testmapping-gmd-bbox.yml")).openStream(),
+                new XPathHelper().newXPathFactory());
+        CswToBuilderMapper m = new CswToBuilderMapper(c);
+
+        Collection<SourceRecord> record = Util.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
+        BuilderRecord mappedRecord = (BuilderRecord) m.map(record.iterator().next());
+        String mappedRecordString = mappedRecord.getBuilder().string();
+
+        assertThat("Mapped record contains extend timestamps", mappedRecordString,
+                allOf(containsString("location"), containsString("envelope"),
+                        containsString("[ [14, -11], [-13, 12] ]")));
     }
 
 }

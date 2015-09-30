@@ -25,6 +25,12 @@ import javax.xml.xpath.XPathExpression;
  */
 public interface MappingEntry {
 
+    public interface IndexProperties {
+
+        public static final String TYPE = "type";
+        
+    }
+
     public static final String INDEX_NAME = "index_name";
 
     public XPathExpression getXPath();
@@ -40,5 +46,13 @@ public interface MappingEntry {
     public Object getIndexPropery(String name);
 
     public boolean isIdentifier();
+    
+    public boolean hasCoordinates();
+    
+    /**
+     * 
+     * @return expression to be evaluated on the element found by getXPath() to create a coordinates string
+    */
+    public XPathExpression getCoordinatesXPath();
 
 }

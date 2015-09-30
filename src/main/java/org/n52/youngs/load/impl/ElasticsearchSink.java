@@ -76,7 +76,7 @@ public abstract class ElasticsearchSink implements Sink {
             log.trace("Created [{}] with id {} @ {}/{}, version {}", response.isCreated(),
                     response.getId(), response.getIndex(), response.getType(), response.getVersion());
 
-            return true;
+            return response.isCreated() || (!response.isCreated() && (response.getVersion() > 1));
         } else {
             throw new InvalidParameterException(
                     String.format("The provided record class '%s' is not supported", record.getClass()));

@@ -43,7 +43,8 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        Report report = dabCsw();
+//        Report report = dabCsw();
+        Report report = dabGmd();
 
         log.info("Done:\n{}", report);
     }
@@ -56,7 +57,7 @@ public class Main {
                 "http://www.isotc211.org/2005/gmd");
 
         MappingConfiguration configuration = new YamlMappingConfiguration(
-                Resources.asByteSource(Resources.getResource("mappings/csw-record.yml")).openStream(),
+                Resources.asByteSource(Resources.getResource("mappings/gmd-metadata.yml")).openStream(),
                 new XPathHelper().newXPathFactory());
         Mapper mapper = new CswToBuilderMapper(configuration);
 
@@ -70,7 +71,7 @@ public class Main {
         Runner runner = new SingleThreadBulkRunner()
                 .setBulkSize(20)
                 .setRecordsLimit(2000)
-                .setStartPosition(100)
+                .setStartPosition(200)
                 .harvest(source)
                 .transform(mapper);
         Report report = runner.load(sink);
@@ -99,8 +100,8 @@ public class Main {
 
         Runner runner = new SingleThreadBulkRunner()
                 .setBulkSize(20)
-                .setRecordsLimit(2000)
-                .setStartPosition(100)
+                .setRecordsLimit(100)
+                .setStartPosition(1)
                 .harvest(source)
                 .transform(mapper);
         Report report = runner.load(sink);

@@ -216,11 +216,21 @@ public class YamlMappingConfiguration implements MappingConfiguration {
             XPath xPath = newXPath(nsContext);
             try {
                 XPathExpression compiledExpression = xPath.compile(expression);
-                return new MappingEntryImpl(compiledExpression,
+                MappingEntryImpl entry = new MappingEntryImpl(compiledExpression,
                         mapNode.path("isoqueryable").asBooleanValue(false),
                         mapNode.path("isoqueryableName").asTextValue(null),
                         indexProperties,
                         isIdentifier);
+
+                if (mapNode.has("coordinates")) {
+                    String coordsExpression = mapNode.path("coordinates").asTextValue();
+                    log.trace("Adding coordinates xpath: {}", coordsExpression);
+                    XPath coordsXPath = newXPath(nsContext);
+                    XPathExpression coordsCompiledExpression = coordsXPath.compile(coordsExpression);
+                    entry.setCoordinatesXPath(coordsCompiledExpression);
+                }
+                
+                return entry;
             } catch (XPathExpressionException e) {
                 log.error("Could not create XPath for provided expression '{}'", expression, e);
                 throw new MappingError(e, "Could not create XPath for provided expression '%s' in field %s",
@@ -273,6 +283,11 @@ public class YamlMappingConfiguration implements MappingConfiguration {
                 log.debug("Index name '{}' of field {} is not a string, falling back to id!", name, id);
                 props.put(MappingEntry.INDEX_NAME, id);
             }
+        }
+
+        // set default type
+        if (!props.containsKey(MappingEntry.IndexProperties.TYPE)) {
+            props.put(MappingEntry.IndexProperties.TYPE, DEFAULT_INDEXPROPERTY_TYPE);
         }
 
         // handle defaulting to parent node name for id

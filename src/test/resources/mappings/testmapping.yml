@@ -57,7 +57,6 @@ mappings:
         isoqueryable: false
         properties:
             store: *STOREDEFAULT
-            type: string
             index_name: title
             boost: 10
             #copy_to: autocomplete_field
@@ -69,7 +68,6 @@ mappings:
         properties:
             index_name: language
             null_value: "N/A"
-            type: string
     date:
         xpath: "//date"
         properties:
@@ -77,3 +75,6 @@ mappings:
             # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
             format: YYYY-MM-DD
             ignore_malformed: true
+    xtitle:
+        xpath: "//title"
+        isoqueryable: false

@@ -12,7 +12,7 @@ namespaces:
 index:
     create: true
     name: csw
-    type: record
+    type: dcrecord
 mappings:
     id:
         xpath: "//dc:identifier"
@@ -31,7 +31,7 @@ mappings:
             type: string
             boost: 2.0
     format:
-        xpath: "//dc:format"
+        xpath: "//dc:format/text()"
         properties:
             type: string
             boost: 2.0
@@ -79,6 +79,6 @@ mappings:
     used_mapping:
         xpath: "string('CSW Record Mapping version 1')"
         properties:
-            type: date
+            type: string
     # add bbox mapping!
         

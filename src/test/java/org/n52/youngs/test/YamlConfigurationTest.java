@@ -50,7 +50,7 @@ public class YamlConfigurationTest {
 
     private YamlMappingConfiguration config;
 
-    private XPathHelper helper = new XPathHelper();
+    private final XPathHelper helper = new XPathHelper();
 
     @Before
     public void loadFile() throws IOException {
@@ -86,6 +86,17 @@ public class YamlConfigurationTest {
         assertThat("name is correct", otherConfig.getName(), is(equalTo(MappingConfiguration.DEFAULT_NAME)));
         assertThat("version is correct", otherConfig.getVersion(), is(equalTo(MappingConfiguration.DEFAULT_VERSION)));
         assertThat("XPath version is correct", otherConfig.getXPathVersion(), is(equalTo(MappingConfiguration.DEFAULT_XPATH_VERSION)));
+    }
+
+    @Test
+    public void testDefaultFieldType() throws Exception {
+        Collection<MappingEntry> entries = config.getEntries();
+        Iterator<MappingEntry> iter = entries.iterator();
+        assertThat("date entry field type", iter.next().getIndexPropery("type"), is(equalTo("date")));
+        assertThat("id entry field type", iter.next().getIndexPropery("type"), is(equalTo("string")));
+        assertThat("language entry field type", iter.next().getIndexPropery("type"), is(equalTo("string")));
+        assertThat("title entry field type", iter.next().getIndexPropery("type"), is(equalTo("string")));
+        assertThat("xtitle entry field type", iter.next().getIndexPropery("type"), is(equalTo("string")));
     }
 
     @Test
@@ -217,7 +228,6 @@ public class YamlConfigurationTest {
 //                NamespaceContextImpl.create(), helper.newXPathFactory());
 //        assertNotNull(m);
 //    }
-
     @Test
     public void testIndexSettings() throws IOException {
         assertThat("name is correct", config.getIndex(), is("testindex"));
@@ -255,6 +265,37 @@ public class YamlConfigurationTest {
         YamlMappingConfiguration c10 = new YamlMappingConfiguration("mappings/testmapping-xpath20.yml",
                 NamespaceContextImpl.create(), helper.newXPathFactory());
         assertThat("mapping configuration was loaded", c10.getName(), is("testxpath"));
+    }
+
+    @Test
+    public void testEnvelope() throws Exception {
+        YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-gmd-bbox.yml",
+                NamespaceContextImpl.create(), helper.newXPathFactory());
+
+        Iterator<MappingEntry> iter = m.getEntries().iterator();
+        iter.next();
+        iter.next();
+        MappingEntry bbox = iter.next();
+        assertThat("envelope field name", bbox.getFieldName(), is("location"));
+        assertThat("envelope type", bbox.getIndexPropery("type"), is("envelope"));
+        assertThat("has coords", bbox.hasCoordinates(), is(true));
+//        assertThat("coords are correctly parsed", bbox.getCoordinates(),
+//                allOf(containsString("concat('[ ['"), containsString("normalize-space(gmd:northBoundLatitude),")));
+        assertThat("coordinates entry xpath works", bbox.getCoordinatesXPath().evaluate(new InputSource(
+                new StringReader("<gmd:EX_GeographicBoundingBox xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">"
+                        + "<gmd:westBoundLongitude>"
+                        + "    <gco:Decimal>-11</gco:Decimal>"
+                        + "</gmd:westBoundLongitude>"
+                        + "<gmd:eastBoundLongitude>"
+                        + "    <gco:Decimal>12</gco:Decimal>"
+                        + "</gmd:eastBoundLongitude>"
+                        + "<gmd:southBoundLatitude>"
+                        + "    <gco:Decimal>-13</gco:Decimal>"
+                        + "</gmd:southBoundLatitude>"
+                        + "<gmd:northBoundLatitude>"
+                        + "    <gco:Decimal>14</gco:Decimal>"
+                        + "</gmd:northBoundLatitude>"
+                        + "</gmd:EX_GeographicBoundingBox>"))), is("[ [14, -11], [-13, 12] ]"));
     }
 
 }

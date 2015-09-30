@@ -135,6 +135,9 @@ public class SingleThreadBulkRunner implements Runner {
         while (counter <= limit) {
             long recordsLeft = limit - counter;
             long size = Math.min(recordsLeft, bulkSize);
+            if(size <= 0) {
+                break;
+            }
             log.info("Requesting {} of {} records from {} starting at {}",
                     size, limit, source.getEndpoint(), counter);
 

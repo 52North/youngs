@@ -1,0 +1,131 @@
+---
+# http://api.eurogeoss-broker.eu/dab/services/cswiso?service=CSW&version=2.0.2&request=GetRecords&namespace=xmlns%28gmd=http://www.isotc211.org/2005/gmd%29&typeNames=gmd:MD_Metadata&ElementSetName=full&resultType=results&maxRecords=10&outputSchema=http://www.isotc211.org/2005/gmd
+name: "GMD Record Mapping"
+version: 1
+xpathversion: 2.0
+applicability_xpath: "boolean(//*[local-name()='MD_Metadata']) and boolean(namespace-uri(//*[local-name()='MD_Metadata']) = 'http://www.isotc211.org/2005/gmd')"
+namespaces:
+    gmd: http://www.isotc211.org/2005/gmd
+    gco: http://www.isotc211.org/2005/gco
+    gml: http://www.opengis.net/gml
+index:
+    create: true
+    name: csw
+    type: isorecord
+mappings:
+    id:
+        xpath: "//gmd:fileIdentifier/gco:CharacterString"
+        identifier: true
+        properties:
+            store: yes
+            type: string
+            boost: 10.0
+    language:
+        xpath: "//gmd:language/gmd:LanguageCode/@codeListValue"
+        properties:
+            store: yes
+    parent:
+        xpath: "//gmd:parentIdentifier/gco:CharacterString/text()"
+        properties:
+            store: yes
+    responsible_individual:
+        xpath: "//gmd:contact/gmd:CI_ResponsibleParty/gmd:individualName/gco:CharacterString/text()"
+        properties:
+            store: yes
+    responsible_org:
+        xpath: "//gmd:contact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString/text()"
+        properties:
+            store: yes
+    responsible_email:
+        xpath: "//gmd:contact/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gco:CharacterString/text()"
+        properties:
+            store: yes
+    md_standard_name:
+        xpath: "//gmd:metadataStandardName/gco:CharacterString/text()"
+        properties:
+            store: yes
+    md_standard_version:
+        xpath: "//gmd:metadataStandardVersion/gco:CharacterString/text()"
+        properties:
+            store: yes
+    reference_system:
+        xpath: "//gmd:referenceSystemInfo/gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gco:CharacterString"
+        properties:
+            store: yes
+    title:
+        xpath: "//gmd:identificationInfo/*/gmd:title/*/text()"
+        properties:
+            store: yes
+            type: string
+            boost: 5.0
+#    publication_date:
+#        xpath: "//dc:type"
+#        properties:
+#            type: date
+    abstract:
+        xpath: "//gmd:identificationInfo/*/gmd:abstract/*/text()"
+        properties:
+            store: yes
+            type: string
+            boost: 4.0
+    status:
+        xpath: "//gmd:identificationInfo/*/gmd:status/*/@codeListValue"
+        properties:
+            store: yes
+    keywords:
+        # only works for first keyword: xpath: "//gmd:identificationInfo/*/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gco:CharacterString/concat(../../gmd:type/*/@codeListValue, ':', ./text())"
+        xpath: "//gmd:identificationInfo/*/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/*/text()"
+        properties:
+            store: yes
+    # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
+    language:
+        xpath: "//gmd:language/*/text()"
+        properties:
+            store: yes
+    topic_category:
+        xpath: "//gmd:topicCategory/*/text()"
+        properties:
+            store: yes
+    extend_begin:
+        xpath: "//gmd:extent//gml:beginPosition/text()"
+        properties:
+            store: yes
+            type: date
+    extend_end:
+        xpath: "//gmd:extent//gml:endPosition/text()"
+        properties:
+            store: yes
+            type: date
+    date:
+        xpath: "//gmd:dateStamp/gco:DateTime"
+        properties:
+            store: yes
+            type: date
+            ignore_malformed: true
+    youngs_created_on:
+        xpath: "current-dateTime()"
+        properties:
+            store: yes
+            type: date
+    youngs_used_mapping:
+        xpath: "string('GMD Record Mapping version 1')"
+        properties:
+            type: string
+    # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-geo-shape-type.html#_envelope
+    bbox:
+        xpath: "//gmd:extent/gmd:EX_Extent/gmd:geographicElement"
+        coordinates: "concat('[ [', 
+            normalize-space(//gmd:EX_GeographicBoundingBox/gmd:northBoundLatitude/gco:Decimal/text()), ', ', 
+            normalize-space(//gmd:EX_GeographicBoundingBox/gmd:westBoundLongitude/gco:Decimal/text()), '], [', 
+            normalize-space(//gmd:EX_GeographicBoundingBox/gmd:southBoundLatitude/gco:Decimal/text()), ', ', 
+            normalize-space(//gmd:EX_GeographicBoundingBox/gmd:eastBoundLongitude/gco:Decimal/text()), '] ]')"
+        properties:
+            store: yes
+            index_name: location
+            type: geo_shape
+            tree: quadtree
+            precision: 1m
+    # distribution info
+    # data quality (lineage, scope)
+        
+        

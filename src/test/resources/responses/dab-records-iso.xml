@@ -372,16 +372,20 @@
                             <gmd:geographicElement>
                                 <gmd:EX_GeographicBoundingBox>
                                     <gmd:westBoundLongitude>
-                                        <gco:Decimal>-66</gco:Decimal>
+                                        <!--<gco:Decimal>-66</gco:Decimal>-->
+                                        <gco:Decimal>-11</gco:Decimal>
                                     </gmd:westBoundLongitude>
                                     <gmd:eastBoundLongitude>
-                                        <gco:Decimal>66</gco:Decimal>
+                                        <!--<gco:Decimal>66</gco:Decimal>-->
+                                        <gco:Decimal>12</gco:Decimal>
                                     </gmd:eastBoundLongitude>
                                     <gmd:southBoundLatitude>
-                                        <gco:Decimal>-66</gco:Decimal>
+                                        <!--<gco:Decimal>-66</gco:Decimal>-->
+                                        <gco:Decimal>-13</gco:Decimal>
                                     </gmd:southBoundLatitude>
                                     <gmd:northBoundLatitude>
-                                        <gco:Decimal>66</gco:Decimal>
+                                        <!--<gco:Decimal>66</gco:Decimal>-->
+                                        <gco:Decimal>14</gco:Decimal>
                                     </gmd:northBoundLatitude>
                                 </gmd:EX_GeographicBoundingBox>
                             </gmd:geographicElement>

@@ -19,12 +19,12 @@ package org.n52.youngs.transform.impl;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Sets;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.logging.Level;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -37,7 +37,6 @@ import org.n52.youngs.transform.MappingConfiguration;
 import org.n52.youngs.transform.MappingEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -107,8 +106,8 @@ public class CswToBuilderMapper implements Mapper {
             log.warn("Error selecting id field from node", e);
         }
 
-        // handle nodesets
-        entries.forEach(entry -> {
+        // handle non-geo entries
+        entries.stream().filter(e -> !e.hasCoordinates()).forEach(entry -> {
             log.trace("Applying field mapping '{}' to node: {}", entry.getFieldName(), node);
 
             Optional<EvalResult> result = Optional.empty();
@@ -146,6 +145,28 @@ public class CswToBuilderMapper implements Mapper {
                 } catch (IOException e) {
                     log.warn("Error adding field {} to builder", entry.getFieldName(), e);
                 }
+            }
+        });
+
+        // handle geo types
+        entries.stream().filter(e -> e.hasCoordinates()).forEach(entry -> {
+            try {
+                Object coordsNode = entry.getXPath().evaluate(node, XPathConstants.NODE);
+                String coordsString = entry.getCoordinatesXPath().evaluate(coordsNode);
+                String geoType = (String) entry.getIndexPropery(MappingEntry.IndexProperties.TYPE);
+                String field = (String) entry.getIndexPropery(MappingEntry.INDEX_NAME);
+
+                if (!coordsString.isEmpty() && !geoType.isEmpty() && !field.isEmpty()) {
+                    builder.startObject(field)
+                            .field(MappingEntry.IndexProperties.TYPE, "envelope") // FIXME geoType)
+                            .field("coordinates", coordsString)
+                            .endObject();
+                    log.debug("Added coordinates '{}' as {}", coordsString, geoType);
+                }
+            } catch (XPathExpressionException | IOException e) {
+                log.warn("Error selecting field {} as nodeset, could be XPath 2.0 expression... trying evaluation to string."
+                        + " Error was: {}", entry.getFieldName(), e.getMessage());
+                log.trace("Error selecting field {} as nodeset", entry.getFieldName(), e);
             }
         });
 

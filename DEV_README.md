@@ -18,4 +18,4 @@ To run integration tests, activate the profile `integration-test`: `mvn verify -
 
 During development, the following commands can be handy to delete indices and types when running an external Elasticsearch database. Commands are tested in [Cmder](http://cmder.net/).
 
-* `curl -XDELETE 'http://localhost:9200/testindex/'` (see [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-delete-index.html)
+* `curl -v -Method Delete 'http://localhost:9200/testindex/'` (see [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-delete-index.html)
