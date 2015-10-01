@@ -24,6 +24,8 @@ import static org.hamcrest.Matchers.greaterThan;
 import org.junit.Assert;
 import org.junit.Test;
 import org.n52.youngs.harvest.CswSource;
+import org.n52.youngs.harvest.KvpCswSource;
+import org.n52.youngs.harvest.PoxCswSource;
 import org.n52.youngs.impl.NamespaceContextImpl;
 
 /**
@@ -33,8 +35,17 @@ import org.n52.youngs.impl.NamespaceContextImpl;
 public class CswSourceIT {
 
     @Test
-    public void namespaceParameterCreation() throws Exception {
-        CswSource source = new CswSource(new URL("http://api.eurogeoss-broker.eu/dab/services/cswiso"),
+    public void kvpCount() throws Exception {
+        CswSource source = new KvpCswSource(new URL("http://api.eurogeoss-broker.eu/dab/services/cswiso"),
+                (Collection<String>) ImmutableList.of("http://www.opengis.net/cat/csw/2.0.2"), NamespaceContextImpl.create(), "csw:Record", "http://www.opengis.net/cat/csw/2.0.2");
+
+        long count = source.getRecordCount();
+        Assert.assertThat("record count is higher than last manual check", count, is(greaterThan(900000l)));
+    }
+
+    @Test
+    public void poxCount() throws Exception {
+        CswSource source = new PoxCswSource(new URL("http://api.eurogeoss-broker.eu/dab/services/cswiso"),
                 (Collection<String>) ImmutableList.of("http://www.opengis.net/cat/csw/2.0.2"), NamespaceContextImpl.create(), "csw:Record", "http://www.opengis.net/cat/csw/2.0.2");
 
         long count = source.getRecordCount();

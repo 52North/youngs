@@ -23,6 +23,7 @@ import org.n52.youngs.api.Report;
 import org.n52.youngs.control.impl.SingleThreadBulkRunner;
 import org.n52.youngs.transform.impl.CswToBuilderMapper;
 import org.n52.youngs.harvest.CswSource;
+import org.n52.youngs.harvest.KvpCswSource;
 import org.n52.youngs.impl.NamespaceContextImpl;
 import org.n52.youngs.harvest.Source;
 import org.n52.youngs.impl.XPathHelper;
@@ -50,7 +51,7 @@ public class Main {
     }
 
     public static Report dabGmd() throws Exception {
-        Source source = new CswSource("http://api.eurogeoss-broker.eu/dab/services/cswiso",
+        Source source = new KvpCswSource("http://api.eurogeoss-broker.eu/dab/services/cswiso",
                 Collections.singleton("http://www.isotc211.org/2005/gmd"),
                 NamespaceContextImpl.create(),
                 "gmd:MD_Metadata",
@@ -80,7 +81,7 @@ public class Main {
 
     public static Report dabCsw() throws Exception {
         // http://api.eurogeoss-broker.eu/dab/services/cswiso?service=CSW&version=2.0.2&request=GetCapabilities
-        Source source = new CswSource("http://api.eurogeoss-broker.eu/dab/services/cswiso",
+        Source source = new KvpCswSource("http://api.eurogeoss-broker.eu/dab/services/cswiso",
                 Collections.singleton("http://www.opengis.net/cat/csw/2.0.2"),
                 NamespaceContextImpl.create(),
                 "csw:Record",

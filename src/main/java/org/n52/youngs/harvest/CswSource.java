@@ -55,13 +55,13 @@ import org.w3c.dom.Node;
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public class CswSource implements Source {
+public abstract class CswSource implements Source {
 
     private static final Logger log = LoggerFactory.getLogger(CswSource.class);
 
     private final URL url;
 
-    private Optional<Long> recordCount = Optional.empty();
+    protected Optional<Long> recordCount = Optional.empty();
 
     private String typeNames;
 
@@ -71,9 +71,9 @@ public class CswSource implements Source {
 
     private String outputSchema;
 
-    private JAXBContext context;
+    protected JAXBContext context;
 
-    private Unmarshaller unmarshaller;
+    protected Unmarshaller unmarshaller;
 
     private NamespaceContext namespaceContext;
 
@@ -119,7 +119,7 @@ public class CswSource implements Source {
 
     @Override
     public long getRecordCount() {
-        return recordCount.orElseGet(new CswRecordCountSupplier());
+        return recordCount.orElseGet(getAndStoreRecordCount());
     }
 
     @Override
@@ -128,75 +128,11 @@ public class CswSource implements Source {
     }
 
     @Override
-    public Collection<SourceRecord> getRecords(long startPosition, long maxRecords) {
-        log.debug("Requesting {} records from catalog starting at {}", maxRecords, startPosition);
-        Collection<SourceRecord> records = Lists.newArrayList();
+    public abstract Collection<SourceRecord> getRecords(long startPosition, long maxRecords);
 
-        String recordsRequest = createRequest(startPosition, maxRecords);
-        log.trace("GetRecords request: {}", recordsRequest);
+    protected abstract Supplier<? extends Long> getAndStoreRecordCount();
 
-        try {
-            InputStream response = Request.Get(recordsRequest).execute().returnContent().asStream();
-
-            JAXBElement<GetRecordsResponseType> jaxb_response = unmarshaller.unmarshal(new StreamSource(response),
-                    GetRecordsResponseType.class);
-            BigInteger numberOfRecordsReturned = jaxb_response.getValue().getSearchResults().getNumberOfRecordsReturned();
-            log.debug("Got response with {} records", numberOfRecordsReturned);
-
-            List<Object> nodes = jaxb_response.getValue().getSearchResults().getAny();
-            if (!nodes.isEmpty()) {
-                log.trace("Found {} \"any\" nodes.", nodes.size());
-                nodes.stream()
-                        .filter(n -> n instanceof Node)
-                        .map(n -> (Node) n)
-                        .map(n -> new NodeSourceRecord(n))
-                        .forEach(records::add);
-            }
-
-            List<JAXBElement<? extends AbstractRecordType>> jaxb_records = jaxb_response.getValue().getSearchResults().getAbstractRecord();
-            if (!jaxb_records.isEmpty()) {
-                log.trace("Found {} \"AbstractRecordType\" records.", jaxb_records.size());
-                DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-                jaxb_records.stream()
-                        .map(type -> {
-                            return getNode(type, context, db);
-                        })
-                        .filter(Objects::nonNull)
-                        .map(n -> new NodeSourceRecord(n))
-                        .forEach(records::add);
-            }
-        } catch (IOException | JAXBException | ParserConfigurationException e) {
-            log.error("Could not retrieve records using url {}", recordsRequest, e);
-        }
-
-        return records;
-    }
-
-    private String createRequest(long startPosition, long maxRecords) {
-        // http://api.eurogeoss-broker.eu/dab/services/cswiso?service=CSW&version=2.0.2&request=GetRecords&namespace=xmlns(gmd=http://www.isotc211.org/2005/gmd)&typeNames=gmd:MD_Metadata&ElementSetName=full&resultType=results&maxRecords=10&outputSchema=http://www.isotc211.org/2005/gmd
-        StringBuilder recordsRequest = new StringBuilder();
-        recordsRequest.append(url);
-        if (!url.toString().endsWith("?")) {
-            recordsRequest.append("?");
-        }
-        String fixedParameters = Joiner.on("&").withKeyValueSeparator("=").join(
-                ImmutableMap.of("service", "CSW",
-                        "version", "2.0.2",
-                        "request", "GetRecords",
-                        "resultType", "results",
-                        "ElementSetName", "full"));
-        recordsRequest.append(fixedParameters);
-        String parameters = Joiner.on("&").withKeyValueSeparator("=").join(
-                ImmutableMap.of("namespace", getNamespacesParameter(),
-                        "typeNames", getTypeNamesParameter(),
-                        "outputSchema", getOutputSchemaParameter(),
-                        "startPosition", startPosition,
-                        "maxRecords", maxRecords));
-        recordsRequest.append("&").append(parameters);
-        return recordsRequest.toString();
-    }
-
-    private Node getNode(JAXBElement<? extends AbstractRecordType> record, JAXBContext context, DocumentBuilder db) {
+    protected Node getNode(JAXBElement<? extends AbstractRecordType> record, JAXBContext context, DocumentBuilder db) {
         try {
             Document document = db.newDocument();
             Marshaller marshaller = context.createMarshaller();
@@ -209,12 +145,12 @@ public class CswSource implements Source {
         }
     }
 
-    private String getNamespacesParameter() {
+    protected String getNamespacesParameter() {
         return namespacesParameter.orElseGet(new NamespacesParameterSupplier(
                 namespaces.orElse(DEFAULT_NAMESPACES), namespaceContext));
     }
 
-    private String getTypeNamesParameter() {
+    protected String getTypeNamesParameter() {
         return typeNames;
     }
 
@@ -222,55 +158,7 @@ public class CswSource implements Source {
         return outputSchema;
     }
 
-    private class CswRecordCountSupplier implements Supplier<Long> {
-
-        public CswRecordCountSupplier() {
-            //
-        }
-
-        @Override
-        public Long get() {
-            log.debug("Requesting record count at {} using {} and {}", url, typeNames, namespaces);
-            Long count = Long.MIN_VALUE;
-
-            // http://api.eurogeoss-broker.eu/dab/services/cswiso?service=CSW&version=2.0.2&
-            //request=GetRecords&namespace=xmlns%28csw=http://www.opengis.net/cat/csw/2.0.2%29%29&typeNames=csw:Record&ElementSetName=summary
-            StringBuilder hitsRequest = new StringBuilder();
-            hitsRequest.append(url);
-            if (!url.toString().endsWith("?")) {
-                hitsRequest.append("?");
-            }
-            String fixedParameters = Joiner.on("&").withKeyValueSeparator("=").join(
-                    ImmutableMap.of("service", "CSW",
-                            "version", "2.0.2",
-                            "request", "GetRecords",
-                            "resultType", "hits",
-                            "ElementSetName", "summary"));
-            hitsRequest.append(fixedParameters);
-            String parameters = Joiner.on("&").withKeyValueSeparator("=").join(
-                    ImmutableMap.of("namespace", getNamespacesParameter(),
-                            "typeNames", getTypeNamesParameter()));
-            hitsRequest.append("&").append(parameters);
-
-            try {
-                InputStream response = Request.Get(hitsRequest.toString()).execute().returnContent().asStream();
-
-                GetRecordsResponseType getRecordsResponse = unmarshaller.unmarshal(new StreamSource(response), GetRecordsResponseType.class).getValue();
-                BigInteger numberOfRecordsMatched = getRecordsResponse.getSearchResults().getNumberOfRecordsMatched();
-                count = numberOfRecordsMatched.longValue();
-                log.debug("Found {} records", count);
-            } catch (IOException | JAXBException e) {
-                log.error("Could not retrieve record count using url {}", hitsRequest, e);
-            }
-
-            // FIXME inproper use of supplier
-            recordCount = Optional.of(count);
-
-            return count;
-        }
-    }
-
-    /**
+        /**
      * "xmlns(csw=http://www.opengis.net/cat/csw)";
      */
     private class NamespacesParameterSupplier implements Supplier<String> {
