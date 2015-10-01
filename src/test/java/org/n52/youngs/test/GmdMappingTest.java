@@ -79,7 +79,7 @@ public class GmdMappingTest {
         assertThat("Mapped record contains extent timestamps", mappedRecordString,
                 allOf(containsString("\"id\" : \"5a716d99-afac-47e0-9de9-14cf707be994\"")));
     }
-    
+
     @Test
     public void bbox() throws Exception {
         Collection<SourceRecord> record = Util.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
@@ -88,7 +88,7 @@ public class GmdMappingTest {
 
         assertThat("Mapped record contains envelope", mappedRecordString,
                 allOf(containsString("location"), containsString("envelope"),
-                        containsString("[ [14, -11], [-13, 12] ]")));
+                        containsString("[ [ 14.0, -11.1 ], [ -13.0, 12.22 ] ]")));
     }
 
 }

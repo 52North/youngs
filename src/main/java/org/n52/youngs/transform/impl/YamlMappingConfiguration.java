@@ -22,6 +22,7 @@ import com.github.autermann.yaml.nodes.YamlBooleanNode;
 import com.github.autermann.yaml.nodes.YamlDecimalNode;
 import com.github.autermann.yaml.nodes.YamlIntegralNode;
 import com.github.autermann.yaml.nodes.YamlMapNode;
+import com.github.autermann.yaml.nodes.YamlSeqNode;
 import com.github.autermann.yaml.nodes.YamlTextNode;
 import com.google.common.base.Joiner;
 import org.n52.youngs.transform.MappingEntry;
@@ -41,7 +42,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -226,23 +229,42 @@ public class YamlMappingConfiguration implements MappingConfiguration {
                 // geo types
                 if (mapNode.has("coordinates")) {
                     String coordsType = mapNode.path("coordinates_type").asTextValue();
-                    String coordsExpression = mapNode.path("coordinates").asTextValue();
-                    log.trace("Adding type '{}' coordinates xpath: {}", coordsType, coordsExpression);
-                    if (coordsType == null || coordsExpression == null) {
-                        log.error("Missing properties for field {} for coordinates type: coordinates_type = {}, coordinatesEyxpression = {}",
-                                entry.getFieldName(), coordsType, coordsExpression);
-                        throw new MappingError("Missing properties in field %s for coordinates type: coordinates_type = %s, coordinatesEyxpression = %s",
-                                entry.getFieldName(), coordsType, coordsExpression);
+                    boolean points = mapNode.path("coordinates").has("points");
+                    if (coordsType == null || !points) {
+                        log.error("Missing properties for field {} for coordinates type: coordinates_type = {}, coordinates.points contained = {}",
+                                entry.getFieldName(), coordsType, points);
+                        throw new MappingError("Missing properties in field %s for coordinates type: coordinates_type = %s, coordinatesEyxpression = %s, coordinates contained = {}",
+                                entry.getFieldName(), coordsType, points);
                     }
 
-                    XPath coordsXPath = newXPath(nsContext);
-                    XPathExpression coordsCompiledExpression = coordsXPath.compile(coordsExpression);
-                    entry.setCoordinatesXPath(coordsCompiledExpression).setCoordinatesType(coordsType);
+                    YamlSeqNode pointsMap = (YamlSeqNode) mapNode.path("coordinates").path("points");
+
+//                    log.trace("Adding type '{}' coordinates xpath: {}", coordsType, coordsExpression);
+                    List<XPathExpression[]> pointExpressions = pointsMap.value().stream().filter(n -> n instanceof YamlMapNode)
+                            .map(n -> (YamlMapNode) n)
+                            .map(mn -> {
+                                String expressionStringLat = mn.path("lat").asTextValue();
+                                String expressionStringLon = mn.path("lon").asTextValue();
+                                try {
+                                    XPathExpression compiledLat = newXPath(nsContext).compile(expressionStringLat);
+                                    XPathExpression compiledLon = newXPath(nsContext).compile(expressionStringLon);
+                                    return new XPathExpression[]{compiledLat, compiledLon};
+                                } catch (XPathExpressionException e) {
+                                    log.warn("Error creating xpath '{}' or '{}' for point in field {}: {}",
+                                            expressionStringLat, expressionStringLon, id, e.getMessage());
+                                    return null;
+                                }
+                            })
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toList());
+
+                    log.trace("Created {} points for {}", pointExpressions.size(), id);
+                    entry.setCoordinatesXPaths(pointExpressions).setCoordinatesType(coordsType);
                 }
 
                 return entry;
             } catch (XPathExpressionException e) {
-                log.error("Could not create XPath for provided expression '{}'", expression, e);
+                log.error("Could not create XPath for provided expression '{}' in field {}", expression, e, id);
                 throw new MappingError(e, "Could not create XPath for provided expression '%s' in field %s",
                         expression, id);
             }

@@ -112,13 +112,19 @@ mappings:
         properties:
             type: string
     # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-geo-shape-type.html#_envelope
+    # FIXME this _probably_ does not support bounding boxes crossing the date line
     bbox:
         xpath: "//gmd:extent/gmd:EX_Extent/gmd:geographicElement"
-        coordinates: "concat('[ [', 
-            normalize-space(//gmd:EX_GeographicBoundingBox/gmd:northBoundLatitude/gco:Decimal/text()), ', ', 
-            normalize-space(//gmd:EX_GeographicBoundingBox/gmd:westBoundLongitude/gco:Decimal/text()), '], [', 
-            normalize-space(//gmd:EX_GeographicBoundingBox/gmd:southBoundLatitude/gco:Decimal/text()), ', ', 
-            normalize-space(//gmd:EX_GeographicBoundingBox/gmd:eastBoundLongitude/gco:Decimal/text()), '] ]')"
+        coordinates:
+            points:
+                # just field
+                -   lat: "//gmd:EX_GeographicBoundingBox/gmd:northBoundLatitude/gco:Decimal"
+                # field text
+                    lon: "//gmd:EX_GeographicBoundingBox/gmd:westBoundLongitude/gco:Decimal/text()"
+                # field text as number
+                -   lat: "number(normalize-space(//gmd:EX_GeographicBoundingBox/gmd:southBoundLatitude/gco:Decimal/text()))"
+                # text with normalized space
+                    lon: "normalize-space(//gmd:EX_GeographicBoundingBox/gmd:eastBoundLongitude/gco:Decimal/text())"
         coordinates_type: envelope
         properties:
             store: yes

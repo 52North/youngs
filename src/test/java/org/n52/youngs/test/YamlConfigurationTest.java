@@ -20,8 +20,11 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathFactoryConfigurationException;
@@ -283,21 +286,27 @@ public class YamlConfigurationTest {
         assertThat("envelope type", bbox.getCoordinatesType(), is("envelope"));
 //        assertThat("coords are correctly parsed", bbox.getCoordinates(),
 //                allOf(containsString("concat('[ ['"), containsString("normalize-space(gmd:northBoundLatitude),")));
-        assertThat("coordinates entry xpath works", bbox.getCoordinatesXPath().evaluate(new InputSource(
-                new StringReader("<gmd:EX_GeographicBoundingBox xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">"
-                        + "<gmd:westBoundLongitude>"
-                        + "    <gco:Decimal>-11</gco:Decimal>"
-                        + "</gmd:westBoundLongitude>"
-                        + "<gmd:eastBoundLongitude>"
-                        + "    <gco:Decimal>12</gco:Decimal>"
-                        + "</gmd:eastBoundLongitude>"
-                        + "<gmd:southBoundLatitude>"
-                        + "    <gco:Decimal>-13</gco:Decimal>"
-                        + "</gmd:southBoundLatitude>"
-                        + "<gmd:northBoundLatitude>"
-                        + "    <gco:Decimal>14</gco:Decimal>"
-                        + "</gmd:northBoundLatitude>"
-                        + "</gmd:EX_GeographicBoundingBox>"))), is("[ [14, -11], [-13, 12] ]"));
+        String bboxString = "<gmd:EX_GeographicBoundingBox xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">"
+                + "<gmd:westBoundLongitude>"
+                + "    <gco:Decimal>-11</gco:Decimal>"
+                + "</gmd:westBoundLongitude>"
+                + "<gmd:eastBoundLongitude>"
+                + "    <gco:Decimal>12</gco:Decimal>"
+                + "</gmd:eastBoundLongitude>"
+                + "<gmd:southBoundLatitude>"
+                + "    <gco:Decimal>-13</gco:Decimal>"
+                + "</gmd:southBoundLatitude>"
+                + "<gmd:northBoundLatitude>"
+                + "    <gco:Decimal>14.0</gco:Decimal>"
+                + "</gmd:northBoundLatitude>"
+                + "</gmd:EX_GeographicBoundingBox>";
+
+        List<XPathExpression[]> coordinatesXPaths = bbox.getCoordinatesXPaths();
+        assertThat("coordinates entry xpath works", coordinatesXPaths.get(0)[0].evaluate(new InputSource(new StringReader(bboxString)), XPathConstants.NUMBER), is(14d));
+        assertThat("coordinates entry xpath works", coordinatesXPaths.get(0)[1].evaluate(new InputSource(new StringReader(bboxString)), XPathConstants.NUMBER), is(-11d));
+        assertThat("coordinates entry xpath works", coordinatesXPaths.get(1)[0].evaluate(new InputSource(new StringReader(bboxString)), XPathConstants.NUMBER), is(-13d));
+        assertThat("coordinates entry xpath works", coordinatesXPaths.get(1)[1].evaluate(new InputSource(new StringReader(bboxString)), XPathConstants.NUMBER), is(12d));
+        //is("[ [14, -11], [-13, 12] ]"));
     }
 
 }

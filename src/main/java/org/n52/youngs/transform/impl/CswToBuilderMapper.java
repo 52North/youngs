@@ -19,13 +19,16 @@ package org.n52.youngs.transform.impl;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Sets;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
 import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
@@ -152,21 +155,43 @@ public class CswToBuilderMapper implements Mapper {
         entries.stream().filter(e -> e.hasCoordinates()).forEach(entry -> {
             try {
                 Object coordsNode = entry.getXPath().evaluate(node, XPathConstants.NODE);
-                String coordsString = entry.getCoordinatesXPath().evaluate(coordsNode);
-                String geoType = (String) entry.getIndexPropery(MappingEntry.IndexProperties.TYPE);
-                String field = (String) entry.getIndexPropery(MappingEntry.INDEX_NAME);
+                if (coordsNode != null) {
+                    String geoType = (String) entry.getIndexPropery(MappingEntry.IndexProperties.TYPE);
+                    String field = (String) entry.getIndexPropery(MappingEntry.INDEX_NAME);
 
-                if (!coordsString.isEmpty() && !geoType.isEmpty() && !field.isEmpty() && entry.hasCoordinatesType()) {
-                    builder.startObject(field)
-                            .field(MappingEntry.IndexProperties.TYPE, entry.getCoordinatesType())
-                            .field("coordinates", coordsString)
-                            .endObject();
-                    log.debug("Added coordinates '{}' as {} of type {}", coordsString, geoType, entry.getCoordinatesType());
-                }
-                else {
-                    log.warn("Mapping '{}' has coordinates but is missing one of the other required settings, not adding field: "
-                            + "node = {}, index_name = {}, coordinates_type = {}, type = {}, evalutated coords string = {}",
-                            entry.getFieldName(), coordsNode, field, entry.getCoordinatesType(), geoType, coordsString);
+                    List<XPathExpression[]> pointsXPaths = entry.getCoordinatesXPaths();
+
+                    if (!pointsXPaths.isEmpty() && !geoType.isEmpty() && !field.isEmpty() && entry.hasCoordinatesType()) {
+                        List<Number[]> pointsDoubles = pointsXPaths.stream().map(p -> {
+                            try {
+                                Number lat = (Number) p[0].evaluate(coordsNode, XPathConstants.NUMBER);
+                                Number lon = (Number) p[1].evaluate(coordsNode, XPathConstants.NUMBER);
+                                return new Number[]{lat, lon};
+                            } catch (XPathExpressionException e) {
+                                log.warn("Error evaluating XPath {} for coordinate: {}", p, e);
+                                return null;
+                            }
+                        })
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.toList());
+                        log.trace("Evaluated {} expressions and got {} points: {}", pointsXPaths.size(),
+                                pointsDoubles.size(), Arrays.deepToString(pointsDoubles.toArray()));
+
+                        builder.startObject(field)
+                                .field(MappingEntry.IndexProperties.TYPE, entry.getCoordinatesType())
+                                //                                .field("coordinates", coordsString)
+                                .field("coordinates", pointsDoubles)
+                                .endObject();
+                        log.debug("Added points '{}' as {} of type {}", Arrays.deepToString(pointsDoubles.toArray()),
+                                geoType, entry.getCoordinatesType());
+                    } else {
+                        log.warn("Mapping '{}' has coordinates but is missing one of the other required settings, not adding field: "
+                                + "node = {}, index_name = {}, coordinates_type = {}, type = {}, points = {}",
+                                entry.getFieldName(), coordsNode, field, entry.getCoordinatesType(), geoType,
+                                Arrays.deepToString(pointsXPaths.toArray()));
+                    }
+                } else {
+                    log.warn("Coords node is null, no result evaluating {} on {]", entry.getXPath(), node);
                 }
             } catch (XPathExpressionException | IOException e) {
                 log.warn("Error selecting coordinate-field {} as node. Error was: {}", entry.getFieldName(), e.getMessage());

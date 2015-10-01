@@ -148,7 +148,7 @@ public class CswToBuilderMapperTest {
 
         assertThat("Mapped record contains envelope", mappedRecordString,
                 allOf(containsString("location"), containsString("envelope"),
-                        containsString("[ [14, -11], [-13, 12] ]")));
+                        containsString("[ [ 14.0, -11.1 ], [ -13.0, 12.22 ] ]")));
     }
 
 }

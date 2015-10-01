@@ -16,6 +16,7 @@
  */
 package org.n52.youngs.transform;
 
+import java.util.List;
 import java.util.Map;
 import javax.xml.xpath.XPathExpression;
 
@@ -51,9 +52,9 @@ public interface MappingEntry {
 
     /**
      *
-     * @return expression to be evaluated on the element found by getXPath() to create a coordinates string
-    */
-    public XPathExpression getCoordinatesXPath();
+     * @return a list of expressions to be evaluated on the element found by getXPath() to create coordinates
+     */
+    public List<XPathExpression[]> getCoordinatesXPaths();
 
     public boolean hasCoordinatesType();
 

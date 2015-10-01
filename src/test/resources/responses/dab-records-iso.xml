@@ -373,15 +373,15 @@
                                 <gmd:EX_GeographicBoundingBox>
                                     <gmd:westBoundLongitude>
                                         <!--<gco:Decimal>-66</gco:Decimal>-->
-                                        <gco:Decimal>-11</gco:Decimal>
+                                        <gco:Decimal>-11.1</gco:Decimal>
                                     </gmd:westBoundLongitude>
                                     <gmd:eastBoundLongitude>
                                         <!--<gco:Decimal>66</gco:Decimal>-->
-                                        <gco:Decimal>12</gco:Decimal>
+                                        <gco:Decimal>12.22</gco:Decimal>
                                     </gmd:eastBoundLongitude>
                                     <gmd:southBoundLatitude>
                                         <!--<gco:Decimal>-66</gco:Decimal>-->
-                                        <gco:Decimal>-13</gco:Decimal>
+                                        <gco:Decimal>-13.00</gco:Decimal>
                                     </gmd:southBoundLatitude>
                                     <gmd:northBoundLatitude>
                                         <!--<gco:Decimal>66</gco:Decimal>-->

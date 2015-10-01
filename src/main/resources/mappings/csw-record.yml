@@ -9,6 +9,7 @@ namespaces:
     csw: http://www.opengis.net/cat/csw/2.0.2
     dc: http://purl.org/dc/elements/1.1/
     dct: http://purl.org/dc/terms/
+    ows: http://www.opengis.net/ows
 index:
     create: true
     name: csw
@@ -80,5 +81,26 @@ mappings:
         xpath: "string('CSW Record Mapping version 1')"
         properties:
             type: string
-    # add bbox mapping!
+    # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-geo-shape-type.html#_envelope
+    # coordinate order depends on CRS hard to handle here, support only WGS84 which is "northing first", so "lat,lon", which has  http://spatialreference.org/ref/epsg/wgs-84/
+    # FIXME this does not support bounding boxes crossing the date line
+    location:
+        xpath: "//ows:BoundingBox"
+        #[contains(@ows:crs,'4326')]"
+        # min works on sequences, use min((1, 2)) > http://stackoverflow.com/questions/21901313/why-cant-i-use-min-function-in-my-xslt-on-a-number
+        # normalize-space does not work on numbers, the an outer 'number(min(..))' call removes trailing zeros after comparison [e.g. min((1.23, 1.1)) = 1.10], to be consistent between the latitute and longitude
+        coordinates:
+            points:
+                -   lat: "number(substring-before(ows:UpperCorner, ' '))"
+                    lon: "min( ( number(substring-after(ows:UpperCorner, ' ') ),
+                    number(substring-after(ows:LowerCorner, ' ')) ) )"
+                -   lat: "number(substring-before(ows:LowerCorner, ' '))"
+                    lon: "max( ( number(substring-after(ows:UpperCorner, ' ') ),
+                    number(substring-after(ows:LowerCorner, ' ')) ) )"
+        coordinates_type: envelope
+        properties:
+            store: yes
+            type: geo_shape
+            tree: quadtree
+            precision: 1m
         

@@ -19,6 +19,7 @@ package org.n52.youngs.transform.impl;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.xml.xpath.XPathExpression;
@@ -40,7 +41,7 @@ public class MappingEntryImpl implements MappingEntry {
 
     private Optional<Boolean> identifier = Optional.empty();
 
-    private Optional<XPathExpression> coordinates = Optional.empty();
+    private Optional<List<XPathExpression[]>> coordinates = Optional.empty();
 
     private Optional<String> coordinatesType = Optional.empty();
 
@@ -115,11 +116,11 @@ public class MappingEntryImpl implements MappingEntry {
     }
 
     @Override
-    public XPathExpression getCoordinatesXPath() {
+    public List<XPathExpression[]> getCoordinatesXPaths() {
         return coordinates.get();
     }
 
-    public MappingEntryImpl setCoordinatesXPath(XPathExpression coords) {
+    public MappingEntryImpl setCoordinatesXPaths(List<XPathExpression[]> coords) {
         this.coordinates = Optional.of(coords);
         return this;
     }
