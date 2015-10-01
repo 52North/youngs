@@ -50,6 +50,8 @@ public interface MappingConfiguration {
     */
     public Collection<MappingEntry> getEntries();
 
+    public MappingEntry getEntry(String name);
+
     public String getName();
 
     public int getVersion();

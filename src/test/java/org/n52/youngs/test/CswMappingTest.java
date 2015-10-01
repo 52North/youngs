@@ -16,6 +16,7 @@
  */
 package org.n52.youngs.test;
 
+import org.n52.youngs.impl.SourceRecordHelper;
 import com.google.common.io.Resources;
 import java.io.IOException;
 import static org.hamcrest.CoreMatchers.allOf;
@@ -49,7 +50,7 @@ public class CswMappingTest {
 
     @Test
     public void bbox() throws Exception {
-        SourceRecord record = Util.getSourceRecordFromFile("records/csw/Record_1ef30a8b-876d-4828-9246-c37ab4510bbd.xml");
+        SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_1ef30a8b-876d-4828-9246-c37ab4510bbd.xml");
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 

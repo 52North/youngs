@@ -399,4 +399,9 @@ public class YamlMappingConfiguration implements MappingConfiguration {
         return indexCreationRequest.get();
     }
 
+    @Override
+    public MappingEntry getEntry(String name) {
+        return this.entries.stream().filter(e -> e.getFieldName().equals(name)).findFirst().get();
+    }
+
 }

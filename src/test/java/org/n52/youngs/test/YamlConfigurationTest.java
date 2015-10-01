@@ -23,6 +23,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
@@ -58,6 +60,12 @@ public class YamlConfigurationTest {
     @Before
     public void loadFile() throws IOException {
         config = new YamlMappingConfiguration("mappings/testmapping.yml", helper.newXPathFactory());
+    }
+
+    @Test
+    public void entryByName() throws IOException {
+        assertThat("name is correct", config.getEntry("title").getFieldName(), is(equalTo("title")));
+        assertThat("name is correct", config.getEntry("title").getIndexProperties().size(), is(equalTo(5)));
     }
 
     @Test
@@ -104,7 +112,7 @@ public class YamlConfigurationTest {
 
     @Test
     public void testApplicabilityMatching() throws Exception {
-        Document document = Util.getDocument("<testdoc xmlns=\"http://www.isotc211.org/2005/gmd\">"
+        Document document = getDocument("<testdoc xmlns=\"http://www.isotc211.org/2005/gmd\">"
                 + "<MD_Metadata>"
                 + "<id>42</id>"
                 + "</MD_Metadata>"
@@ -114,7 +122,7 @@ public class YamlConfigurationTest {
 
 //    @Test // FIXME
     public void testApplicabilityNonMatchingElem() throws Exception {
-        Document document = Util.getDocument("<testdoc xmlns=\"http://www.isotc211.org/2005/gmd\">"
+        Document document = getDocument("<testdoc xmlns=\"http://www.isotc211.org/2005/gmd\">"
                 + "<MI_Metadata>"
                 + "<id>42</id>"
                 + "</MI_Metadata>"
@@ -124,7 +132,7 @@ public class YamlConfigurationTest {
 
 //    @Test // FIXME
     public void testApplicabilityNonMatchingNS() throws Exception {
-        Document document = Util.getDocument("<testdoc>"
+        Document document = getDocument("<testdoc>"
                 + "<ns1:MD_Metadata xmlns:ns1=\"http://wrong.namespace\">"
                 + "<id>42</id>"
                 + "</ns1:MD_Metadata>"
@@ -137,7 +145,7 @@ public class YamlConfigurationTest {
         YamlMappingConfiguration otherConfig = new YamlMappingConfiguration("mappings/testmapping-invalidXPath.yml",
                 NamespaceContextImpl.create(), helper.newXPathFactory());
 
-        Document document = Util.getDocument("<testdoc" + new Random().nextInt(52) + " />");
+        Document document = getDocument("<testdoc" + new Random().nextInt(52) + " />");
 
         assertThat("matching document is always applicable", otherConfig.isApplicable(document), is(true));
     }
@@ -147,7 +155,7 @@ public class YamlConfigurationTest {
         YamlMappingConfiguration otherConfig = new YamlMappingConfiguration("mappings/testmapping-empty.yml",
                 NamespaceContextImpl.create(), helper.newXPathFactory());
 
-        Document document = Util.getDocument("<testdoc/>");
+        Document document = getDocument("<testdoc/>");
 
         assertThat("is always applicable", otherConfig.isApplicable(document), is(true));
         assertThat("is always applicable, but not for 'null'", otherConfig.isApplicable(null), is(false));
@@ -307,6 +315,14 @@ public class YamlConfigurationTest {
         assertThat("coordinates entry xpath works", coordinatesXPaths.get(1)[0].evaluate(new InputSource(new StringReader(bboxString)), XPathConstants.NUMBER), is(-13d));
         assertThat("coordinates entry xpath works", coordinatesXPaths.get(1)[1].evaluate(new InputSource(new StringReader(bboxString)), XPathConstants.NUMBER), is(12d));
         //is("[ [14, -11], [-13, 12] ]"));
+    }
+
+    private Document getDocument(String xmlString) throws Exception {
+        DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        InputSource is = new InputSource();
+        is.setCharacterStream(new StringReader(xmlString));
+        Document doc = db.parse(is);
+        return doc;
     }
 
 }

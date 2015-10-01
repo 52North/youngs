@@ -16,6 +16,7 @@
  */
 package org.n52.youngs.test;
 
+import org.n52.youngs.impl.SourceRecordHelper;
 import com.google.common.collect.Sets;
 import com.google.common.io.Resources;
 import java.io.File;
@@ -30,6 +31,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
@@ -42,7 +44,6 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.n52.youngs.api.Record;
 import org.n52.youngs.harvest.DirectorySource;
 import org.n52.youngs.impl.NamespaceContextImpl;
 import org.n52.youngs.harvest.NodeSourceRecord;
@@ -120,7 +121,7 @@ public class DirectorySourceTest {
         DirectorySource source = new DirectorySource(baseDirectory.resolve("csw"));
         Collection<SourceRecord> records = source.getRecords(2, 9);
 
-        String allMappedRecordsString = Util.sourceRecordsToString(records, cswMapper);
+        String allMappedRecordsString = sourceRecordsToString(records, cswMapper);
 
         assertThat("first record id is in NOT mapped records", allMappedRecordsString,
                 not(containsString("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f")));
@@ -137,7 +138,7 @@ public class DirectorySourceTest {
         DirectorySource source = new DirectorySource(baseDirectory.resolve("csw"));
         Collection<SourceRecord> records = source.getRecords(12, 100);
 
-        String allMappedRecordsString = Util.sourceRecordsToString(records, cswMapper);
+        String allMappedRecordsString = sourceRecordsToString(records, cswMapper);
 
         assertThat("last record id is in mapped records", allMappedRecordsString,
                 containsString("e9330592-0932-474b-be34-c3a3bb67c7db"));
@@ -160,6 +161,22 @@ public class DirectorySourceTest {
         DirectorySource source = new DirectorySource(tempDirectory.toPath());
 
         assertThat("all files are found", source.getRecordCount(), is(equalTo(16l)));
+    }
+
+    public static String sourceRecordsToString(Collection<SourceRecord> records, Mapper mapper) {
+        return records.stream()
+                .map(mapper::map)
+                .map(r -> (BuilderRecord) r)
+                .map(BuilderRecord::getBuilder)
+                .map((xContentBuilder) -> {
+                    try {
+                        return xContentBuilder.string();
+                    } catch (IOException ex) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining("\n\n"));
     }
 
 }

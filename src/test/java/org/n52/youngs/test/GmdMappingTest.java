@@ -16,6 +16,7 @@
  */
 package org.n52.youngs.test;
 
+import org.n52.youngs.impl.SourceRecordHelper;
 import com.google.common.io.Resources;
 import java.io.IOException;
 import java.util.Collection;
@@ -50,7 +51,7 @@ public class GmdMappingTest {
 
 //    @Test
     public void keywordTypeConcatenation() throws Exception {
-        Collection<SourceRecord> record = Util.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
+        Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record.iterator().next());
         String mappedRecordString = mappedRecord.getBuilder().string();
 
@@ -61,7 +62,7 @@ public class GmdMappingTest {
 
     @Test
     public void temporalExtent() throws Exception {
-        Collection<SourceRecord> record = Util.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
+        Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record.iterator().next());
         String mappedRecordString = mappedRecord.getBuilder().string();
 
@@ -72,7 +73,7 @@ public class GmdMappingTest {
 
     @Test
     public void id() throws Exception {
-        Collection<SourceRecord> record = Util.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
+        Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record.iterator().next());
         String mappedRecordString = mappedRecord.getBuilder().string();
 
@@ -82,7 +83,7 @@ public class GmdMappingTest {
 
     @Test
     public void bbox() throws Exception {
-        Collection<SourceRecord> record = Util.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
+        Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record.iterator().next());
         String mappedRecordString = mappedRecord.getBuilder().string();
 

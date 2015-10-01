@@ -122,7 +122,7 @@ public class CswToBuilderMapper implements Mapper {
                     log.trace("Found nodeset result: {}", result.get());
                 }
             } catch (XPathExpressionException e) {
-                log.warn("Error selecting field {} as nodeset, could be XPath 2.0 expression... trying evaluation to string."
+                log.debug("Error selecting field {} as nodeset, could be XPath 2.0 expression... trying evaluation to string."
                         + " Error was: {}", entry.getFieldName(), e.getMessage());
                 log.trace("Error selecting field {} as nodeset", entry.getFieldName(), e);
             }
@@ -130,7 +130,7 @@ public class CswToBuilderMapper implements Mapper {
             // try string eval if nodeset did not work
             if (!result.isPresent()) {
                 try {
-                    String stringResult = entry.getXPath().evaluate(node);
+                    String stringResult = (String) entry.getXPath().evaluate(node, XPathConstants.STRING);
                     result = Optional.ofNullable(handleEvaluationResult(stringResult, entry.getFieldName()));
                     if (result.isPresent()) {
                         log.trace("Found string result: {}", result.get());
@@ -144,9 +144,9 @@ public class CswToBuilderMapper implements Mapper {
             if (result.isPresent()) {
                 try {
                     builder.field(result.get().name, result.get().value);
-                    log.debug("Added field: {}", result);
+                    log.debug("Added field: {}", result.get());
                 } catch (IOException e) {
-                    log.warn("Error adding field {} to builder", entry.getFieldName(), e);
+                    log.warn("Error adding field {}: {}", entry.getFieldName(), e);
                 }
             }
         });
@@ -213,6 +213,8 @@ public class CswToBuilderMapper implements Mapper {
             if (!valueString.isEmpty()) {
                 log.trace("Found field {} = {}", name, valueString);
                 return new EvalResult(name, valueString);
+            } else {
+                log.debug("Evaluation returned empty string for entry {}", name);
             }
         } else if (evalutationResult instanceof NodeList) {
             NodeList nodeList = (NodeList) evalutationResult;

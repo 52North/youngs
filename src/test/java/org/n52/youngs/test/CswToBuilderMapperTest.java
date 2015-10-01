@@ -16,6 +16,7 @@
  */
 package org.n52.youngs.test;
 
+import org.n52.youngs.impl.SourceRecordHelper;
 import com.google.common.io.Resources;
 import java.io.IOException;
 import java.util.Collection;
@@ -52,7 +53,7 @@ public class CswToBuilderMapperTest {
 
     @Test
     public void singleElementsAreParsedWithoutSlashText() throws Exception {
-        SourceRecord record = Util.getSourceRecordFromFile("records/csw/Record_829babb0-b2f1-49e1-8cd5-7b489fe71a1e.xml");
+        SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_829babb0-b2f1-49e1-8cd5-7b489fe71a1e.xml");
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 
@@ -64,7 +65,7 @@ public class CswToBuilderMapperTest {
 
     @Test
     public void singleElementsAreParsedWithSlashText() throws Exception {
-        SourceRecord record = Util.getSourceRecordFromFile("records/csw/Record_829babb0-b2f1-49e1-8cd5-7b489fe71a1e.xml");
+        SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_829babb0-b2f1-49e1-8cd5-7b489fe71a1e.xml");
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 
@@ -74,7 +75,7 @@ public class CswToBuilderMapperTest {
 
     @Test
     public void multipleElementsAreParsed() throws Exception {
-        SourceRecord record = Util.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
+        SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 
@@ -91,7 +92,7 @@ public class CswToBuilderMapperTest {
                 new XPathHelper().newXPathFactory());
         CswToBuilderMapper m = new CswToBuilderMapper(c);
 
-        SourceRecord record = Util.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
+        SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
         BuilderRecord mappedRecord = (BuilderRecord) m.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 
@@ -110,7 +111,7 @@ public class CswToBuilderMapperTest {
                 new XPathHelper().newXPathFactory());
         CswToBuilderMapper m = new CswToBuilderMapper(c);
 
-        SourceRecord record = Util.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
+        SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
         BuilderRecord mappedRecord = (BuilderRecord) m.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 
@@ -125,7 +126,7 @@ public class CswToBuilderMapperTest {
                 new XPathHelper().newXPathFactory());
         CswToBuilderMapper m = new CswToBuilderMapper(c);
 
-        SourceRecord record = Util.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
+        SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
         BuilderRecord mappedRecord = (BuilderRecord) m.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 
@@ -142,7 +143,7 @@ public class CswToBuilderMapperTest {
                 new XPathHelper().newXPathFactory());
         CswToBuilderMapper m = new CswToBuilderMapper(c);
 
-        Collection<SourceRecord> record = Util.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
+        Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
         BuilderRecord mappedRecord = (BuilderRecord) m.map(record.iterator().next());
         String mappedRecordString = mappedRecord.getBuilder().string();
 
