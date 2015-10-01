@@ -153,7 +153,7 @@ public class YamlConfigurationTest {
     @Test
     public void testEntriesLoading() throws IOException, XPathExpressionException {
         Collection<MappingEntry> entries = config.getEntries();
-        assertThat("all entries are loaded", entries.size(), is(equalTo(4)));
+        assertThat("all entries are loaded", entries.size(), is(equalTo(5)));
     }
 
     @Test
@@ -276,9 +276,11 @@ public class YamlConfigurationTest {
         iter.next();
         iter.next();
         MappingEntry bbox = iter.next();
-        assertThat("envelope field name", bbox.getFieldName(), is("location"));
-        assertThat("envelope type", bbox.getIndexPropery("type"), is("envelope"));
         assertThat("has coords", bbox.hasCoordinates(), is(true));
+        assertThat("has coords", bbox.hasCoordinatesType(), is(true));
+        assertThat("envelope field name", bbox.getFieldName(), is("location"));
+        assertThat("envelope type", bbox.getIndexPropery("type"), is("geo_shape"));
+        assertThat("envelope type", bbox.getCoordinatesType(), is("envelope"));
 //        assertThat("coords are correctly parsed", bbox.getCoordinates(),
 //                allOf(containsString("concat('[ ['"), containsString("normalize-space(gmd:northBoundLatitude),")));
         assertThat("coordinates entry xpath works", bbox.getCoordinatesXPath().evaluate(new InputSource(

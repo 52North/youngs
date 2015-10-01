@@ -28,7 +28,7 @@ mappings:
             normalize-space(//gmd:EX_GeographicBoundingBox/gmd:westBoundLongitude/gco:Decimal/text()), '], [', 
             normalize-space(//gmd:EX_GeographicBoundingBox/gmd:southBoundLatitude/gco:Decimal/text()), ', ', 
             normalize-space(//gmd:EX_GeographicBoundingBox/gmd:eastBoundLongitude/gco:Decimal/text()), '] ]')"
-        field_type: envelope
+        coordinates_type: envelope
         properties:
             store: yes
             index_name: location

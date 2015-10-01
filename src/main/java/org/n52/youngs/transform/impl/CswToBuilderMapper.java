@@ -156,16 +156,20 @@ public class CswToBuilderMapper implements Mapper {
                 String geoType = (String) entry.getIndexPropery(MappingEntry.IndexProperties.TYPE);
                 String field = (String) entry.getIndexPropery(MappingEntry.INDEX_NAME);
 
-                if (!coordsString.isEmpty() && !geoType.isEmpty() && !field.isEmpty()) {
+                if (!coordsString.isEmpty() && !geoType.isEmpty() && !field.isEmpty() && entry.hasCoordinatesType()) {
                     builder.startObject(field)
-                            .field(MappingEntry.IndexProperties.TYPE, "envelope") // FIXME geoType)
+                            .field(MappingEntry.IndexProperties.TYPE, entry.getCoordinatesType())
                             .field("coordinates", coordsString)
                             .endObject();
-                    log.debug("Added coordinates '{}' as {}", coordsString, geoType);
+                    log.debug("Added coordinates '{}' as {} of type {}", coordsString, geoType, entry.getCoordinatesType());
+                }
+                else {
+                    log.warn("Mapping '{}' has coordinates but is missing one of the other required settings, not adding field: "
+                            + "node = {}, index_name = {}, coordinates_type = {}, type = {}, evalutated coords string = {}",
+                            entry.getFieldName(), coordsNode, field, entry.getCoordinatesType(), geoType, coordsString);
                 }
             } catch (XPathExpressionException | IOException e) {
-                log.warn("Error selecting field {} as nodeset, could be XPath 2.0 expression... trying evaluation to string."
-                        + " Error was: {}", entry.getFieldName(), e.getMessage());
+                log.warn("Error selecting coordinate-field {} as node. Error was: {}", entry.getFieldName(), e.getMessage());
                 log.trace("Error selecting field {} as nodeset", entry.getFieldName(), e);
             }
         });

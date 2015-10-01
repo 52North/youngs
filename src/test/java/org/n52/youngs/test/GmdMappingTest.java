@@ -60,7 +60,7 @@ public class GmdMappingTest {
     }
 
     @Test
-    public void temporalExtend() throws Exception {
+    public void temporalExtent() throws Exception {
         Collection<SourceRecord> record = Util.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record.iterator().next());
         String mappedRecordString = mappedRecord.getBuilder().string();
@@ -76,8 +76,19 @@ public class GmdMappingTest {
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record.iterator().next());
         String mappedRecordString = mappedRecord.getBuilder().string();
 
-        assertThat("Mapped record contains extend timestamps", mappedRecordString,
+        assertThat("Mapped record contains extent timestamps", mappedRecordString,
                 allOf(containsString("\"id\" : \"5a716d99-afac-47e0-9de9-14cf707be994\"")));
+    }
+    
+    @Test
+    public void bbox() throws Exception {
+        Collection<SourceRecord> record = Util.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
+        BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record.iterator().next());
+        String mappedRecordString = mappedRecord.getBuilder().string();
+
+        assertThat("Mapped record contains envelope", mappedRecordString,
+                allOf(containsString("location"), containsString("envelope"),
+                        containsString("[ [14, -11], [-13, 12] ]")));
     }
 
 }

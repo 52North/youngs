@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.xml.namespace.NamespaceContext;
@@ -222,14 +223,23 @@ public class YamlMappingConfiguration implements MappingConfiguration {
                         indexProperties,
                         isIdentifier);
 
+                // geo types
                 if (mapNode.has("coordinates")) {
+                    String coordsType = mapNode.path("coordinates_type").asTextValue();
                     String coordsExpression = mapNode.path("coordinates").asTextValue();
-                    log.trace("Adding coordinates xpath: {}", coordsExpression);
+                    log.trace("Adding type '{}' coordinates xpath: {}", coordsType, coordsExpression);
+                    if (coordsType == null || coordsExpression == null) {
+                        log.error("Missing properties for field {} for coordinates type: coordinates_type = {}, coordinatesEyxpression = {}",
+                                entry.getFieldName(), coordsType, coordsExpression);
+                        throw new MappingError("Missing properties in field %s for coordinates type: coordinates_type = %s, coordinatesEyxpression = %s",
+                                entry.getFieldName(), coordsType, coordsExpression);
+                    }
+
                     XPath coordsXPath = newXPath(nsContext);
                     XPathExpression coordsCompiledExpression = coordsXPath.compile(coordsExpression);
-                    entry.setCoordinatesXPath(coordsCompiledExpression);
+                    entry.setCoordinatesXPath(coordsCompiledExpression).setCoordinatesType(coordsType);
                 }
-                
+
                 return entry;
             } catch (XPathExpressionException e) {
                 log.error("Could not create XPath for provided expression '{}'", expression, e);

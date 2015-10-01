@@ -146,7 +146,7 @@ public class CswToBuilderMapperTest {
         BuilderRecord mappedRecord = (BuilderRecord) m.map(record.iterator().next());
         String mappedRecordString = mappedRecord.getBuilder().string();
 
-        assertThat("Mapped record contains extend timestamps", mappedRecordString,
+        assertThat("Mapped record contains envelope", mappedRecordString,
                 allOf(containsString("location"), containsString("envelope"),
                         containsString("[ [14, -11], [-13, 12] ]")));
     }

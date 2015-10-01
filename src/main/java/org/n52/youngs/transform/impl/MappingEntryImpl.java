@@ -39,8 +39,10 @@ public class MappingEntryImpl implements MappingEntry {
     private final Map<String, Object> indexProperties = Maps.newHashMap();
 
     private Optional<Boolean> identifier = Optional.empty();
-    
+
     private Optional<XPathExpression> coordinates = Optional.empty();
+
+    private Optional<String> coordinatesType = Optional.empty();
 
     public MappingEntryImpl(XPathExpression xPath, boolean isoQueryable, String isoQueryableName,
             Map<String, Object> indexProperties, boolean identifier) {
@@ -116,9 +118,24 @@ public class MappingEntryImpl implements MappingEntry {
     public XPathExpression getCoordinatesXPath() {
         return coordinates.get();
     }
-    
+
     public MappingEntryImpl setCoordinatesXPath(XPathExpression coords) {
         this.coordinates = Optional.of(coords);
+        return this;
+    }
+
+    @Override
+    public boolean hasCoordinatesType() {
+        return this.coordinatesType.isPresent();
+    }
+
+    @Override
+    public String getCoordinatesType() {
+        return this.coordinatesType.get();
+    }
+
+    public MappingEntryImpl setCoordinatesType(String type) {
+        this.coordinatesType = Optional.of(type);
         return this;
     }
 
