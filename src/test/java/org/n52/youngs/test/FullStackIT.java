@@ -44,7 +44,7 @@ import org.n52.youngs.transform.impl.YamlMappingConfiguration;
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public class DirectorySourceIT {
+public class FullStackIT {
 
     private static Path baseDirectory;
 
@@ -64,7 +64,7 @@ public class DirectorySourceIT {
     }
 
     @Test
-    public void testCswRecordsDirectory() throws IOException {
+    public void testCswRecordsDirectoryToElasticsearchSink() throws IOException {
         DirectorySource source = new DirectorySource(baseDirectory.resolve("csw"));
 
         String host = "localhost";

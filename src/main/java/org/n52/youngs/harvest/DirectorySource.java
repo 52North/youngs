@@ -93,9 +93,12 @@ public class DirectorySource implements Source {
     @Override
     public Collection<SourceRecord> getRecords(long startPosition, long maxRecords) {
         List<SourceRecord> sorted = readRecordsFromDirectory();
-        int calculatedEnd = (int) (startPosition + maxRecords);
-        return sorted.subList((int) (startPosition - 1), // java starts at 0
-                Math.min(sorted.size(), calculatedEnd)); // end is exclusive
+        int calculatedBegin = (int) (startPosition - 1);
+        int calculatedEnd = (int) Math.min(sorted.size(), (calculatedBegin + maxRecords));
+        log.trace("Mapped subsetting from start={} max={} to [{}, {}[(exclusive) for {} records",
+                startPosition, maxRecords, calculatedBegin, calculatedEnd, sorted.size());
+        return sorted.subList(calculatedBegin, // java starts at 0
+                calculatedEnd); // end is exclusive
     }
 
     private File[] getFiles() {

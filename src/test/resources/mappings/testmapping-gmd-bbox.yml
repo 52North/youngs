@@ -39,7 +39,6 @@ mappings:
                 # text with normalized space
                     lon: "normalize-space(//gmd:EX_GeographicBoundingBox/gmd:eastBoundLongitude/gco:Decimal/text())"
         coordinates_type: envelope
-        coordinates_type: envelope
         properties:
             store: yes
             index_name: location

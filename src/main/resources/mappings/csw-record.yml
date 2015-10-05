@@ -100,6 +100,7 @@ mappings:
         coordinates_type: envelope
         properties:
             store: yes
+            index_name: location
             type: geo_shape
             tree: quadtree
             precision: 1m

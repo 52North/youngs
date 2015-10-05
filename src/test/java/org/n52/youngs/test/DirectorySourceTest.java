@@ -16,7 +16,6 @@
  */
 package org.n52.youngs.test;
 
-import org.n52.youngs.impl.SourceRecordHelper;
 import com.google.common.collect.Sets;
 import com.google.common.io.Resources;
 import java.io.File;
@@ -31,6 +30,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,6 +38,7 @@ import org.apache.commons.io.FileUtils;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.startsWith;
@@ -49,6 +50,7 @@ import org.n52.youngs.impl.NamespaceContextImpl;
 import org.n52.youngs.harvest.NodeSourceRecord;
 import org.n52.youngs.harvest.SourceRecord;
 import org.n52.youngs.impl.XPathHelper;
+import org.n52.youngs.load.SinkRecord;
 import org.n52.youngs.load.impl.BuilderRecord;
 import org.n52.youngs.transform.Mapper;
 import org.n52.youngs.transform.MappingConfiguration;
@@ -63,7 +65,7 @@ public class DirectorySourceTest {
 
     private static Path baseDirectory;
 
-    private static Mapper cswMapper;
+    private static Mapper mapper;
 
     @BeforeClass
     public static void baseDir() throws URISyntaxException, IOException {
@@ -72,7 +74,7 @@ public class DirectorySourceTest {
         MappingConfiguration cswConfiguration = new YamlMappingConfiguration(
                 Resources.asByteSource(Resources.getResource("mappings/csw-record.yml")).openStream(),
                 NamespaceContextImpl.create(), new XPathHelper().newXPathFactory());
-        cswMapper = new CswToBuilderMapper(cswConfiguration);
+        mapper = new CswToBuilderMapper(cswConfiguration);
     }
 
     @Test
@@ -110,7 +112,7 @@ public class DirectorySourceTest {
         assertThat("all records are NodeSourceRecords", isNodeRecord, is(equalTo(Sets.newHashSet(true))));
 
         Iterator<SourceRecord> iter = records.iterator();
-        BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map((SourceRecord) iter.next());
+        BuilderRecord mappedRecord = (BuilderRecord) mapper.map((SourceRecord) iter.next());
         String mappedRecordString = mappedRecord.getBuilder().string();
 
         assertThat("record id is in mapped record", mappedRecordString, containsString("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f"));
@@ -120,9 +122,9 @@ public class DirectorySourceTest {
     public void testPagination() {
         DirectorySource source = new DirectorySource(baseDirectory.resolve("csw"));
         Collection<SourceRecord> records = source.getRecords(2, 9);
+        assertThat("correct number of records", records.size(), is(9));
 
-        String allMappedRecordsString = sourceRecordsToString(records, cswMapper);
-
+        String allMappedRecordsString = sourceRecordsToString(records, mapper);
         assertThat("first record id is in NOT mapped records", allMappedRecordsString,
                 not(containsString("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f")));
         assertThat("second record id is in mapped records", allMappedRecordsString,
@@ -137,9 +139,9 @@ public class DirectorySourceTest {
     public void testPaginationUpperBound() {
         DirectorySource source = new DirectorySource(baseDirectory.resolve("csw"));
         Collection<SourceRecord> records = source.getRecords(12, 100);
+        assertThat("correct number of records", records.size(), is(1));
 
-        String allMappedRecordsString = sourceRecordsToString(records, cswMapper);
-
+        String allMappedRecordsString = sourceRecordsToString(records, mapper);
         assertThat("last record id is in mapped records", allMappedRecordsString,
                 containsString("e9330592-0932-474b-be34-c3a3bb67c7db"));
     }
@@ -177,6 +179,21 @@ public class DirectorySourceTest {
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining("\n\n"));
+    }
+
+    @Test
+    public void testCswRecordsDirectoryWithMapping() throws IOException {
+        DirectorySource source = new DirectorySource(baseDirectory.resolve("csw"));
+
+        Collection<SourceRecord> records = source.getRecords(1, 7);
+        List<SinkRecord> mappedRecords = records.stream().map(mapper::map).collect(Collectors.toList());
+        assertThat("all records mapped", mappedRecords.size(), is(7));
+
+        Set<String> ids = mappedRecords.stream().map(SinkRecord::getId).collect(Collectors.toSet());
+        assertThat("ids are contained in mapped records", ids, // some test IDs
+                hasItems("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f",
+                        "urn:uuid:6a3de50b-fa66-4b58-a0e6-ca146fdd18d4",
+                        "urn:uuid:88247b56-4cbc-4df9-9860-db3f8042e357"));
     }
 
 }
