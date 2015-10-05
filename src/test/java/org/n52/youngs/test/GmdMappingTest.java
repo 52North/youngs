@@ -24,6 +24,7 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.n52.youngs.harvest.SourceRecord;
 import org.n52.youngs.impl.XPathHelper;
@@ -49,7 +50,8 @@ public class GmdMappingTest {
         cswMapper = new CswToBuilderMapper(cswConfiguration);
     }
 
-//    @Test
+    @Ignore
+    @Test
     public void keywordTypeConcatenation() throws Exception {
         Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record.iterator().next());

@@ -37,6 +37,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.n52.youngs.exception.MappingError;
 import org.n52.youngs.impl.NamespaceContextImpl;
@@ -120,7 +121,8 @@ public class YamlConfigurationTest {
         assertThat("matching document is applicable", config.isApplicable(document), is(true));
     }
 
-//    @Test // FIXME
+    @Ignore
+    @Test
     public void testApplicabilityNonMatchingElem() throws Exception {
         Document document = getDocument("<testdoc xmlns=\"http://www.isotc211.org/2005/gmd\">"
                 + "<MI_Metadata>"
@@ -130,7 +132,8 @@ public class YamlConfigurationTest {
         assertThat("non-matching element is not applicable", config.isApplicable(document), is(false));
     }
 
-//    @Test // FIXME
+    @Ignore
+    @Test
     public void testApplicabilityNonMatchingNS() throws Exception {
         Document document = getDocument("<testdoc>"
                 + "<ns1:MD_Metadata xmlns:ns1=\"http://wrong.namespace\">"
@@ -233,12 +236,6 @@ public class YamlConfigurationTest {
         assertNotNull(m);
     }
 
-//    @Test(expected = MappingError.class)
-//    public void testNoIdentifier() throws Exception {
-//        YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-no-id.yml",
-//                NamespaceContextImpl.create(), helper.newXPathFactory());
-//        assertNotNull(m);
-//    }
     @Test
     public void testIndexSettings() throws IOException {
         assertThat("name is correct", config.getIndex(), is("testindex"));
