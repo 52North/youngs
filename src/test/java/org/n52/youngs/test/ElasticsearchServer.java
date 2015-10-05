@@ -82,6 +82,9 @@ public class ElasticsearchServer extends ExternalResource {
             embeddedNode.close();
             System.out.println("### Elasticsearch server closed ###");
         }
+        if(Optional.ofNullable(client).isPresent()) {
+            client.close();
+        }
     }
 
     public Client getClient() {

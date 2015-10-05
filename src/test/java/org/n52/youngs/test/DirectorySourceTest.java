@@ -112,7 +112,7 @@ public class DirectorySourceTest {
         assertThat("all records are NodeSourceRecords", isNodeRecord, is(equalTo(Sets.newHashSet(true))));
 
         Iterator<SourceRecord> iter = records.iterator();
-        BuilderRecord mappedRecord = (BuilderRecord) mapper.map((SourceRecord) iter.next());
+        BuilderRecord mappedRecord = (BuilderRecord) mapper.map(iter.next());
         String mappedRecordString = mappedRecord.getBuilder().string();
 
         assertThat("record id is in mapped record", mappedRecordString, containsString("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f"));
@@ -129,8 +129,10 @@ public class DirectorySourceTest {
                 not(containsString("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f")));
         assertThat("second record id is in mapped records", allMappedRecordsString,
                 containsString("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd"));
-        assertThat("second last record id is in mapped records", allMappedRecordsString,
-                containsString("urn:uuid:ab42a8c4-95e8-4630-bf79-33e59241605a"));
+        assertThat("third last id is in mapped records", allMappedRecordsString,
+                containsString("urn:uuid:a06af396-3105-442d-8b40-22b57a90d2f2"));
+        assertThat("second last record id is not in mapped records", allMappedRecordsString,
+                not(containsString("urn:uuid:ab42a8c4-95e8-4630-bf79-33e59241605a")));
         assertThat("last record id is in NOT mapped records", allMappedRecordsString,
                 not(containsString("urn:uuid:e9330592-0932-474b-be34-c3a3bb67c7db")));
     }

@@ -28,16 +28,18 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.n52.youngs.harvest.DirectorySource;
 import org.n52.youngs.impl.NamespaceContextImpl;
 import org.n52.youngs.impl.XPathHelper;
+import org.n52.youngs.load.Sink;
 import org.n52.youngs.load.SinkRecord;
-import org.n52.youngs.load.impl.ElasticsearchRemoteHttpSink;
+import org.n52.youngs.load.impl.ElasticsearchClientSink;
 import org.n52.youngs.transform.Mapper;
+import org.n52.youngs.transform.MappingConfiguration;
 import org.n52.youngs.transform.impl.CswToBuilderMapper;
 import org.n52.youngs.transform.impl.YamlMappingConfiguration;
 import static org.n52.youngs.util.JsonMatchers.hasJsonPath;
@@ -48,26 +50,36 @@ import static org.n52.youngs.util.JsonMatchers.hasJsonPath;
  */
 public class SpatialSearchIT {
 
-    private ElasticsearchRemoteHttpSink sink;
+    private static MappingConfiguration mapping;
 
-    private YamlMappingConfiguration mapping;
+    private static Sink sink;
 
     // set to (true); to run focussed test methods from Netbeans
     @ClassRule
     public static ElasticsearchServer server = new ElasticsearchServer(); // (true);
 
-    @Before
-    public void createMappingAndSink() throws IOException {
+    @BeforeClass
+    public static void prepareAndStoreSink() throws Exception {
         mapping = new YamlMappingConfiguration(Resources.asByteSource(
-                Resources.getResource("mappings/testmapping.yml")).openStream(),
+                Resources.getResource("mappings/csw-record.yml")).openStream(),
                 NamespaceContextImpl.create(),
                 new XPathHelper().newXPathFactory());
+//        sink = new ElasticsearchRemoteHttpSink("localhost", 9300, "elasticsearch", mapping.getIndex(), mapping.getType());
+        sink = new ElasticsearchClientSink(server.getClient(), "elasticsearhch", mapping.getIndex(), mapping.getType());
+        sink.prepare(mapping);
+        Mapper mapper = new CswToBuilderMapper(mapping);
 
-        sink = new ElasticsearchRemoteHttpSink("localhost", 9300, "elasticsearch", mapping.getIndex(), mapping.getType());
+        DirectorySource source = new DirectorySource(
+                Paths.get(Resources.getResource("records").toURI()).resolve("csw"));
+        List<SinkRecord> mappedRecords = source.getRecords().stream().map(mapper::map).collect(Collectors.toList());
+        boolean stored = sink.store(mappedRecords);
+
+        Thread.sleep(1000);
+        assertThat("all records stored", stored);
     }
 
-    @After
-    public void clearSink() throws IOException {
+    @AfterClass
+    public static void clearSink() throws IOException {
         boolean result = sink.clear(mapping);
         assertThat("sink is cleared", result, is(true));
     }
@@ -94,22 +106,6 @@ public class SpatialSearchIT {
      */
     @Test
     public void spatialQueryPointSearch() throws Exception {
-        mapping = new YamlMappingConfiguration(Resources.asByteSource(
-                Resources.getResource("mappings/csw-record.yml")).openStream(),
-                NamespaceContextImpl.create(),
-                new XPathHelper().newXPathFactory());
-        sink = new ElasticsearchRemoteHttpSink("localhost", 9300, "elasticsearch", mapping.getIndex(), mapping.getType());
-        sink.prepare(mapping);
-        Mapper mapper = new CswToBuilderMapper(mapping);
-
-        DirectorySource source = new DirectorySource(
-                Paths.get(Resources.getResource("records").toURI()).resolve("csw"));
-        List<SinkRecord> mappedRecords = source.getRecords().stream().map(mapper::map).collect(Collectors.toList());
-        boolean stored = sink.store(mappedRecords);
-
-        Thread.sleep(1000);
-        assertThat("all records stored", stored);
-
         String endpoint = "http://localhost:9200/" + mapping.getIndex() + "/" + mapping.getType()
                 + "/_search?pretty";
 
@@ -150,22 +146,6 @@ public class SpatialSearchIT {
 
     @Test
     public void spatialQueryEnvelopeSearch() throws Exception {
-        mapping = new YamlMappingConfiguration(Resources.asByteSource(
-                Resources.getResource("mappings/csw-record.yml")).openStream(),
-                NamespaceContextImpl.create(),
-                new XPathHelper().newXPathFactory());
-        sink = new ElasticsearchRemoteHttpSink("localhost", 9300, "elasticsearch", mapping.getIndex(), mapping.getType());
-        sink.prepare(mapping);
-        Mapper mapper = new CswToBuilderMapper(mapping);
-
-        DirectorySource source = new DirectorySource(
-                Paths.get(Resources.getResource("records").toURI()).resolve("csw"));
-        List<SinkRecord> mappedRecords = source.getRecords().stream().map(mapper::map).collect(Collectors.toList());
-        boolean stored = sink.store(mappedRecords);
-
-        Thread.sleep(1000);
-        assertThat("all records stored", stored);
-
         String endpoint = "http://localhost:9200/" + mapping.getIndex() + "/" + mapping.getType()
                 + "/_search?pretty";
 

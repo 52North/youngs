@@ -54,7 +54,7 @@ public class CswToBuilderMapperTest {
     @Test
     public void singleElementsAreParsedWithoutSlashText() throws Exception {
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_829babb0-b2f1-49e1-8cd5-7b489fe71a1e.xml");
-        BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
+        BuilderRecord mappedRecord = cswMapper.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 
         assertThat("Mapped record contains identifier", mappedRecordString,
@@ -66,7 +66,7 @@ public class CswToBuilderMapperTest {
     @Test
     public void singleElementsAreParsedWithSlashText() throws Exception {
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_829babb0-b2f1-49e1-8cd5-7b489fe71a1e.xml");
-        BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
+        BuilderRecord mappedRecord = cswMapper.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 
         assertThat("Mapped record contains format", mappedRecordString,
@@ -76,7 +76,7 @@ public class CswToBuilderMapperTest {
     @Test
     public void multipleElementsAreParsed() throws Exception {
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
-        BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
+        BuilderRecord mappedRecord = cswMapper.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 
 //        assertThat("Mapped record contains all subjects", mappedRecordString,
@@ -93,7 +93,7 @@ public class CswToBuilderMapperTest {
         CswToBuilderMapper m = new CswToBuilderMapper(c);
 
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
-        BuilderRecord mappedRecord = (BuilderRecord) m.map(record);
+        BuilderRecord mappedRecord = m.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 
 //        assertThat("Mapped record contains all subjects", mappedRecordString,
@@ -112,7 +112,7 @@ public class CswToBuilderMapperTest {
         CswToBuilderMapper m = new CswToBuilderMapper(c);
 
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
-        BuilderRecord mappedRecord = (BuilderRecord) m.map(record);
+        BuilderRecord mappedRecord = m.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 
         assertThat("Mapped record contains created_on field", mappedRecordString,
@@ -127,7 +127,7 @@ public class CswToBuilderMapperTest {
         CswToBuilderMapper m = new CswToBuilderMapper(c);
 
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
-        BuilderRecord mappedRecord = (BuilderRecord) m.map(record);
+        BuilderRecord mappedRecord = m.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 
         assertThat("Mapped record contains full_text field", mappedRecordString,
@@ -144,7 +144,7 @@ public class CswToBuilderMapperTest {
         CswToBuilderMapper m = new CswToBuilderMapper(c);
 
         Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
-        BuilderRecord mappedRecord = (BuilderRecord) m.map(record.iterator().next());
+        BuilderRecord mappedRecord = m.map(record.iterator().next());
         String mappedRecordString = mappedRecord.getBuilder().string();
 
         assertThat("Mapped record contains envelope", mappedRecordString,

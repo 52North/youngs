@@ -54,7 +54,7 @@ public class GmdMappingTest {
     @Test
     public void keywordTypeConcatenation() throws Exception {
         Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
-        BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record.iterator().next());
+        BuilderRecord mappedRecord = cswMapper.map(record.iterator().next());
         String mappedRecordString = mappedRecord.getBuilder().string();
 
         assertThat("Mapped record contains type", mappedRecordString,
@@ -65,7 +65,7 @@ public class GmdMappingTest {
     @Test
     public void temporalExtent() throws Exception {
         Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
-        BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record.iterator().next());
+        BuilderRecord mappedRecord = cswMapper.map(record.iterator().next());
         String mappedRecordString = mappedRecord.getBuilder().string();
 
         assertThat("Mapped record contains extend timestamps", mappedRecordString,
@@ -76,7 +76,7 @@ public class GmdMappingTest {
     @Test
     public void id() throws Exception {
         Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
-        BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record.iterator().next());
+        BuilderRecord mappedRecord = cswMapper.map(record.iterator().next());
         String mappedRecordString = mappedRecord.getBuilder().string();
 
         assertThat("Mapped record contains extent timestamps", mappedRecordString,
@@ -86,7 +86,7 @@ public class GmdMappingTest {
     @Test
     public void bbox() throws Exception {
         Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
-        BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record.iterator().next());
+        BuilderRecord mappedRecord = cswMapper.map(record.iterator().next());
         String mappedRecordString = mappedRecord.getBuilder().string();
 
         assertThat("Mapped record contains envelope", mappedRecordString,
