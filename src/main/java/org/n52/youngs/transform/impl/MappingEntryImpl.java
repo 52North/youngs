@@ -33,10 +33,6 @@ public class MappingEntryImpl implements MappingEntry {
 
     private final XPathExpression xPath;
 
-    private final boolean isoQueryable;
-
-    private Optional<String> isoQueryableName = Optional.empty();
-
     private final Map<String, Object> indexProperties = Maps.newHashMap();
 
     private Optional<Boolean> identifier = Optional.empty();
@@ -45,18 +41,14 @@ public class MappingEntryImpl implements MappingEntry {
 
     private Optional<String> coordinatesType = Optional.empty();
 
-    public MappingEntryImpl(XPathExpression xPath, boolean isoQueryable, String isoQueryableName,
-            Map<String, Object> indexProperties, boolean identifier) {
-        this(xPath, isoQueryable, indexProperties, identifier);
-        this.isoQueryableName = Optional.ofNullable(isoQueryableName);
-    }
+    private Optional<Boolean> raw = Optional.empty();
 
-    public MappingEntryImpl(XPathExpression xPath, boolean isoQueryable, Map<String, Object> indexProperties,
-            boolean identifier) {
+    public MappingEntryImpl(XPathExpression xPath, Map<String, Object> indexProperties,
+            boolean identifier, boolean rawXml) {
         this.xPath = xPath;
-        this.isoQueryable = isoQueryable;
         this.indexProperties.putAll(indexProperties);
-        this.identifier = Optional.ofNullable(identifier);
+        this.identifier = Optional.of(identifier);
+        this.raw = Optional.of(rawXml);
     }
 
     @Override
@@ -67,16 +59,6 @@ public class MappingEntryImpl implements MappingEntry {
     @Override
     public String getFieldName() {
         return (String) indexProperties.get(INDEX_NAME);
-    }
-
-    @Override
-    public boolean isIsoQueryable() {
-        return isoQueryable && isoQueryableName.isPresent();
-    }
-
-    @Override
-    public String getIsoQueryableName() {
-        return isoQueryableName.get();
     }
 
     public MappingEntryImpl addIndexProperty(String key, Object value) {
@@ -98,8 +80,8 @@ public class MappingEntryImpl implements MappingEntry {
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("xpath", xPath)
-                .add("isoQueryable", isoQueryable)
-                .add("isoName", isoQueryableName)
+                .add("identifer", identifier)
+                .add("raw", raw)
                 .add("properties", Arrays.deepToString(indexProperties.entrySet().toArray()))
                 .omitNullValues()
                 .toString();
@@ -140,4 +122,8 @@ public class MappingEntryImpl implements MappingEntry {
         return this;
     }
 
+    @Override
+    public boolean isRawXml() {
+        return raw.isPresent() && raw.get();
+    }
 }

@@ -27,8 +27,6 @@ defaults:
     store: &STOREDEFAULT true
 index:
     create: true
-    store_xml: true
-    store_xml_fieldname: xmldoc
     name: testindex
     type: testrecord
     #dynamic_mapping: true
@@ -79,4 +77,12 @@ mappings:
             ignore_malformed: true
     xtitle:
         xpath: "//title"
-        isoqueryable: false
+    raw_xml:
+        xpath: "/"
+        raw_xml: TRUE
+        properties:
+            type: string
+            store: *STOREDEFAULT
+            index: no
+            index_name: xmldoc
+

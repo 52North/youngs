@@ -38,10 +38,6 @@ public interface MappingEntry {
 
     public String getFieldName();
 
-    public boolean isIsoQueryable();
-
-    public String getIsoQueryableName();
-
     public Map<String, Object> getIndexProperties();
 
     public Object getIndexPropery(String name);
@@ -59,5 +55,7 @@ public interface MappingEntry {
     public boolean hasCoordinatesType();
 
     public String getCoordinatesType();
+
+    public boolean isRawXml();
 
 }

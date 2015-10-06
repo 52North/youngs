@@ -76,8 +76,11 @@ public class YamlConfigurationTest {
     }
 
     @Test
-    public void testXmlStoringMetadata() throws IOException {
-        assertThat("storing is enabled", config.isXmlStoringEnabled(), is(true));
+    public void testRawXmlMetadata() throws IOException {
+        assertThat("one raw field is found", config.getEntries().stream().filter(e -> e.isRawXml()).count(), is(1l));
+
+        MappingEntry rawEntry = config.getEntries().stream().filter(e -> e.isRawXml()).findFirst().get();
+        assertThat("one raw field is found", rawEntry.getFieldName(), is("xmldoc"));
     }
 
     @Test
@@ -102,8 +105,6 @@ public class YamlConfigurationTest {
         assertThat("name is correct", otherConfig.getName(), is(equalTo(MappingConfiguration.DEFAULT_NAME)));
         assertThat("version is correct", otherConfig.getVersion(), is(equalTo(MappingConfiguration.DEFAULT_VERSION)));
         assertThat("XPath version is correct", otherConfig.getXPathVersion(), is(equalTo(MappingConfiguration.DEFAULT_XPATH_VERSION)));
-        assertThat("storing is enabled", config.isXmlStoringEnabled(), is(true));
-        assertThat("storing fieldname is correct", config.getXmlFieldname(), is("xmldoc"));
     }
 
     @Test
@@ -171,7 +172,7 @@ public class YamlConfigurationTest {
     @Test
     public void testEntriesLoading() throws IOException, XPathExpressionException {
         Collection<MappingEntry> entries = config.getEntries();
-        assertThat("all entries are loaded", entries.size(), is(equalTo(5)));
+        assertThat("all entries are loaded", entries.size(), is(equalTo(6)));
     }
 
     @Test
@@ -200,17 +201,12 @@ public class YamlConfigurationTest {
         Iterator<MappingEntry> iter = entries.iterator();
         iter.next();
         MappingEntry second = iter.next();
-        assertThat("id entry isoqueryable", second.isIsoQueryable(), is(equalTo(false)));
         Map<String, Object> props = second.getIndexProperties();
         assertThat("id entry index properties size", props.size(), is(equalTo(5)));
         assertThat("id entry property type", props.get("type"), is(equalTo("string")));
         assertThat("id entry property type", props.get("store"), is(equalTo(true)));
         assertThat("id entry property type", props.get("index"), is(equalTo("analyzed")));
         assertThat("id entry property type", props.get("boost"), is(equalTo(2d)));
-
-        MappingEntry third = iter.next();
-        assertThat("third entry isoqueryable", third.isIsoQueryable(), is(equalTo(true)));
-        assertThat("third entry isoqueryable name", third.getIsoQueryableName(), is(equalTo("language")));
     }
 
     @Test

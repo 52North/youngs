@@ -76,8 +76,4 @@ public interface MappingConfiguration {
 
     public String getIndexCreationRequest();
 
-    public boolean isXmlStoringEnabled();
-
-    public String getXmlFieldname();
-
 }

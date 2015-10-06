@@ -99,9 +99,21 @@ mappings:
                     number(substring-after(ows:LowerCorner, ' ')) ) )"
         coordinates_type: envelope
         properties:
-            store: yes
             index_name: location
             type: geo_shape
             tree: quadtree
             precision: 1m
-        
+    raw_xml:
+        xpath: "/"
+        raw_xml: TRUE
+        properties:
+            type: string
+            index: no
+            index_name: xmldoc
+    raw_bbox:
+        xpath: "//ows:BoundingBox"
+        raw_xml: TRUE
+        properties:
+            type: string
+            index: no
+            index_name: bbox_xmldoc

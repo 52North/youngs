@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -118,21 +119,19 @@ public class CswToBuilderMapper implements Mapper {
         }
 
         // handle non-geo entries
-        entries.stream().filter(e -> !e.hasCoordinates()).forEach(entry -> {
+        entries.stream().filter(e -> !e.hasCoordinates() && !e.isRawXml()).forEach(entry -> {
             mapEntry(entry, node, builder);
         });
 
         // handle geo types
-        entries.stream().filter(e -> e.hasCoordinates()).forEach(entry -> {
+        entries.stream().filter(e -> e.hasCoordinates() && !e.isRawXml()).forEach(entry -> {
             mapSpatialEntry(entry, node, builder);
         });
 
-        // handle full xml
-        if (mapper.isXmlStoringEnabled()) {
-            String xmldoc = asString(node);
-            log.trace("Storing full XML to field {} starting with {}", mapper.getXmlFieldname(), xmldoc.substring(0, 120));
-            builder.field(mapper.getXmlFieldname(), xmldoc);
-        }
+        // handle raw types
+        entries.stream().filter(e -> e.isRawXml()).forEach(entry -> {
+            mapRawEntry(entry, node, builder);
+        });
 
         builder.endObject();
         builder.close();
@@ -230,6 +229,19 @@ public class CswToBuilderMapper implements Mapper {
         }
     }
 
+    private void mapRawEntry(MappingEntry entry, Node node, XContentBuilder builder) {
+        try {
+            // handle full xml
+            Node nodesetResult = (Node) entry.getXPath().evaluate(node, XPathConstants.NODE);
+            String xmldoc = asString(nodesetResult);
+            log.trace("Storing full XML to field {} starting with {}", entry.getFieldName(),
+                    xmldoc.substring(0, Math.min(xmldoc.length(), 120)));
+            builder.field(entry.getFieldName(), xmldoc);
+        } catch (IOException | XPathExpressionException e) {
+            log.warn("Error adding field {}: {}", entry.getFieldName(), e);
+        }
+    }
+
     private EvalResult handleEvaluationResult(final Object evalutationResult, final String name) {
         if (evalutationResult instanceof String) {
             String valueString = (String) evalutationResult;
@@ -250,7 +262,7 @@ public class CswToBuilderMapper implements Mapper {
                 for (int i = 0; i < nodeList.getLength(); i++) {
                     Node n = nodeList.item(i);
                     String textContent = n.getTextContent();
-                    if (!textContent.isEmpty()) {
+                    if (textContent != null && !textContent.isEmpty()) {
                         contents.add(textContent);
                     }
                 }

@@ -83,10 +83,6 @@ public class YamlMappingConfiguration implements MappingConfiguration {
 
     private Optional<String> indexCreationRequest = Optional.empty();
 
-    private boolean storeXml = DEFAULT_STORE_XML;
-
-    private String storeXmlFieldname = DEFAULT_STORE_XML_FIELDNAME;
-
     public YamlMappingConfiguration(String fileName, XPathFactory factory) throws IOException {
         this(Resources.asByteSource(Resources.getResource(fileName)).openStream(), factory);
         log.info("Created configuration from filename {}", fileName);
@@ -143,12 +139,6 @@ public class YamlMappingConfiguration implements MappingConfiguration {
             if (indexField.hasNotNull("settings")) {
                 this.indexCreationRequest = Optional.of(indexField.get("settings").asTextValue());
             }
-            if (indexField.hasNotNull("store_xml")) {
-                this.storeXml = indexField.path("store_xml").asBooleanValue(DEFAULT_STORE_XML);
-            }
-            if (indexField.hasNotNull("store_xml_fieldname")) {
-                this.storeXmlFieldname = indexField.path("store_xml_fieldname").asTextValue(DEFAULT_STORE_XML_FIELDNAME);
-            }
         }
 
         XPathHelper xph = new XPathHelper();
@@ -176,7 +166,7 @@ public class YamlMappingConfiguration implements MappingConfiguration {
                 this.entries.add(e);
             }
 
-            // ensure not exactly one field is identifier
+            // ensure exactly one field is identifier
             long idCount = this.entries.stream().filter(MappingEntry::isIdentifier).count();
             if (idCount > 1) {
                 List<String> entriesWithId = this.entries.stream().filter(MappingEntry::isIdentifier)
@@ -201,16 +191,16 @@ public class YamlMappingConfiguration implements MappingConfiguration {
             Map<String, Object> indexProperties = createIndexProperties(id, node);
 
             boolean isIdentifier = mapNode.path("identifier").asBooleanValue(false);
+            boolean isXml = mapNode.path("raw_xml").asBooleanValue(false);
 
             String expression = mapNode.path("xpath").asTextValue();
             XPath xPath = newXPath(nsContext);
             try {
                 XPathExpression compiledExpression = xPath.compile(expression);
                 MappingEntryImpl entry = new MappingEntryImpl(compiledExpression,
-                        mapNode.path("isoqueryable").asBooleanValue(false),
-                        mapNode.path("isoqueryableName").asTextValue(null),
                         indexProperties,
-                        isIdentifier);
+                        isIdentifier,
+                        isXml);
 
                 // geo types
                 if (mapNode.has("coordinates")) {
@@ -388,16 +378,6 @@ public class YamlMappingConfiguration implements MappingConfiguration {
     @Override
     public MappingEntry getEntry(String name) {
         return this.entries.stream().filter(e -> e.getFieldName().equals(name)).findFirst().get();
-    }
-
-    @Override
-    public boolean isXmlStoringEnabled() {
-        return storeXml;
-    }
-
-    @Override
-    public String getXmlFieldname() {
-        return storeXmlFieldname;
     }
 
 }

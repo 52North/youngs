@@ -21,7 +21,6 @@ import java.util.Map;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
-import org.n52.youngs.impl.NamespaceContextImpl;
 import org.n52.youngs.impl.XPathHelper;
 import org.n52.youngs.load.SchemaGenerator;
 import org.n52.youngs.load.impl.SchemaGeneratorImpl;
