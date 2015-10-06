@@ -130,7 +130,8 @@ public class SingleThreadBulkRunner implements Runner {
         final Stopwatch timer = Stopwatch.createStarted();
         ExecutorService executor = Executors.newSingleThreadExecutor();
         long counter = startPosition;
-        long limit = Math.min(recordsLimit + startPosition, source.getRecordCount());
+        long count = source.getRecordCount();
+        long limit = Math.min(recordsLimit + startPosition, count);
 
         while (counter <= limit) {
             long recordsLeft = limit - counter;

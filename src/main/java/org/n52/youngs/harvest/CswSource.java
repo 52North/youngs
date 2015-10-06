@@ -17,17 +17,12 @@
 package org.n52.youngs.harvest;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 import javax.xml.bind.JAXBContext;
@@ -37,13 +32,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.stream.StreamSource;
 import net.opengis.csw.v_2_0_2.AbstractRecordType;
-import net.opengis.csw.v_2_0_2.GetRecordsResponseType;
-import org.apache.http.client.fluent.Request;
-import org.elasticsearch.common.collect.Lists;
 import org.n52.youngs.impl.ContextHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +56,7 @@ public abstract class CswSource implements Source {
 
     private Optional<String> namespacesParameter = Optional.empty();
 
-    private Optional<Collection<String>> namespaces = Optional.empty();
+    Optional<Collection<String>> namespaces = Optional.empty();
 
     private String outputSchema;
 
@@ -184,5 +173,14 @@ public abstract class CswSource implements Source {
             return sb.toString();
         }
     }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("url", getEndpoint())
+                .omitNullValues().toString();
+    }
+
+
 
 }

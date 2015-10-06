@@ -20,6 +20,7 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.math.BigInteger;
@@ -67,18 +68,6 @@ public class PoxCswSource extends CswSource {
 
     private Optional<Marshaller> marshaller = Optional.empty();
 
-    public PoxCswSource(String url, NamespaceContext nsContext) throws MalformedURLException, JAXBException {
-        super(url, nsContext);
-    }
-
-    public PoxCswSource(String url, Collection<String> namespaces, NamespaceContext nsContext, String typeName, String outputSchema) throws MalformedURLException, JAXBException {
-        super(url, namespaces, nsContext, typeName, outputSchema);
-    }
-
-    public PoxCswSource(URL url, String namespacesParameter, String typeName, String outputSchema) throws JAXBException {
-        super(url, namespacesParameter, typeName, outputSchema);
-    }
-
     public PoxCswSource(URL url, Collection<String> namespaces, NamespaceContext nsContext, String typeName, String outputSchema) throws JAXBException {
         super(url, namespaces, nsContext, typeName, outputSchema);
     }
@@ -91,12 +80,14 @@ public class PoxCswSource extends CswSource {
         HttpEntity entity = createRequest(startPosition, maxRecords);
 
         try {
-            log.trace("GetRecords request: {}", EntityUtils.toString(entity));
+            log.debug("GetRecords request: {}", EntityUtils.toString(entity));
 
-            InputStream response = Request.Post(getEndpoint().toString()).body(entity)
-                    .addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_XML.toString())
-                    .execute().returnContent().asStream();
-            JAXBElement<GetRecordsResponseType> jaxb_response = unmarshaller.unmarshal(new StreamSource(response),
+            String response = Request.Post(getEndpoint().toString()).body(entity)
+                    .addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_XML.getMimeType())
+                    .execute().returnContent().asString();
+            log.trace("Response: {}", response);
+            JAXBElement<GetRecordsResponseType> jaxb_response = unmarshaller.unmarshal(
+                    new StreamSource(new StringReader(response)),
                     GetRecordsResponseType.class);
             BigInteger numberOfRecordsReturned = jaxb_response.getValue().getSearchResults().getNumberOfRecordsReturned();
             log.debug("Got response with {} records", numberOfRecordsReturned);
@@ -193,7 +184,10 @@ public class PoxCswSource extends CswSource {
         @Override
         public Long get() {
             URL url = getEndpoint();
-            log.debug("Requesting record count at {} using {} and {}", url, getTypeNamesParameter(), getNamespacesParameter());
+            String tn = getTypeNamesParameter();
+            String os = getOutputSchemaParameter();
+
+            log.debug("Requesting record count at {} using typenames {}, output schema {}", url, tn, os);
             Long count = Long.MIN_VALUE;
 
             Marshaller m;
@@ -209,14 +203,13 @@ public class PoxCswSource extends CswSource {
             JAXBElement<GetRecordsType> jaxb_getRecords = objectFactory.createGetRecords(getRecords);
 
             getRecords.setResultType(ResultType.HITS);
-            getRecords.setOutputSchema(getOutputSchemaParameter());
+            getRecords.setOutputSchema(os);
             QueryType query = new QueryType();
             ElementSetNameType esn = new ElementSetNameType();
             esn.setValue(ElementSetType.FULL);
             query.setElementSetName(esn);
-            query.setTypeNames(Lists.newArrayList(
-                    new QName(getOutputSchemaParameter(),
-                            getTypeNamesParameter().substring(getTypeNamesParameter().indexOf(":") + 1))));
+            QName qn = new QName(os, tn.substring(tn.indexOf(":") + 1));
+            query.setTypeNames(Lists.newArrayList(qn));
             getRecords.setAbstractQuery(objectFactory.createQuery(query));
 
             Writer w = new StringWriter();
@@ -226,7 +219,7 @@ public class PoxCswSource extends CswSource {
                 log.error("Error marshalling request", e);
             }
 
-            log.trace("Sending GetRecords request:\n{}", w.toString());
+            log.debug("Sending GetRecords request:\n{}", w.toString());
             try {
                 InputStream response = Request.Post(getEndpoint().toString())
                         .bodyString(w.toString(), ContentType.APPLICATION_XML)
