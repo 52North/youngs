@@ -111,92 +111,12 @@ public class CswToBuilderMapper implements Mapper {
 
         // handle non-geo entries
         entries.stream().filter(e -> !e.hasCoordinates()).forEach(entry -> {
-            log.trace("Applying field mapping '{}' to node: {}", entry.getFieldName(), node);
-
-            Optional<EvalResult> result = Optional.empty();
-            // try nodeset first
-            try {
-                Object nodesetResult = entry.getXPath().evaluate(node, XPathConstants.NODESET);
-                result = Optional.ofNullable(handleEvaluationResult(nodesetResult, entry.getFieldName()));
-                if (result.isPresent()) {
-                    log.trace("Found nodeset result: {}", result.get());
-                }
-            } catch (XPathExpressionException e) {
-                log.debug("Error selecting field {} as nodeset, could be XPath 2.0 expression... trying evaluation to string."
-                        + " Error was: {}", entry.getFieldName(), e.getMessage());
-                log.trace("Error selecting field {} as nodeset", entry.getFieldName(), e);
-            }
-
-            // try string eval if nodeset did not work
-            if (!result.isPresent()) {
-                try {
-                    String stringResult = (String) entry.getXPath().evaluate(node, XPathConstants.STRING);
-                    result = Optional.ofNullable(handleEvaluationResult(stringResult, entry.getFieldName()));
-                    if (result.isPresent()) {
-                        log.trace("Found string result: {}", result.get());
-                    }
-                } catch (XPathExpressionException e) {
-                    log.warn("Error selecting field {} as string: {}", entry.getFieldName(), e.getMessage());
-                    log.trace("Error selecting field {} as string", entry.getFieldName(), e);
-                }
-            }
-
-            if (result.isPresent()) {
-                try {
-                    builder.field(result.get().name, result.get().value);
-                    log.debug("Added field: {}", result.get());
-                } catch (IOException e) {
-                    log.warn("Error adding field {}: {}", entry.getFieldName(), e);
-                }
-            }
+            mapEntry(entry, node, builder);
         });
 
         // handle geo types
         entries.stream().filter(e -> e.hasCoordinates()).forEach(entry -> {
-            try {
-                Object coordsNode = entry.getXPath().evaluate(node, XPathConstants.NODE);
-                if (coordsNode != null) {
-                    String geoType = (String) entry.getIndexPropery(MappingEntry.IndexProperties.TYPE);
-                    String field = (String) entry.getIndexPropery(MappingEntry.INDEX_NAME);
-
-                    List<XPathExpression[]> pointsXPaths = entry.getCoordinatesXPaths();
-
-                    if (!pointsXPaths.isEmpty() && !geoType.isEmpty() && !field.isEmpty() && entry.hasCoordinatesType()) {
-                        List<Number[]> pointsDoubles = pointsXPaths.stream().map(p -> {
-                            try {
-                                Number lat = (Number) p[0].evaluate(coordsNode, XPathConstants.NUMBER);
-                                Number lon = (Number) p[1].evaluate(coordsNode, XPathConstants.NUMBER);
-                                return new Number[]{lat, lon};
-                            } catch (XPathExpressionException e) {
-                                log.warn("Error evaluating XPath {} for coordinate: {}", p, e);
-                                return null;
-                            }
-                        })
-                                .filter(Objects::nonNull)
-                                .collect(Collectors.toList());
-                        log.trace("Evaluated {} expressions and got {} points: {}", pointsXPaths.size(),
-                                pointsDoubles.size(), Arrays.deepToString(pointsDoubles.toArray()));
-
-                        builder.startObject(field)
-                                .field(MappingEntry.IndexProperties.TYPE, entry.getCoordinatesType())
-                                //                                .field("coordinates", coordsString)
-                                .field("coordinates", pointsDoubles)
-                                .endObject();
-                        log.debug("Added points '{}' as {} of type {}", Arrays.deepToString(pointsDoubles.toArray()),
-                                geoType, entry.getCoordinatesType());
-                    } else {
-                        log.warn("Mapping '{}' has coordinates but is missing one of the other required settings, not adding field: "
-                                + "node = {}, index_name = {}, coordinates_type = {}, type = {}, points = {}",
-                                entry.getFieldName(), coordsNode, field, entry.getCoordinatesType(), geoType,
-                                Arrays.deepToString(pointsXPaths.toArray()));
-                    }
-                } else {
-                    log.warn("Coords node is null, no result evaluating {} on {]", entry.getXPath(), node);
-                }
-            } catch (XPathExpressionException | IOException e) {
-                log.warn("Error selecting coordinate-field {} as node. Error was: {}", entry.getFieldName(), e.getMessage());
-                log.trace("Error selecting field {} as nodeset", entry.getFieldName(), e);
-            }
+            mapSpatialEntry(entry, node, builder);
         });
 
         builder.endObject();
@@ -205,6 +125,94 @@ public class CswToBuilderMapper implements Mapper {
         log.trace("Created content for id '{}':\n{}", id, builder.string());
 
         return new IdAndBuilder(id, builder);
+    }
+
+    private void mapSpatialEntry(MappingEntry entry, final Node node, XContentBuilder builder) {
+        log.trace("Applying field mapping '{}' to node: {}", entry.getFieldName(), node);
+        try {
+            Object coordsNode = entry.getXPath().evaluate(node, XPathConstants.NODE);
+            if (coordsNode != null) {
+                String geoType = (String) entry.getIndexPropery(MappingEntry.IndexProperties.TYPE);
+                String field = (String) entry.getIndexPropery(MappingEntry.INDEX_NAME);
+
+                List<XPathExpression[]> pointsXPaths = entry.getCoordinatesXPaths();
+
+                if (!pointsXPaths.isEmpty() && !geoType.isEmpty() && !field.isEmpty() && entry.hasCoordinatesType()) {
+                    List<Number[]> pointsDoubles = pointsXPaths.stream().map(p -> {
+                        try {
+                            Number lat = (Number) p[0].evaluate(coordsNode, XPathConstants.NUMBER);
+                            Number lon = (Number) p[1].evaluate(coordsNode, XPathConstants.NUMBER);
+                            return new Number[]{lon, lat}; // in arrays: GeoJSON conform as [lon, lat], see https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-geo-point-type.html
+                        } catch (XPathExpressionException e) {
+                            log.warn("Error evaluating XPath {} for coordinate: {}", p, e);
+                            return null;
+                        }
+                    })
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toList());
+                    log.trace("Evaluated {} expressions and got {} points: {}", pointsXPaths.size(),
+                            pointsDoubles.size(), Arrays.deepToString(pointsDoubles.toArray()));
+
+                    builder.startObject(field)
+                            .field(MappingEntry.IndexProperties.TYPE, entry.getCoordinatesType())
+                            .field("coordinates", pointsDoubles)
+                            .endObject();
+                    log.debug("Added points '{}' as {} of type {}", Arrays.deepToString(pointsDoubles.toArray()),
+                            geoType, entry.getCoordinatesType());
+                } else {
+                    log.warn("Mapping '{}' has coordinates but is missing one of the other required settings, not adding field: "
+                            + "node = {}, index_name = {}, coordinates_type = {}, type = {}, points = {}",
+                            entry.getFieldName(), coordsNode, field, entry.getCoordinatesType(), geoType,
+                            Arrays.deepToString(pointsXPaths.toArray()));
+                }
+            } else {
+                log.warn("Coords node is null, no result evaluating {} on {]", entry.getXPath(), node);
+            }
+        } catch (XPathExpressionException | IOException e) {
+            log.warn("Error selecting coordinate-field {} as node. Error was: {}", entry.getFieldName(), e.getMessage());
+            log.trace("Error selecting field {} as nodeset", entry.getFieldName(), e);
+        }
+    }
+
+    private void mapEntry(MappingEntry entry, final Node node, XContentBuilder builder) {
+        log.trace("Applying field mapping '{}' to node: {}", entry.getFieldName(), node);
+
+        Optional<EvalResult> result = Optional.empty();
+        // try nodeset first
+        try {
+            Object nodesetResult = entry.getXPath().evaluate(node, XPathConstants.NODESET);
+            result = Optional.ofNullable(handleEvaluationResult(nodesetResult, entry.getFieldName()));
+            if (result.isPresent()) {
+                log.trace("Found nodeset result: {}", result.get());
+            }
+        } catch (XPathExpressionException e) {
+            log.debug("Error selecting field {} as nodeset, could be XPath 2.0 expression... trying evaluation to string."
+                    + " Error was: {}", entry.getFieldName(), e.getMessage());
+            log.trace("Error selecting field {} as nodeset", entry.getFieldName(), e);
+        }
+
+        // try string eval if nodeset did not work
+        if (!result.isPresent()) {
+            try {
+                String stringResult = (String) entry.getXPath().evaluate(node, XPathConstants.STRING);
+                result = Optional.ofNullable(handleEvaluationResult(stringResult, entry.getFieldName()));
+                if (result.isPresent()) {
+                    log.trace("Found string result: {}", result.get());
+                }
+            } catch (XPathExpressionException e) {
+                log.warn("Error selecting field {} as string: {}", entry.getFieldName(), e.getMessage());
+                log.trace("Error selecting field {} as string", entry.getFieldName(), e);
+            }
+        }
+
+        if (result.isPresent()) {
+            try {
+                builder.field(result.get().name, result.get().value);
+                log.debug("Added field: {}", result.get());
+            } catch (IOException e) {
+                log.warn("Error adding field {}: {}", entry.getFieldName(), e);
+            }
+        }
     }
 
     private EvalResult handleEvaluationResult(final Object evalutationResult, final String name) {

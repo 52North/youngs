@@ -55,10 +55,11 @@ public class CswMappingTest {
         String mappedRecordString = mappedRecord.getBuilder().string();
 
         // https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-geo-shape-type.html#_envelope
+        // lat lon as array > GeoJSON conform: [lon, lat]
         assertThat("Mapped record contains envelope location", mappedRecordString,
                 allOf(containsString("location"), containsString("envelope")));
         assertThat("Mapped record contains correct coordinate string", mappedRecordString,
-                containsString("[ [ 68.41, 13.754 ], [ 60.042, 17.92 ] ]"));
+                containsString("[ [ 13.754, 68.41 ], [ 17.92, 60.042 ] ]"));
     }
 
 }

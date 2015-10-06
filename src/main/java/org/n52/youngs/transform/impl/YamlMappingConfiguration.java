@@ -121,11 +121,15 @@ public class YamlMappingConfiguration implements MappingConfiguration {
 
         Yaml yaml = new Yaml();
         YamlNode configurationNodes = yaml.load(input);
-        log.trace("Read configuration file with the root elements {}", Joiner.on(" ").join(configurationNodes));
+        if (configurationNodes == null) {
+            log.error("Could not load configuration from {}, nodes: {}", input, configurationNodes);
+        } else {
+            log.trace("Read configuration file with the root elements {}", Joiner.on(" ").join(configurationNodes));
 
-        NamespaceContext nsContext = parseNamespaceContext(configurationNodes);
-        parse(configurationNodes, nsContext);
-
+            NamespaceContext nsContext = parseNamespaceContext(configurationNodes);
+            parse(configurationNodes, nsContext);
+        }
+        
         log.info("Created configuration from stream {} with {} entries", input, entries.size());
     }
 
