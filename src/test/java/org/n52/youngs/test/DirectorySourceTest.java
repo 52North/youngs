@@ -73,7 +73,7 @@ public class DirectorySourceTest {
 
         MappingConfiguration cswConfiguration = new YamlMappingConfiguration(
                 Resources.asByteSource(Resources.getResource("mappings/csw-record.yml")).openStream(),
-                NamespaceContextImpl.create(), new XPathHelper().newXPathFactory());
+                new XPathHelper().newXPathFactory());
         mapper = new CswToBuilderMapper(cswConfiguration);
     }
 

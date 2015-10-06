@@ -27,6 +27,8 @@ defaults:
     store: &STOREDEFAULT true
 index:
     create: true
+    store_xml: true
+    store_xml_fieldname: xmldoc
     name: testindex
     type: testrecord
     #dynamic_mapping: true

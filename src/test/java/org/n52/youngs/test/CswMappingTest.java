@@ -59,7 +59,20 @@ public class CswMappingTest {
         assertThat("Mapped record contains envelope location", mappedRecordString,
                 allOf(containsString("location"), containsString("envelope")));
         assertThat("Mapped record contains correct coordinate string", mappedRecordString,
-                containsString("[ [ 13.754, 68.41 ], [ 17.92, 60.042 ] ]"));
+                containsString("[ [ 68.41, 13.754 ], [ 60.042, 17.92 ] ]"));
+    }
+
+    @Test
+    public void fullXml() throws Exception {
+        SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_1ef30a8b-876d-4828-9246-c37ab4510bbd.xml");
+        BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
+        String mappedRecordString = mappedRecord.getBuilder().string();
+
+        assertThat("Mapped record contains xmldoc field name", mappedRecordString, containsString("xmldoc"));
+        assertThat("Mapped record contains xml snippets", mappedRecordString,
+                allOf(containsString("<dc:type>http://purl.org/dc/dcmitype/Service</dc:type>"),
+                        containsString("tifier>urn:uuid:1ef3"),
+                        containsString("<ows:LowerCorner>60.042 13.754</ows:LowerCorner>\\n")));
     }
 
 }

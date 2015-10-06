@@ -29,9 +29,6 @@ import org.n52.youngs.transform.MappingEntry;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -42,9 +39,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -88,28 +83,9 @@ public class YamlMappingConfiguration implements MappingConfiguration {
 
     private Optional<String> indexCreationRequest = Optional.empty();
 
-    public YamlMappingConfiguration(File file, NamespaceContext nsContext, XPathFactory factory) throws FileNotFoundException {
-        this(new FileInputStream(file), nsContext, factory);
-        log.info("Created configuration from file {}", file);
-    }
+    private boolean storeXml = DEFAULT_STORE_XML;
 
-    public YamlMappingConfiguration(String fileName, NamespaceContext nsContext, XPathFactory factory) throws IOException {
-        this(Resources.asByteSource(Resources.getResource(fileName)).openStream(),
-                nsContext, factory);
-        log.info("Created configuration from filename {}", fileName);
-    }
-
-    public YamlMappingConfiguration(InputStream input, NamespaceContext nsContext, XPathFactory factory) {
-        this.xpathFactory = factory;
-
-        Yaml yaml = new Yaml();
-        YamlNode configurationNodes = yaml.load(input);
-        log.trace("Read configuration file with the root elements {}", Joiner.on(" ").join(configurationNodes));
-
-        parse(configurationNodes, nsContext);
-
-        log.info("Created configuration from stream {} with {} entries", input, entries.size());
-    }
+    private String storeXmlFieldname = DEFAULT_STORE_XML_FIELDNAME;
 
     public YamlMappingConfiguration(String fileName, XPathFactory factory) throws IOException {
         this(Resources.asByteSource(Resources.getResource(fileName)).openStream(), factory);
@@ -127,9 +103,9 @@ public class YamlMappingConfiguration implements MappingConfiguration {
             log.trace("Read configuration file with the root elements {}", Joiner.on(" ").join(configurationNodes));
 
             NamespaceContext nsContext = parseNamespaceContext(configurationNodes);
-            parse(configurationNodes, nsContext);
+            init(configurationNodes, nsContext);
         }
-        
+
         log.info("Created configuration from stream {} with {} entries", input, entries.size());
     }
 
@@ -147,13 +123,13 @@ public class YamlMappingConfiguration implements MappingConfiguration {
             log.trace("Created namespace context from mapping configuration: {}", nsc);
             return nsc;
         } else {
-            log.error("No namespace in mapping file, must be either there or provided in constructor. Mapping {}",
+            log.error("Requited namespace map missing in mapping file '{}'",
                     configurationNodes.get("name"));
-            throw new MappingError("Mapping must containg 'namespaces' map or namespaces must be provided in constructor.");
+            throw new MappingError("Mapping '%s' does not contain 'namespaces' map.", configurationNodes.get("name"));
         }
     }
 
-    private void parse(YamlNode configurationNodes, NamespaceContext nsContext) {
+    private void init(YamlNode configurationNodes, NamespaceContext nsContext) {
         // read the entries from the config file
         this.name = configurationNodes.path("name").asTextValue(DEFAULT_NAME);
         this.version = configurationNodes.path("version").asIntValue(DEFAULT_VERSION);
@@ -166,6 +142,12 @@ public class YamlMappingConfiguration implements MappingConfiguration {
             this.type = indexField.path("type").asTextValue(DEFAULT_TYPE);
             if (indexField.hasNotNull("settings")) {
                 this.indexCreationRequest = Optional.of(indexField.get("settings").asTextValue());
+            }
+            if (indexField.hasNotNull("store_xml")) {
+                this.storeXml = indexField.path("store_xml").asBooleanValue(DEFAULT_STORE_XML);
+            }
+            if (indexField.hasNotNull("store_xml_fieldname")) {
+                this.storeXmlFieldname = indexField.path("store_xml_fieldname").asTextValue(DEFAULT_STORE_XML_FIELDNAME);
             }
         }
 
@@ -406,6 +388,16 @@ public class YamlMappingConfiguration implements MappingConfiguration {
     @Override
     public MappingEntry getEntry(String name) {
         return this.entries.stream().filter(e -> e.getFieldName().equals(name)).findFirst().get();
+    }
+
+    @Override
+    public boolean isXmlStoringEnabled() {
+        return storeXml;
+    }
+
+    @Override
+    public String getXmlFieldname() {
+        return storeXmlFieldname;
     }
 
 }

@@ -33,7 +33,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.n52.youngs.harvest.SourceRecord;
-import org.n52.youngs.impl.NamespaceContextImpl;
 import org.n52.youngs.impl.XPathHelper;
 import org.n52.youngs.load.Sink;
 import org.n52.youngs.load.SinkRecord;
@@ -55,7 +54,7 @@ public class ElasticsearchSinkCswMappingIT {
 
     // set to (true); to run focussed test methods from Netbeans
     @ClassRule
-    public static ElasticsearchServer server = new ElasticsearchServer(); // (true);
+    public static ElasticsearchServer server = new ElasticsearchServer(); // FIXME (true);
 
     private CswToBuilderMapper mapper;
 
@@ -63,7 +62,6 @@ public class ElasticsearchSinkCswMappingIT {
     public void createMappingAndSink() throws IOException {
         mapping = new YamlMappingConfiguration(Resources.asByteSource(
                 Resources.getResource("mappings/csw-record.yml")).openStream(),
-                NamespaceContextImpl.create(),
                 new XPathHelper().newXPathFactory());
         sink = new ElasticsearchClientSink(server.getClient(), "elasticsearch", mapping.getIndex(), mapping.getType());
 
@@ -109,6 +107,22 @@ public class ElasticsearchSinkCswMappingIT {
         assertThat("record is in index", recordResponse, hasJsonPath("_index", is(equalTo(mapping.getIndex()))));
         assertThat("record is found", recordResponse, hasJsonPath("_id", is(id)));
         assertThat("record is found", recordResponse, hasJsonPath("_source.type", is("series")));
+    }
+
+    @Test
+    public void mapAndStoreFile() throws Exception {
+        SourceRecord sourceRecord = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_94bc9c83-97f6-4b40-9eb8-a8e8787a5c63.xml");
+        SinkRecord sinkRecord = mapper.map(sourceRecord);
+
+        boolean stored = sink.store(sinkRecord);
+        assertThat("record added", stored);
+
+        String response = Request.Get("http://localhost:9200/" + mapping.getIndex() + "/" + mapping.getType() + "/_search?pretty&q=*")
+                .setHeader("Accept", "application/json").execute().returnContent().asString();
+        assertThat(response, containsString("\"total\" : 1"));
+        assertThat(response, containsString("urn:uuid:94bc9c83-97f6-4b40-9eb8-a8e8787a5c63"));
+        assertThat(response, containsString("xmldoc"));
+        assertThat(response, containsString("<dc:subject scheme=\"http://www.digest.org/2.1\">Vegetation-Cropland</dc:subject>"));
     }
 
 }

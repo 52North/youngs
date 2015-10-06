@@ -40,6 +40,10 @@ public interface MappingConfiguration {
 
     public static final boolean DEFAULT_INDEX_CREATION = false;
 
+    public static final boolean DEFAULT_STORE_XML = true;
+
+    public static final String DEFAULT_STORE_XML_FIELDNAME = "xmldoc";
+
     public static final boolean DEFAULT_DYNAMIC_MAPPING = false;
 
     public static final String DEFAULT_INDEXPROPERTY_TYPE = "string";
@@ -71,5 +75,9 @@ public interface MappingConfiguration {
     public boolean hasIndexCreationRequest();
 
     public String getIndexCreationRequest();
+
+    public boolean isXmlStoringEnabled();
+
+    public String getXmlFieldname();
 
 }

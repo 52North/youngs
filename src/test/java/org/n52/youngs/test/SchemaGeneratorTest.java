@@ -35,7 +35,7 @@ public class SchemaGeneratorTest {
 
     @Test
     public void generateSchema() throws IOException {
-        YamlMappingConfiguration config = new YamlMappingConfiguration("mappings/testmapping.yml", NamespaceContextImpl.create(), new XPathHelper().newXPathFactory());
+        YamlMappingConfiguration config = new YamlMappingConfiguration("mappings/testmapping.yml", new XPathHelper().newXPathFactory());
 
         SchemaGenerator generator = new SchemaGeneratorImpl();
         Map<String, Object> generatedRequest = generator.generate(config);
@@ -49,7 +49,7 @@ public class SchemaGeneratorTest {
 
     @Test
     public void generateSchemaDisabledAndDynamic() throws IOException {
-        YamlMappingConfiguration config = new YamlMappingConfiguration("mappings/testmapping-creation-disabled-but-dynamic.yml", NamespaceContextImpl.create(), new XPathHelper().newXPathFactory());
+        YamlMappingConfiguration config = new YamlMappingConfiguration("mappings/testmapping-creation-disabled-but-dynamic.yml", new XPathHelper().newXPathFactory());
 
         SchemaGenerator generator = new SchemaGeneratorImpl();
         Map<String, Object> generatedRequest = generator.generate(config);

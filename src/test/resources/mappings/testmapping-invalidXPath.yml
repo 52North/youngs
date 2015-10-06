@@ -1,2 +1,4 @@
 ---
 applicability_xpath: "in va_lid x-path"
+namespaces:
+    test: http://test.url

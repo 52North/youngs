@@ -1,2 +1,3 @@
 ---
-# nothing here to see
+namespaces:
+    test: http://test.url

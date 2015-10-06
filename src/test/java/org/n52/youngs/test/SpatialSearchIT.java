@@ -62,7 +62,6 @@ public class SpatialSearchIT {
     public static void prepareAndStoreSink() throws Exception {
         mapping = new YamlMappingConfiguration(Resources.asByteSource(
                 Resources.getResource("mappings/csw-record.yml")).openStream(),
-                NamespaceContextImpl.create(),
                 new XPathHelper().newXPathFactory());
 //        sink = new ElasticsearchRemoteHttpSink("localhost", 9300, "elasticsearch", mapping.getIndex(), mapping.getType());
         sink = new ElasticsearchClientSink(server.getClient(), "elasticsearhch", mapping.getIndex(), mapping.getType());

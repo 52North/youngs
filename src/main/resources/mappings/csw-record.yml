@@ -88,14 +88,14 @@ mappings:
         xpath: "//ows:BoundingBox"
         #[contains(@ows:crs,'4326')]"
         # min works on sequences, use min((1, 2)) > http://stackoverflow.com/questions/21901313/why-cant-i-use-min-function-in-my-xslt-on-a-number
-        # normalize-space does not work on numbers, the an outer 'number(min(..))' call removes trailing zeros after comparison [e.g. min((1.23, 1.1)) = 1.10], to be consistent between the latitute and longitude
+        # normalize-space does not work on numbers; the outer 'number(min(..))' call removes trailing zeros after comparison [e.g. min((1.23, 1.1)) = 1.10], to be consistent between the latitute and longitude
         coordinates:
             points:
-                -   lat: "number(substring-before(ows:UpperCorner, ' '))"
-                    lon: "min( ( number(substring-after(ows:UpperCorner, ' ') ),
+                -   lon: "number(substring-before(ows:UpperCorner, ' '))"
+                    lat: "min( ( number(substring-after(ows:UpperCorner, ' ') ),
                     number(substring-after(ows:LowerCorner, ' ')) ) )"
-                -   lat: "number(substring-before(ows:LowerCorner, ' '))"
-                    lon: "max( ( number(substring-after(ows:UpperCorner, ' ') ),
+                -   lon: "number(substring-before(ows:LowerCorner, ' '))"
+                    lat: "max( ( number(substring-after(ows:UpperCorner, ' ') ),
                     number(substring-after(ows:LowerCorner, ' ')) ) )"
         coordinates_type: envelope
         properties:

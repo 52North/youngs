@@ -1,2 +1,4 @@
 ---
 version: 2.52
+namespaces:
+    test: http://test.url

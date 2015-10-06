@@ -19,14 +19,20 @@ package org.n52.youngs.transform.impl;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Sets;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
@@ -52,6 +58,8 @@ public class CswToBuilderMapper implements Mapper {
     private static final Logger log = LoggerFactory.getLogger(CswToBuilderMapper.class);
 
     private final MappingConfiguration mapper;
+
+    private final TransformerFactory tFactory = TransformerFactory.newInstance();
 
     public CswToBuilderMapper(MappingConfiguration mapper) {
         this.mapper = mapper;
@@ -118,6 +126,13 @@ public class CswToBuilderMapper implements Mapper {
         entries.stream().filter(e -> e.hasCoordinates()).forEach(entry -> {
             mapSpatialEntry(entry, node, builder);
         });
+
+        // handle full xml
+        if (mapper.isXmlStoringEnabled()) {
+            String xmldoc = asString(node);
+            log.trace("Storing full XML to field {} starting with {}", mapper.getXmlFieldname(), xmldoc.substring(0, 120));
+            builder.field(mapper.getXmlFieldname(), xmldoc);
+        }
 
         builder.endObject();
         builder.close();
@@ -264,6 +279,19 @@ public class CswToBuilderMapper implements Mapper {
         }
 
         return null;
+    }
+
+    private String asString(Node node) {
+        StringWriter sw = new StringWriter();
+        try {
+            Transformer t = tFactory.newTransformer();
+            t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            t.setOutputProperty(OutputKeys.INDENT, "yes");
+            t.transform(new DOMSource(node), new StreamResult(sw));
+        } catch (TransformerException e) {
+            log.warn("Problem getting node {} as string", node, e);
+        }
+        return sw.toString();
     }
 
     private static class IdAndBuilder {

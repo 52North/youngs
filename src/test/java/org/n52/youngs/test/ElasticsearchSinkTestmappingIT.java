@@ -34,7 +34,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.n52.youngs.impl.NamespaceContextImpl;
 import org.n52.youngs.impl.XPathHelper;
 import org.n52.youngs.load.impl.ElasticsearchRemoteHttpSink;
 import org.n52.youngs.transform.impl.YamlMappingConfiguration;
@@ -58,7 +57,6 @@ public class ElasticsearchSinkTestmappingIT {
     public void createMappingAndSink() throws IOException {
         mapping = new YamlMappingConfiguration(Resources.asByteSource(
                 Resources.getResource("mappings/testmapping.yml")).openStream(),
-                NamespaceContextImpl.create(),
                 new XPathHelper().newXPathFactory());
 
         sink = new ElasticsearchRemoteHttpSink("localhost", 9300, "elasticsearch", mapping.getIndex(), mapping.getType());

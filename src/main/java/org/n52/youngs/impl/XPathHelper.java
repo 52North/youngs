@@ -22,7 +22,6 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathFactoryConfigurationException;
 import org.n52.youngs.api.XPathConstants;
-import org.n52.youngs.transform.impl.YamlMappingConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
@@ -34,7 +33,7 @@ import org.xml.sax.InputSource;
  */
 public class XPathHelper {
 
-    private static final Logger log = LoggerFactory.getLogger(YamlMappingConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(XPathHelper.class);
 
     private String systemSettingKey = "javax.xml.xpath.XPathFactory:"
             //    + NamespaceConstant.OBJECT_MODEL_SAXON;

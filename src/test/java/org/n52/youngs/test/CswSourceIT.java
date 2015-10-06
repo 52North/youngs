@@ -55,7 +55,6 @@ public class CswSourceIT {
     public static void prepare() throws IOException {
         mapping = new YamlMappingConfiguration(Resources.asByteSource(
                 Resources.getResource("mappings/csw-record.yml")).openStream(),
-                NamespaceContextImpl.create(),
                 new XPathHelper().newXPathFactory());
         mapper = new CswToBuilderMapper(mapping);
     }
