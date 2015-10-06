@@ -135,7 +135,7 @@ public class SingleThreadBulkRunner implements Runner {
         while (counter <= limit) {
             long recordsLeft = limit - counter;
             long size = Math.min(recordsLeft, bulkSize);
-            if(size <= 0) {
+            if (size <= 0) {
                 break;
             }
             log.info("Requesting {} of {} records from {} starting at {}",
@@ -164,7 +164,7 @@ public class SingleThreadBulkRunner implements Runner {
                 }
 
             } catch (RuntimeException e) {
-                String msg = String.format("Problem processing records %s to %s: %s", counter, size, e.getMessage());
+                String msg = String.format("Problem processing records %s to %s: %s", counter, counter + size, e.getMessage());
                 log.error(msg, e);
                 report.addMessage(msg);
             }
