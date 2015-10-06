@@ -27,12 +27,18 @@ import javax.xml.bind.JAXBException;
  */
 public class ContextHelper {
 
+    private static final String DEFAULT_NAMESPACE = "http://www.opengis.net/cat/csw/2.0.2";
+
     private static final Map<String, String> namespaceToContextPath = ImmutableMap.of(
-            "http://www.opengis.net/cat/csw/2.0.2", "net.opengis.csw.v_2_0_2",
+            DEFAULT_NAMESPACE, "net.opengis.csw.v_2_0_2",
             "http://www.isotc211.org/2005/gmd", "net.opengis.csw.v_2_0_2"); // just need context to harvest response, not the content
 
     public static JAXBContext getContextForNamespace(String namespace) throws JAXBException {
         String contextPath = namespaceToContextPath.get(namespace);
+        if(contextPath == null) {
+            // return default context
+            contextPath = namespaceToContextPath.get(DEFAULT_NAMESPACE);
+        }
         return JAXBContext.newInstance(contextPath);
     }
 
