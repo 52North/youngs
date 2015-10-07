@@ -33,6 +33,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import net.opengis.csw.v_2_0_2.AbstractRecordType;
+import org.n52.youngs.api.Report;
 import org.n52.youngs.impl.ContextHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,12 +113,12 @@ public abstract class CswSource implements Source {
     }
 
     @Override
-    public Collection<SourceRecord> getRecords() {
-        return getRecords(1, Long.MAX_VALUE);
+    public Collection<SourceRecord> getRecords(Report report) {
+        return getRecords(1, Long.MAX_VALUE, report);
     }
 
     @Override
-    public abstract Collection<SourceRecord> getRecords(long startPosition, long maxRecords);
+    public abstract Collection<SourceRecord> getRecords(long startPosition, long maxRecords, Report report);
 
     protected abstract Supplier<? extends Long> getAndStoreRecordCount();
 

@@ -54,6 +54,7 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
+import org.n52.youngs.api.Report;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -73,7 +74,7 @@ public class PoxCswSource extends CswSource {
     }
 
     @Override
-    public Collection<SourceRecord> getRecords(long startPosition, long maxRecords) {
+    public Collection<SourceRecord> getRecords(long startPosition, long maxRecords, Report report) {
         log.debug("Requesting {} records from catalog starting at {}", maxRecords, startPosition);
         Collection<SourceRecord> records = org.elasticsearch.common.collect.Lists.newArrayList();
 
@@ -94,7 +95,7 @@ public class PoxCswSource extends CswSource {
 
             List<Object> nodes = jaxb_response.getValue().getSearchResults().getAny();
             if (!nodes.isEmpty()) {
-                log.trace("Found {} \"any\" nodes.", nodes.size());
+                log.debug("Found {} \"any\" nodes.", nodes.size());
                 nodes.stream()
                         .filter(n -> n instanceof Node)
                         .map(n -> (Node) n)
@@ -104,7 +105,7 @@ public class PoxCswSource extends CswSource {
 
             List<JAXBElement<? extends AbstractRecordType>> jaxb_records = jaxb_response.getValue().getSearchResults().getAbstractRecord();
             if (!jaxb_records.isEmpty()) {
-                log.trace("Found {} \"AbstractRecordType\" records.", jaxb_records.size());
+                log.debug("Found {} \"AbstractRecordType\" records.", jaxb_records.size());
                 DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
                 jaxb_records.stream()
                         .map(type -> {
@@ -116,15 +117,19 @@ public class PoxCswSource extends CswSource {
             }
         } catch (IOException | JAXBException | ParserConfigurationException e) {
             log.error("Could not retrieve records from endpoint {}", getEndpoint(), e);
+            report.addMessage(String.format("Error retrieving record from endpoint %s: %s", this, e));
         }
 
+        log.debug("Decoded {} records", records.size());
         return records;
     }
 
     @Override
     protected Supplier<? extends Long> getAndStoreRecordCount() {
         Supplier<Long> s = new CswRecordCountSupplier();
-        recordCount = Optional.of(s.get());
+        if (!recordCount.isPresent()) {
+            recordCount = Optional.of(s.get());
+        }
         return s;
     }
 

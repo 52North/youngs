@@ -34,6 +34,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.n52.youngs.harvest.DirectorySource;
 import org.n52.youngs.impl.NamespaceContextImpl;
+import org.n52.youngs.impl.ReportImpl;
 import org.n52.youngs.impl.XPathHelper;
 import org.n52.youngs.load.Sink;
 import org.n52.youngs.load.SinkRecord;
@@ -70,7 +71,7 @@ public class SpatialSearchIT {
 
         DirectorySource source = new DirectorySource(
                 Paths.get(Resources.getResource("records").toURI()).resolve("csw"));
-        List<SinkRecord> mappedRecords = source.getRecords().stream().map(mapper::map).collect(Collectors.toList());
+        List<SinkRecord> mappedRecords = source.getRecords(new ReportImpl()).stream().map(mapper::map).collect(Collectors.toList());
         boolean stored = sink.store(mappedRecords);
 
         Thread.sleep(1000);

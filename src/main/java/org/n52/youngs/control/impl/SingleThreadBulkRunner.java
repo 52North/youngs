@@ -143,7 +143,7 @@ public class SingleThreadBulkRunner implements Runner {
                     size, limit, source.getEndpoint(), counter);
 
             try {
-                Collection<SourceRecord> records = source.getRecords(counter, size);
+                Collection<SourceRecord> records = source.getRecords(counter, size, report);
 
                 log.debug("Mapping {} retrieved records.", records.size());
                 List<SinkRecord> mappedRecords = records.stream()

@@ -19,7 +19,7 @@ package org.n52.youngs.harvest;
 import com.google.common.collect.ImmutableList;
 import java.net.URL;
 import java.util.Collection;
-import org.n52.youngs.api.Record;
+import org.n52.youngs.api.Report;
 
 /**
  *
@@ -41,8 +41,8 @@ public interface Source {
     */
     public long getRecordCount();
 
-    public Collection<SourceRecord> getRecords();
+    public Collection<SourceRecord> getRecords(Report report);
 
-    public Collection<SourceRecord> getRecords(long startPosition, long maxRecords);
+    public Collection<SourceRecord> getRecords(long startPosition, long maxRecords, Report report);
 
 }

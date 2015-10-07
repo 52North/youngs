@@ -39,6 +39,7 @@ import net.opengis.csw.v_2_0_2.AbstractRecordType;
 import net.opengis.csw.v_2_0_2.GetRecordsResponseType;
 import org.apache.http.client.fluent.Request;
 import org.elasticsearch.common.collect.Lists;
+import org.n52.youngs.api.Report;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -68,7 +69,7 @@ public class KvpCswSource extends CswSource {
     }
 
     @Override
-    public Collection<SourceRecord> getRecords(long startPosition, long maxRecords) {
+    public Collection<SourceRecord> getRecords(long startPosition, long maxRecords, Report report) {
         log.debug("Requesting {} records from catalog starting at {}", maxRecords, startPosition);
         Collection<SourceRecord> records = Lists.newArrayList();
 
@@ -107,6 +108,7 @@ public class KvpCswSource extends CswSource {
             }
         } catch (IOException | JAXBException | ParserConfigurationException e) {
             log.error("Could not retrieve records using url {}", recordsRequest, e);
+            report.addMessage(String.format("Error retrieving record from endpoint %s: %s", this, e));
         }
 
         return records;

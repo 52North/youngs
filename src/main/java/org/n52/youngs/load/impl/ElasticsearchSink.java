@@ -196,7 +196,7 @@ public abstract class ElasticsearchSink implements Sink {
         Map<String, Object> updatedMetadata = createUpdatedMetadata(indexId);
         UpdateResponse mdUpdate = getClient().prepareUpdate(indexId, MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID)
                 .setDoc(updatedMetadata).get();
-        log.info("Update metadata record created: {}, exists: {} | id = {} @ {}/{}",
+        log.info("Update metadata record created: {} | id = {} @ {}/{}",
                 mdUpdate.isCreated(), mdUpdate.getId(), mdUpdate.getIndex(), mdUpdate.getType());
 
         return (mdUpdate.getId().equals(MetadataDataMapping.METADATA_ROW_ID)

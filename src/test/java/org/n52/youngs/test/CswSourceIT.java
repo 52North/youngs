@@ -36,6 +36,7 @@ import org.n52.youngs.harvest.KvpCswSource;
 import org.n52.youngs.harvest.PoxCswSource;
 import org.n52.youngs.harvest.SourceRecord;
 import org.n52.youngs.impl.NamespaceContextImpl;
+import org.n52.youngs.impl.ReportImpl;
 import org.n52.youngs.impl.XPathHelper;
 import org.n52.youngs.load.SinkRecord;
 import org.n52.youngs.transform.impl.CswToBuilderMapper;
@@ -85,7 +86,7 @@ public class CswSourceIT {
                 (Collection<String>) ImmutableList.of("http://www.opengis.net/cat/csw/2.0.2"), NamespaceContextImpl.create(),
                 "csw:Record", "http://www.opengis.net/cat/csw/2.0.2");
 
-        Collection<SourceRecord> records = source.getRecords(1, 52);
+        Collection<SourceRecord> records = source.getRecords(1, 52, new ReportImpl());
         List<SinkRecord> mappedRecords = records.stream().map(mapper::map).collect(Collectors.toList());
 
         assertThat("all records mapped", mappedRecords.size(), is(52));
@@ -103,7 +104,7 @@ public class CswSourceIT {
                 (Collection<String>) ImmutableList.of("http://www.opengis.net/cat/csw/2.0.2"), NamespaceContextImpl.create(),
                 "csw:Record", "http://www.opengis.net/cat/csw/2.0.2");
 
-        Collection<SourceRecord> records = source.getRecords(1, 52);
+        Collection<SourceRecord> records = source.getRecords(1, 52, new ReportImpl());
         List<SinkRecord> mappedRecords = records.stream().map(mapper::map).collect(Collectors.toList());
 
         assertThat("all records mapped", mappedRecords.size(), is(52));

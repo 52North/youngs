@@ -32,6 +32,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.n52.youngs.api.Record;
+import org.n52.youngs.api.Report;
 import org.n52.youngs.exception.SourceError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,12 +87,12 @@ public class DirectorySource implements Source {
     }
 
     @Override
-    public Collection<SourceRecord> getRecords() {
+    public Collection<SourceRecord> getRecords(Report report) {
         return readRecordsFromDirectory();
     }
 
     @Override
-    public Collection<SourceRecord> getRecords(long startPosition, long maxRecords) {
+    public Collection<SourceRecord> getRecords(long startPosition, long maxRecords, Report report) {
         List<SourceRecord> sorted = readRecordsFromDirectory();
         int calculatedBegin = (int) (startPosition - 1);
         int calculatedEnd = (int) Math.min(sorted.size(), (calculatedBegin + maxRecords));
