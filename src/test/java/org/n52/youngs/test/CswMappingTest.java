@@ -86,10 +86,21 @@ public class CswMappingTest {
         assertThat("Mapped record contains xmldoc field name", mappedRecordString, containsString("bbox_xmldoc"));
         assertThat("Mapped record contains xml snippets", mappedRecordString,
                 JsonMatchers.hasJsonPath("bbox_xmldoc",
-                allOf(containsString("<ows:BoundingBox xmlns:ows="),
-                        containsString("<ows:LowerCorner>60.042 13.754</ows:LowerCorner>"),
-                        not(containsString("csw:Record")),
-                        not(containsString("urn:uuid")))));
+                        allOf(containsString("<ows:BoundingBox xmlns:ows="),
+                                containsString("<ows:LowerCorner>60.042 13.754</ows:LowerCorner>"),
+                                not(containsString("csw:Record")),
+                                not(containsString("urn:uuid")))));
     }
 
+    @Test
+    public void replace() throws Exception {
+        SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_1ef30a8b-876d-4828-9246-c37ab4510bbd.xml");
+        BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
+        String mappedRecordString = mappedRecord.getBuilder().string();
+
+        assertThat("Mapped record contains field", mappedRecordString,
+                allOf(containsString("replacer")));
+        assertThat("Mapped record contains replaced coordinates as string", mappedRecordString,
+                containsString(" [ \"60_042 13_754\", \"68_410 17_920\" ]"));
+    }
 }

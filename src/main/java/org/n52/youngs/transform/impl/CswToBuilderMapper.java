@@ -23,10 +23,10 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -220,13 +220,52 @@ public class CswToBuilderMapper implements Mapper {
         }
 
         if (result.isPresent()) {
+            EvalResult er = result.get();
+
+            if (entry.hasReplacements()) {
+                result = handleReplacements(entry, er, result);
+            }
+
             try {
-                builder.field(result.get().name, result.get().value);
-                log.debug("Added field: {}", result.get());
+                Object value = result.get().value;
+                builder.field(result.get().name, value);
+                log.debug("Added field: {}", (value instanceof Object[]) ? Arrays.toString((Object[]) value) : value);
             } catch (IOException e) {
                 log.warn("Error adding field {}: {}", entry.getFieldName(), e);
             }
         }
+    }
+
+    private Optional<EvalResult> handleReplacements(MappingEntry entry, EvalResult er, Optional<EvalResult> result) {
+        Map<String, String> replacements = entry.getReplacements();
+        log.trace("Applying replacements in {}: {}", er.name, Arrays.toString(replacements.entrySet().toArray()));
+        if (er.value instanceof String) {
+            result = Optional.of(new EvalResult(er.name, applyReplacements(replacements, (String) er.value)));
+        } else if (er.value instanceof String[]) {
+            String[] val = (String[]) er.value;
+            result = Optional.of(new EvalResult(er.name, Arrays.stream(val).map(currentVal -> {
+                return applyReplacements(replacements, currentVal);
+            }).collect(Collectors.toList()).toArray()));
+        } else if (er.value instanceof Object[]) {
+            Object[] val = (Object[]) er.value;
+            result = Optional.of(new EvalResult(er.name, Arrays.stream(val)
+                    .filter(v -> v instanceof String)
+                    .filter(Objects::nonNull)
+                    .map(v -> (String) v)
+                    .map(currentVal -> {
+                        return applyReplacements(replacements, currentVal);
+                    }).collect(Collectors.toList()).toArray()));
+        }
+        log.trace("Result after replacements: {}", result.get());
+        return result;
+    }
+
+    private String applyReplacements(Map<String, String> replacements, String in) {
+        String out = in;
+        for (Map.Entry<String, String> replacement : replacements.entrySet()) {
+            out = out.replace(replacement.getKey(), replacement.getValue());
+        }
+        return out;
     }
 
     private void mapRawEntry(MappingEntry entry, Node node, XContentBuilder builder) {

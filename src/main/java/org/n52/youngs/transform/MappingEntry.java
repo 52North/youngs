@@ -58,4 +58,8 @@ public interface MappingEntry {
 
     public boolean isRawXml();
 
+    public boolean hasReplacements();
+
+    public Map<String, String> getReplacements();
+
 }

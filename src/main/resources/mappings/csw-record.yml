@@ -117,3 +117,9 @@ mappings:
             type: string
             index: no
             index_name: bbox_xmldoc
+    replacer:
+        xpath: "//ows:BoundingBox/*/text()"
+        replacements:
+            - replace: "."
+              with: "_"
+        

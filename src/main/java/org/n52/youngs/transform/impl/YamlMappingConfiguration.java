@@ -203,7 +203,7 @@ public class YamlMappingConfiguration implements MappingConfiguration {
                         isXml);
 
                 // geo types
-                if (mapNode.has("coordinates")) {
+                if (mapNode.hasNotNull("coordinates")) {
                     String coordsType = mapNode.path("coordinates_type").asTextValue();
                     boolean points = mapNode.path("coordinates").has("points");
                     if (coordsType == null || !points) {
@@ -236,6 +236,21 @@ public class YamlMappingConfiguration implements MappingConfiguration {
 
                     log.trace("Created {} points for {}", pointExpressions.size(), id);
                     entry.setCoordinatesXPaths(pointExpressions).setCoordinatesType(coordsType);
+                }
+
+                if (mapNode.hasNotNull("replacements")) {
+                    YamlSeqNode rMap = (YamlSeqNode) mapNode.path("replacements");
+                    Map<String, String> replacements = Maps.newHashMap();
+                    rMap.value().stream().filter(n -> n instanceof YamlMapNode)
+                            .map(n -> (YamlMapNode) n)
+                            .map(mn -> {
+                                String replace = mn.path("replace").asTextValue();
+                                String with = mn.path("with").asTextValue();
+                                return new String[] {replace, with};
+                            })
+                            .forEach(e -> replacements.put(e[0], e[1]));
+                    log.trace("Parsed replacements: {}", Arrays.toString(replacements.entrySet().toArray()));
+                    entry.setReplacements(replacements);
                 }
 
                 return entry;

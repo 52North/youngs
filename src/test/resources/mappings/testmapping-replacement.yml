@@ -1,0 +1,13 @@
+---
+name: replacement-test
+xpathversion: 2.0
+namespaces:
+    test: http://test
+mappings:
+    replacer:
+        xpath: "/*"
+        replacements:
+            - replace: "."
+              with: ","  
+            - replace: "_"
+              with: "-"

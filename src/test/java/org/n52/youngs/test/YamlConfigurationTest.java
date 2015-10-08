@@ -30,6 +30,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathFactoryConfigurationException;
+import org.hamcrest.CoreMatchers;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -307,6 +308,19 @@ public class YamlConfigurationTest {
         assertThat("coordinates entry xpath works", coordinatesXPaths.get(1)[0].evaluate(new InputSource(new StringReader(bboxString)), XPathConstants.NUMBER), is(-13d));
         assertThat("coordinates entry xpath works", coordinatesXPaths.get(1)[1].evaluate(new InputSource(new StringReader(bboxString)), XPathConstants.NUMBER), is(12d));
         //is("[ [14, -11], [-13, 12] ]"));
+    }
+
+    @Test
+    public void testReplacement() throws IOException {
+        YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-replacement.yml", helper.newXPathFactory());
+        assertThat("replacement field is found", m.getEntries().stream().filter(e -> e.hasReplacements()).count(), is(1l));
+
+        MappingEntry entry = m.getEntries().stream().filter(e -> e.hasReplacements()).findFirst().get();
+        assertThat("fieldname is correct", entry.getFieldName(), is("replacer"));
+        assertThat("two replacements found", entry.getReplacements().size(), is(2));
+        assertThat("key is correct", entry.getReplacements().keySet().iterator().next(), is("."));
+        assertThat("key is correct", entry.getReplacements().values().iterator().next(), is(","));
+
     }
 
     private Document getDocument(String xmlString) throws Exception {

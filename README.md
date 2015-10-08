@@ -41,7 +41,7 @@ The harvesting of a catalog is mainly a mapping of metadata encoded in XML (e.g.
 
 *Mapping Metadata* (defaults are `<unnamed>`, `1`, and `2.0` respectively.
 
-```
+```yaml
 name: test
 version: 42
 xpathversion: 2.0
@@ -49,13 +49,13 @@ xpathversion: 2.0
 
 *Applicability test*: This XPath is executed to determine if a mapping should be applied to a provided XML document. Default is `true()`.
 
-```
+```yaml
 applicability_xpath: "boolean(//*[local-name()='MD_Metadata']) and boolean(namespace-uri(//*[local-name()='MD_Metadata']) = 'http://www.isotc211.org/2005/gmd')"
 ```
 
 *Namespaces*: This list of namespaces and prefixes is provided to the XPath evaluation classes and can be used in the XPath definitions throughout the mapping file.
 
-```
+```yaml
 namespaces:
     gmd: http://www.isotc211.org/2005/gmd
     csw: http://www.opengis.net/cat/csw/2.0.2
@@ -63,7 +63,7 @@ namespaces:
 
 *Index configuration*: Settings for the Elasticsearch index, such as name, type to be used for storing records, etc. A string field even contains (in this case YAML) markup that will be send to the node at index creation. Creation of the index with the schema can be enabled/disabld.
 
-```
+```yaml
 index:
     create: true
     name: testindex
@@ -78,7 +78,7 @@ index:
 
 An example mapping definition and corresponding Elasticsearch type deffinition is as follows:
 
-```
+```yaml
 mappings:
     id:
         xpath: "//gmd:fileIdentifier"
@@ -111,7 +111,7 @@ mappings:
 
 The advantag of a YAML file is that it supports references, e.g. using default values as shown below.
 
-```
+```yaml
 defaults:
     store: &STOREDEFAULT true
 [...]
@@ -123,6 +123,65 @@ mappings:
     title:
         properties:
             store: *STOREDEFAULT
+```
+
+#### Spatial field mapping
+
+A special mapping must be used for fields with geospatial data. A ``coordinates`` field with a single field ``points`` is needed. The points field contains an ordered list of latitude and longitude coordinates which form the geometry of the field. The type of the geometry must be given as value of ``coordinates_type``. Currently supported types and the required format for Elasticsearch are as follows:
+
+* [envelope](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-geo-shape-type.html#_envelope)
+
+The fields `lat` and `lon` must contain numbers to be correctly encoded, which removes trailing zeros.
+
+An example for a bounding box field is given below.
+
+```yaml
+location:
+    xpath: "//ows:BoundingBox"
+    coordinates:
+        points:
+            -   lon: "number(substring-before(ows:UpperCorner, ' '))"
+                lat: "min( ( number(substring-after(ows:UpperCorner, ' ') ),
+                number(substring-after(ows:LowerCorner, ' ')) ) )"
+            -   lon: "number(substring-before(ows:LowerCorner, ' '))"
+                lat: "max( ( number(substring-after(ows:UpperCorner, ' ') ),
+                number(substring-after(ows:LowerCorner, ' ')) ) )"
+    coordinates_type: envelope
+    properties:
+        index_name: location
+        type: geo_shape
+        tree: quadtree
+        precision: 1m
+```
+
+#### Id field mapping
+
+Exactly _one_ mapping can be marked to be used for the identifier of index entries.
+
+```yaml
+id:
+    xpath: "//dc:identifier"
+    identifier: true
+    properties:
+        type: string
+        boost: 10.0
+```
+
+#### Mapping with replacement
+
+A specific replacement can be applied after the evaluation of the XPath to allow complex select expressions in combination with partial field values, e.g. hierachical keywords.
+
+The following example would create a field `` { "classes": [ "A", "B" ] }`` out of XML snippet ``<keyword>class.A</keyword><keyword>class.B</keyword>``. Multiple replacements will be done in order.
+
+```yaml
+classes:
+    xpath: "//keyword/*[contains(text(), 'class.')]/text()"
+    replacements:
+        - replace: "class."
+          with: ""
+    properties:
+        store: yes
+        type: string
 ```
 
 
