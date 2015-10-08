@@ -16,9 +16,13 @@
  */
 package org.n52.youngs.transform.impl;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
+import com.google.common.io.Resources;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,22 +30,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
+import org.elasticsearch.common.collect.Maps;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.n52.youngs.load.impl.BuilderRecord;
 import org.n52.youngs.harvest.SourceRecord;
 import org.n52.youngs.harvest.NodeSourceRecord;
+import org.n52.youngs.impl.XPathHelper;
 import org.n52.youngs.transform.Mapper;
 import org.n52.youngs.transform.MappingConfiguration;
 import org.n52.youngs.transform.MappingEntry;
@@ -62,8 +73,23 @@ public class CswToBuilderMapper implements Mapper {
 
     private final TransformerFactory tFactory = TransformerFactory.newInstance();
 
+    private static final Map<String, String> DEFAULT_OUTPUT_PROPERTIES = ImmutableMap.of(
+            OutputKeys.OMIT_XML_DECLARATION, "no",
+            OutputKeys.INDENT, "no",
+            OutputKeys.ENCODING, Charsets.UTF_8.name());
+
+    private Optional<Transformer> stripspaceTransformer = Optional.empty();
+
     public CswToBuilderMapper(MappingConfiguration mapper) {
         this.mapper = mapper;
+
+        try (InputStream is = Resources.getResource("xslt/stripspace.xslt").openStream();) {
+            Source xslt = new StreamSource(is);
+            stripspaceTransformer = Optional.of(tFactory.newTransformer(xslt));
+            log.trace("Will apply stripspace XSLT.");
+        } catch (TransformerConfigurationException | IOException e) {
+            log.error("Problem loading strip-space XSLT file.", e);
+        }
     }
 
     @Override
@@ -272,7 +298,13 @@ public class CswToBuilderMapper implements Mapper {
         try {
             // handle full xml
             Node nodesetResult = (Node) entry.getXPath().evaluate(node, XPathConstants.NODE);
-            String xmldoc = asString(nodesetResult);
+
+            Map<String, String> outputProperties = Maps.newHashMap();
+            outputProperties.putAll(DEFAULT_OUTPUT_PROPERTIES);
+            if (entry.hasOutputProperties()) {
+                outputProperties.putAll(entry.getOutputProperties());
+            }
+            String xmldoc = asString(nodesetResult, outputProperties);
             log.trace("Storing full XML to field {} starting with {}", entry.getFieldName(),
                     xmldoc.substring(0, Math.min(xmldoc.length(), 120)));
             builder.field(entry.getFieldName(), xmldoc);
@@ -332,16 +364,28 @@ public class CswToBuilderMapper implements Mapper {
         return null;
     }
 
-    private String asString(Node node) {
+    private String asString(Node node, Map<String, String> outputProperties) {
+        log.debug("Converting node {} to string using properties {}", node, Arrays.toString(outputProperties.entrySet().toArray()));
+
         StringWriter sw = new StringWriter();
         try {
-            Transformer t = tFactory.newTransformer();
-            t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            t.setOutputProperty(OutputKeys.INDENT, "yes");
+            Transformer t = null;
+            if (outputProperties.get("indent").equals("no") && stripspaceTransformer.isPresent()) {
+                t = stripspaceTransformer.get();
+                log.trace("Will apply stripspace XSLT.");
+            } else {
+                t = tFactory.newTransformer();
+            }
+
+            for (Map.Entry<String, String> op : outputProperties.entrySet()) {
+                t.setOutputProperty(op.getKey(), op.getValue());
+            }
+
             t.transform(new DOMSource(node), new StreamResult(sw));
         } catch (TransformerException e) {
             log.warn("Problem getting node {} as string", node, e);
         }
+
         return sw.toString();
     }
 

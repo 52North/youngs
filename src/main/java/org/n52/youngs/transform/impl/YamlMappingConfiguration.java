@@ -83,13 +83,16 @@ public class YamlMappingConfiguration implements MappingConfiguration {
 
     private Optional<String> indexCreationRequest = Optional.empty();
 
-    public YamlMappingConfiguration(String fileName, XPathFactory factory) throws IOException {
-        this(Resources.asByteSource(Resources.getResource(fileName)).openStream(), factory);
+    private final XPathHelper xpathHelper;
+
+    public YamlMappingConfiguration(String fileName, XPathHelper xpathHelper) throws IOException {
+        this(Resources.asByteSource(Resources.getResource(fileName)).openStream(), xpathHelper);
         log.info("Created configuration from filename {}", fileName);
     }
 
-    public YamlMappingConfiguration(InputStream input, XPathFactory factory) {
-        this.xpathFactory = factory;
+    public YamlMappingConfiguration(InputStream input, XPathHelper xpathHelper) {
+        this.xpathHelper = xpathHelper;
+        this.xpathFactory = xpathHelper.newXPathFactory();
 
         Yaml yaml = new Yaml();
         YamlNode configurationNodes = yaml.load(input);
@@ -141,8 +144,7 @@ public class YamlMappingConfiguration implements MappingConfiguration {
             }
         }
 
-        XPathHelper xph = new XPathHelper();
-        if (!xph.isVersionSupported(xpathFactory, xpathVersion)) {
+        if (!this.xpathHelper.isVersionSupported(xpathFactory, xpathVersion)) {
             throw new MappingError("Provided factory {} does not support version {}", xpathFactory, xpathVersion);
         }
         log.debug("Using XPathFactory {}", xpathFactory);
@@ -246,11 +248,27 @@ public class YamlMappingConfiguration implements MappingConfiguration {
                             .map(mn -> {
                                 String replace = mn.path("replace").asTextValue();
                                 String with = mn.path("with").asTextValue();
-                                return new String[] {replace, with};
+                                return new String[]{replace, with};
                             })
                             .forEach(e -> replacements.put(e[0], e[1]));
                     log.trace("Parsed replacements: {}", Arrays.toString(replacements.entrySet().toArray()));
                     entry.setReplacements(replacements);
+                }
+
+                // for raw types
+                if (mapNode.hasNotNull("output_properties")) {
+                    YamlSeqNode rMap = (YamlSeqNode) mapNode.path("output_properties");
+                    Map<String, String> op = Maps.newHashMap();
+                    rMap.value().stream().filter(n -> n instanceof YamlMapNode)
+                            .map(n -> (YamlMapNode) n)
+                            .map(mn -> {
+                                String replace = mn.path("name").asTextValue();
+                                String with = mn.path("value").asTextValue();
+                                return new String[]{replace, with};
+                            })
+                            .forEach(e -> op.put(e[0], e[1]));
+                    log.trace("Parsed outputProperties: {}", Arrays.toString(op.entrySet().toArray()));
+                    entry.setOutputProperties(op);
                 }
 
                 return entry;

@@ -62,7 +62,7 @@ public class ElasticsearchSinkCswMappingIT {
     public void createMappingAndSink() throws IOException {
         mapping = new YamlMappingConfiguration(Resources.asByteSource(
                 Resources.getResource("mappings/csw-record.yml")).openStream(),
-                new XPathHelper().newXPathFactory());
+                new XPathHelper());
         sink = new ElasticsearchClientSink(server.getClient(), "elasticsearch", mapping.getIndex(), mapping.getType());
 
         boolean prepare = sink.prepare(mapping);

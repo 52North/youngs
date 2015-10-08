@@ -35,18 +35,29 @@ public class XPathHelper {
 
     private static final Logger log = LoggerFactory.getLogger(XPathHelper.class);
 
-    private String systemSettingKey = "javax.xml.xpath.XPathFactory:"
-            //    + NamespaceConstant.OBJECT_MODEL_SAXON;
-            + "http://saxon.sf.net/jaxp/xpath/om";
+    private final String systemSettingKey;
+
+    private final String systemSettingValue;
+
+    private final String objectModel;
 
     public XPathHelper() {
-        //
+        this("javax.xml.xpath.XPathFactory:"
+                //+ NamespaceConstant.OBJECT_MODEL_SAXON;
+                + "http://saxon.sf.net/jaxp/xpath/om",
+                "net.sf.saxon.xpath.XPathFactoryImpl",
+                "http://saxon.sf.net/jaxp/xpath/om");
+    }
+
+    public XPathHelper(String systemSettingKey, String systemSettingValue, String objectModel) {
+        this.systemSettingKey = systemSettingKey;
+        this.systemSettingValue = systemSettingValue;
+        this.objectModel = objectModel;
     }
 
     private void setSystemSetting() {
-        String value = "net.sf.saxon.xpath.XPathFactoryImpl";
-        System.setProperty(systemSettingKey, value);
-        log.info("Setting system property {} to {}", systemSettingKey, value);
+        System.setProperty(systemSettingKey, systemSettingValue);
+        log.info("Setting system property {} to {}", systemSettingKey, systemSettingValue);
     }
 
     private void unsetSystemSetting() {
@@ -58,7 +69,7 @@ public class XPathHelper {
         setSystemSetting();
         XPathFactory factory = null;
         try {
-            factory = XPathFactory.newInstance("http://saxon.sf.net/jaxp/xpath/om");
+            factory = XPathFactory.newInstance(objectModel);
             //NamespaceConstant.OBJECT_MODEL_SAXON);
         } catch (XPathFactoryConfigurationException e) {
             log.error("Could not create new instance of XPathFactory", e);

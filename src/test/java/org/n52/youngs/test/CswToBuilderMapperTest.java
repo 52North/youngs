@@ -23,6 +23,7 @@ import java.util.Collection;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +48,7 @@ public class CswToBuilderMapperTest {
     public void load() throws IOException {
         cswConfiguration = new YamlMappingConfiguration(
                 Resources.asByteSource(Resources.getResource("mappings/csw-record.yml")).openStream(),
-                new XPathHelper().newXPathFactory());
+                new XPathHelper());
         cswMapper = new CswToBuilderMapper(cswConfiguration);
     }
 
@@ -79,8 +80,6 @@ public class CswToBuilderMapperTest {
         BuilderRecord mappedRecord = cswMapper.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 
-//        assertThat("Mapped record contains all subjects", mappedRecordString,
-//                equalToIgnoringWhiteSpace("[ \"Otherography\", \"Physiography\", \"Morography\" ]"));
         assertThat("Mapped record contains all subjects", mappedRecordString,
                 containsString("[ \"Otherography\", \"Physiography\", \"Morography\" ]"));
     }
@@ -89,7 +88,7 @@ public class CswToBuilderMapperTest {
     public void stringResultsAdded() throws Exception {
         YamlMappingConfiguration c = new YamlMappingConfiguration(
                 Resources.asByteSource(Resources.getResource("mappings/testmapping-xpath-values.yml")).openStream(),
-                new XPathHelper().newXPathFactory());
+                new XPathHelper());
         CswToBuilderMapper m = new CswToBuilderMapper(c);
 
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
@@ -108,7 +107,7 @@ public class CswToBuilderMapperTest {
     public void datetimeResultsAdded() throws Exception {
         YamlMappingConfiguration c = new YamlMappingConfiguration(
                 Resources.asByteSource(Resources.getResource("mappings/testmapping-xpath-values.yml")).openStream(),
-                new XPathHelper().newXPathFactory());
+                new XPathHelper());
         CswToBuilderMapper m = new CswToBuilderMapper(c);
 
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
@@ -123,7 +122,7 @@ public class CswToBuilderMapperTest {
     public void fulltextResultsAdded() throws Exception {
         YamlMappingConfiguration c = new YamlMappingConfiguration(
                 Resources.asByteSource(Resources.getResource("mappings/testmapping-xpath-values.yml")).openStream(),
-                new XPathHelper().newXPathFactory());
+                new XPathHelper());
         CswToBuilderMapper m = new CswToBuilderMapper(c);
 
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
@@ -140,7 +139,7 @@ public class CswToBuilderMapperTest {
     public void bbox() throws Exception {
         YamlMappingConfiguration c = new YamlMappingConfiguration(
                 Resources.asByteSource(Resources.getResource("mappings/testmapping-gmd-bbox.yml")).openStream(),
-                new XPathHelper().newXPathFactory());
+                new XPathHelper());
         CswToBuilderMapper m = new CswToBuilderMapper(c);
 
         Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
@@ -150,6 +149,61 @@ public class CswToBuilderMapperTest {
         assertThat("Mapped record contains envelope", mappedRecordString,
                 allOf(containsString("location"), containsString("envelope"),
                         containsString("[ [ -11.1, 14.0 ], [ 12.22, -13.0 ] ]")));
+    }
+
+    @Test
+    public void removeWhitespace() throws Exception {
+        YamlMappingConfiguration c = new YamlMappingConfiguration(
+                Resources.asByteSource(Resources.getResource("mappings/testmapping-raw-outputproperties.yml")).openStream(),
+                new XPathHelper());
+        CswToBuilderMapper m = new CswToBuilderMapper(c);
+
+        SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
+        BuilderRecord mappedRecord = m.map(record);
+        String mappedRecordString = mappedRecord.getBuilder().string();
+
+        assertThat("Mapped record contains identifier", mappedRecordString, hasJsonPath("id", is("testid")));
+        assertThat("Mapped record contains field", mappedRecordString, containsString("raw_xml"));
+
+        assertThat("XML field has no new lines between elements", mappedRecordString,
+                hasJsonPath("raw_xml", not(containsString("\n"))));
+    }
+
+    @Test
+    public void doIndentation() throws Exception {
+        YamlMappingConfiguration c = new YamlMappingConfiguration(
+                Resources.asByteSource(Resources.getResource("mappings/testmapping-xpath-values.yml")).openStream(),
+                new XPathHelper());
+        CswToBuilderMapper m = new CswToBuilderMapper(c);
+
+        SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
+        BuilderRecord mappedRecord = m.map(record);
+        String mappedRecordString = mappedRecord.getBuilder().string();
+
+        assertThat("Mapped record contains identifier", mappedRecordString, hasJsonPath("id", is("testid")));
+        assertThat("Mapped record contains field", mappedRecordString, containsString("raw_xml"));
+
+        assertThat("XML field has no new lines between elements", mappedRecordString,
+                hasJsonPath("raw_xml", containsString("\n")));
+        assertThat("XML has some whitespace before elements", mappedRecordString,
+                hasJsonPath("raw_xml", containsString("    <dc:subject")));
+    }
+
+    @Test
+    public void xmlDeclaration() throws Exception {
+        YamlMappingConfiguration c = new YamlMappingConfiguration(
+                Resources.asByteSource(Resources.getResource("mappings/testmapping-raw-outputproperties.yml")).openStream(),
+                new XPathHelper());
+        CswToBuilderMapper m = new CswToBuilderMapper(c);
+
+        SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
+        BuilderRecord mappedRecord = m.map(record);
+        String mappedRecordString = mappedRecord.getBuilder().string();
+
+        assertThat("Mapped record contains identifier", mappedRecordString, hasJsonPath("id", is("testid")));
+        assertThat("Mapped record contains field", mappedRecordString, containsString("raw_xml"));
+        assertThat("XML declaration is not contained", mappedRecordString,
+                not(containsString("<?xml")));
     }
 
 }

@@ -22,7 +22,6 @@ import org.n52.youngs.load.impl.ElasticsearchRemoteHttpSink;
 import org.n52.youngs.api.Report;
 import org.n52.youngs.control.impl.SingleThreadBulkRunner;
 import org.n52.youngs.transform.impl.CswToBuilderMapper;
-import org.n52.youngs.harvest.CswSource;
 import org.n52.youngs.harvest.KvpCswSource;
 import org.n52.youngs.impl.NamespaceContextImpl;
 import org.n52.youngs.harvest.Source;
@@ -59,7 +58,7 @@ public class Main {
 
         MappingConfiguration configuration = new YamlMappingConfiguration(
                 Resources.asByteSource(Resources.getResource("mappings/gmd-metadata.yml")).openStream(),
-                new XPathHelper().newXPathFactory());
+                new XPathHelper());
         Mapper mapper = new CswToBuilderMapper(configuration);
 
         String host = "localhost";
@@ -89,7 +88,7 @@ public class Main {
 
         MappingConfiguration configuration = new YamlMappingConfiguration(
                 Resources.asByteSource(Resources.getResource("mappings/csw-record.yml")).openStream(),
-                new XPathHelper().newXPathFactory());
+                new XPathHelper());
         Mapper mapper = new CswToBuilderMapper(configuration);
 
         String host = "localhost";

@@ -46,7 +46,7 @@ public class CswMappingTest {
     public void load() throws IOException {
         cswConfiguration = new YamlMappingConfiguration(
                 Resources.asByteSource(Resources.getResource("mappings/csw-record.yml")).openStream(),
-                new XPathHelper().newXPathFactory());
+                new XPathHelper());
         cswMapper = new CswToBuilderMapper(cswConfiguration);
     }
 
@@ -86,7 +86,7 @@ public class CswMappingTest {
         assertThat("Mapped record contains xmldoc field name", mappedRecordString, containsString("bbox_xmldoc"));
         assertThat("Mapped record contains xml snippets", mappedRecordString,
                 JsonMatchers.hasJsonPath("bbox_xmldoc",
-                        allOf(containsString("<ows:BoundingBox xmlns:ows="),
+                        allOf(containsString("<ows:BoundingBox xmlns:"),
                                 containsString("<ows:LowerCorner>60.042 13.754</ows:LowerCorner>"),
                                 not(containsString("csw:Record")),
                                 not(containsString("urn:uuid")))));

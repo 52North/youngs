@@ -64,7 +64,7 @@ public class FullStackIT {
 
         MappingConfiguration cswConfiguration = new YamlMappingConfiguration(
                 Resources.asByteSource(Resources.getResource("mappings/csw-record.yml")).openStream(),
-                new XPathHelper().newXPathFactory());
+                new XPathHelper());
         cswMapper = new CswToBuilderMapper(cswConfiguration);
     }
 

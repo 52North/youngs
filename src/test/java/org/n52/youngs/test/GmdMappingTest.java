@@ -46,7 +46,7 @@ public class GmdMappingTest {
     public void load() throws IOException {
         cswConfiguration = new YamlMappingConfiguration(
                 Resources.asByteSource(Resources.getResource("mappings/gmd-metadata.yml")).openStream(),
-                new XPathHelper().newXPathFactory());
+                new XPathHelper());
         cswMapper = new CswToBuilderMapper(cswConfiguration);
     }
 

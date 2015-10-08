@@ -57,7 +57,7 @@ public class ElasticsearchSinkTestmappingIT {
     public void createMappingAndSink() throws IOException {
         mapping = new YamlMappingConfiguration(Resources.asByteSource(
                 Resources.getResource("mappings/testmapping.yml")).openStream(),
-                new XPathHelper().newXPathFactory());
+                new XPathHelper());
 
         sink = new ElasticsearchRemoteHttpSink("localhost", 9300, "elasticsearch", mapping.getIndex(), mapping.getType());
     }
@@ -115,8 +115,7 @@ public class ElasticsearchSinkTestmappingIT {
 
     @Test
     public void createIndexDisabled() throws Exception {
-        mapping = new YamlMappingConfiguration("mappings/testmapping-creation-disabled-but-dynamic.yml",
-                new XPathHelper().newXPathFactory());
+        mapping = new YamlMappingConfiguration("mappings/testmapping-creation-disabled-but-dynamic.yml", new XPathHelper());
         sink.prepare(mapping);
         Thread.sleep(1000);
 

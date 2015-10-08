@@ -45,6 +45,8 @@ public class MappingEntryImpl implements MappingEntry {
 
     private Optional<Map<String, String>> replacements = Optional.empty();
 
+    private Optional<Map<String, String>> outputProperties = Optional.empty();
+
     public MappingEntryImpl(XPathExpression xPath, Map<String, Object> indexProperties,
             boolean identifier, boolean rawXml) {
         this.xPath = xPath;
@@ -142,5 +144,19 @@ public class MappingEntryImpl implements MappingEntry {
     public MappingEntryImpl setReplacements(Map<String, String> replacements) {
         this.replacements = Optional.of(replacements);
         return this;
+    }
+
+    @Override
+    public boolean hasOutputProperties() {
+        return this.outputProperties.isPresent();
+    }
+
+    @Override
+    public Map<String, String> getOutputProperties() {
+        return this.outputProperties.get();
+    }
+
+    public void setOutputProperties(Map<String, String> properties) {
+        this.outputProperties = Optional.of(properties);
     }
 }

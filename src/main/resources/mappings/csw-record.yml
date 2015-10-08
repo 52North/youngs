@@ -110,6 +110,9 @@ mappings:
             type: string
             index: no
             index_name: xmldoc
+        output_properties:
+            - name: indent
+              value: "yes"
     raw_bbox:
         xpath: "//ows:BoundingBox"
         raw_xml: TRUE

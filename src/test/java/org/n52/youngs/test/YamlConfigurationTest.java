@@ -30,7 +30,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathFactoryConfigurationException;
-import org.hamcrest.CoreMatchers;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -60,7 +59,7 @@ public class YamlConfigurationTest {
 
     @Before
     public void loadFile() throws IOException {
-        config = new YamlMappingConfiguration("mappings/testmapping.yml", helper.newXPathFactory());
+        config = new YamlMappingConfiguration("mappings/testmapping.yml", helper);
     }
 
     @Test
@@ -87,21 +86,21 @@ public class YamlConfigurationTest {
     @Test
     public void testConfigMetadataVersionParsing() throws IOException {
         YamlMappingConfiguration c = new YamlMappingConfiguration("mappings/testmapping-double-version-number.yml",
-                helper.newXPathFactory());
+                helper);
         assertThat("version is correct", c.getVersion(), is(equalTo(2)));
     }
 
     @Test
     public void testConfigMetadataVersionString() throws IOException {
         YamlMappingConfiguration c = new YamlMappingConfiguration("mappings/testmapping-string-version-number.yml",
-                helper.newXPathFactory());
+                helper);
         assertThat("version is correct", c.getVersion(), is(equalTo(1)));
     }
 
     @Test
     public void testDefaultMetadata() throws Exception {
         YamlMappingConfiguration otherConfig = new YamlMappingConfiguration("mappings/testmapping-empty.yml",
-                helper.newXPathFactory());
+                helper);
 
         assertThat("name is correct", otherConfig.getName(), is(equalTo(MappingConfiguration.DEFAULT_NAME)));
         assertThat("version is correct", otherConfig.getVersion(), is(equalTo(MappingConfiguration.DEFAULT_VERSION)));
@@ -153,7 +152,7 @@ public class YamlConfigurationTest {
 
     @Test
     public void testApplicabilityInvalidPath() throws Exception {
-        YamlMappingConfiguration otherConfig = new YamlMappingConfiguration("mappings/testmapping-invalidXPath.yml", helper.newXPathFactory());
+        YamlMappingConfiguration otherConfig = new YamlMappingConfiguration("mappings/testmapping-invalidXPath.yml", helper);
 
         Document document = getDocument("<testdoc" + new Random().nextInt(52) + " />");
 
@@ -162,7 +161,7 @@ public class YamlConfigurationTest {
 
     @Test
     public void testApplicabilityMissing() throws Exception {
-        YamlMappingConfiguration otherConfig = new YamlMappingConfiguration("mappings/testmapping-empty.yml", helper.newXPathFactory());
+        YamlMappingConfiguration otherConfig = new YamlMappingConfiguration("mappings/testmapping-empty.yml", helper);
 
         Document document = getDocument("<testdoc/>");
 
@@ -226,13 +225,13 @@ public class YamlConfigurationTest {
 
     @Test(expected = MappingError.class)
     public void testMissingNamespaces() throws Exception {
-        YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-no-namespaces.yml", helper.newXPathFactory());
+        YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-no-namespaces.yml", helper);
         assertNotNull(m);
     }
 
     @Test(expected = MappingError.class)
     public void testMultipleIdentifiers() throws Exception {
-        YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-multiple-ids.yml", helper.newXPathFactory());
+        YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-multiple-ids.yml", helper);
         assertNotNull(m);
     }
 
@@ -250,31 +249,31 @@ public class YamlConfigurationTest {
 
     @Test(expected = MappingError.class)
     public void testEmbeddedNamespaceContextMissingNS() throws IOException {
-        YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-missing-ns.yml", helper.newXPathFactory());
+        YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-missing-ns.yml", helper);
         assertNotNull(m);
     }
 
     @Test
     public void testXpath10VersionSupportedJava() throws XPathExpressionException, IOException, XPathFactoryConfigurationException {
-        YamlMappingConfiguration c10 = new YamlMappingConfiguration("mappings/testmapping-xpath10.yml", XPathFactory.newInstance());
+        YamlMappingConfiguration c10 = new YamlMappingConfiguration("mappings/testmapping-xpath10.yml", new XPathHelperTest10());
         assertThat("mapping configuration was loaded", c10.getName(), is("testxpath"));
     }
 
     @Test(expected = MappingError.class)
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testXpath20VersionNOTSupportedJava() throws XPathExpressionException, IOException, XPathFactoryConfigurationException {
-        new YamlMappingConfiguration("mappings/testmapping-xpath20.yml", XPathFactory.newInstance());
+        new YamlMappingConfiguration("mappings/testmapping-xpath20.yml", new XPathHelperTest10());
     }
 
     @Test
     public void testXpath20VersionSupportedWithHelper() throws XPathExpressionException, IOException, XPathFactoryConfigurationException {
-        YamlMappingConfiguration c10 = new YamlMappingConfiguration("mappings/testmapping-xpath20.yml", helper.newXPathFactory());
+        YamlMappingConfiguration c10 = new YamlMappingConfiguration("mappings/testmapping-xpath20.yml", helper);
         assertThat("mapping configuration was loaded", c10.getName(), is("testxpath"));
     }
 
     @Test
     public void testEnvelope() throws Exception {
-        YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-gmd-bbox.yml", helper.newXPathFactory());
+        YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-gmd-bbox.yml", helper);
 
         Iterator<MappingEntry> iter = m.getEntries().iterator();
         iter.next();
@@ -312,15 +311,28 @@ public class YamlConfigurationTest {
 
     @Test
     public void testReplacement() throws IOException {
-        YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-replacement.yml", helper.newXPathFactory());
+        YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-replacement.yml", helper);
         assertThat("replacement field is found", m.getEntries().stream().filter(e -> e.hasReplacements()).count(), is(1l));
 
         MappingEntry entry = m.getEntries().stream().filter(e -> e.hasReplacements()).findFirst().get();
         assertThat("fieldname is correct", entry.getFieldName(), is("replacer"));
         assertThat("two replacements found", entry.getReplacements().size(), is(2));
-        assertThat("key is correct", entry.getReplacements().keySet().iterator().next(), is("."));
-        assertThat("key is correct", entry.getReplacements().values().iterator().next(), is(","));
+        assertThat("first key is correct", entry.getReplacements().keySet().iterator().next(), is("."));
+        assertThat("first value is correct", entry.getReplacements().values().iterator().next(), is(","));
+    }
 
+    @Test
+    public void testOutputProperties() throws IOException {
+        YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-raw-outputproperties.yml", helper);
+        assertThat("outputproperties field is found", m.getEntries().stream().filter(e -> e.hasOutputProperties()).count(), is(1l));
+
+        MappingEntry entry = m.getEntries().stream().filter(e -> e.hasOutputProperties()).findFirst().get();
+        assertThat("fieldname is correct", entry.getFieldName(), is("raw_xml"));
+        assertThat("two properties found", entry.getOutputProperties().size(), is(2));
+        assertThat("has omit", entry.getOutputProperties().keySet().contains("omit-xml-declaration"), is(true));
+        assertThat("omit value is correct", entry.getOutputProperties().get("omit-xml-declaration"), is("yes"));
+        assertThat("has indent", entry.getOutputProperties().keySet().contains("indent"), is(true));
+        assertThat("indent value is correct", entry.getOutputProperties().get("indent"), is("no"));
     }
 
     private Document getDocument(String xmlString) throws Exception {
@@ -329,6 +341,19 @@ public class YamlConfigurationTest {
         is.setCharacterStream(new StringReader(xmlString));
         Document doc = db.parse(is);
         return doc;
+    }
+
+    private static class XPathHelperTest10 extends XPathHelper {
+
+        public XPathHelperTest10() {
+            //
+        }
+
+        @Override
+        public synchronized XPathFactory newXPathFactory() {
+            return XPathFactory.newInstance();
+        }
+
     }
 
 }
