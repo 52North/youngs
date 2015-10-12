@@ -13,6 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-This project includes:
+
+The used runtime dependency JTS Topology Suite is published under the 
+Lesser General Public License (LGPL). The source code is available at
+http://sourceforge.net/projects/jts-topo-suite/ or on request to 
+d.nuest@52north.org.
+
+
+This project further includes:
 
 #GENERATED_NOTICES#

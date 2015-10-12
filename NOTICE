@@ -13,7 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-This project includes:
+
+The used runtime dependency JTS Topology Suite is published under the 
+Lesser General Public License (LGPL). The source code is available at
+http://sourceforge.net/projects/jts-topo-suite/ or on request to 
+d.nuest@52north.org.
+
+
+This project further includes:
 
   52°North Iceland under The Apache Software License, Version 2.0
   52°North Iceland Statistics under The Apache Software License, Version 2.0
@@ -41,7 +48,6 @@ This project includes:
   Jackson-annotations under The Apache Software License, Version 2.0
   Jackson-core under The Apache Software License, Version 2.0
   jackson-databind under The Apache Software License, Version 2.0
-  Javassist under MPL 1.1 or LGPL 2.1 or Apache License 2.0
   javax.inject under The Apache Software License, Version 2.0
   JAXB2 Basics - Runtime under BSD-Style License
   Joda-Time under Apache 2
@@ -66,7 +72,6 @@ This project includes:
   OGC Filter 1.1.0 under BSD-Style License
   OGC GML 3.1.1 under BSD-Style License
   OGC OWS 1.0.0 under BSD-Style License
-  Reflections under WTFPL or The New BSD License
   Saxon-HE under Mozilla Public License Version 2.0
   servlet-api under CDDL 1.1 or GPL2 w/ CPE
   SLF4J API Module under MIT License
