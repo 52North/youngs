@@ -1,0 +1,19 @@
+language: java
+sudo: false
+jdk:
+- oraclejdk8
+install: true
+script: mvn clean install -P check
+#after_script: "./.travis/deploy.sh"
+notifications:
+  irc:
+    channels:
+    - chat.freenode.net#52north
+    on_success: always
+    on_failure: always
+    use_notice: true
+    skip_join: false
+#env:
+#  global:
+#  - SNAPSHOT_BRANCH=develop
+#  - secure: ...
