@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="info" monitorInterval="10" name="youngs-log">
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="org.n52.youngs" level="info" additivity="false">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="cswrollingfile"/>
+        </Logger>
+        <Logger name="org.elasticsearch" level="info" additivity="false">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="cswrollingfile"/>
+        </Logger>
+        <Root level="warn">
+            <AppenderRef ref="console"/>
+        </Root>
+    </Loggers>
+</Configuration>
