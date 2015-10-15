@@ -4,21 +4,10 @@
         <Console name="console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </Console>
-
-        <RollingFile name="cswrollingfile" fileName="logs/youngs.log" immediateFlush="false"
-                     filePattern="logs/$${date:yyyy-MM}/csw-%d{MM-dd-yyyy}-%i.log.gz">
-            <PatternLayout>
-                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
-            </PatternLayout>
-            <Policies>
-                <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="25 MB"/>
-            </Policies>
-        </RollingFile>
     </Appenders>
 
     <Loggers>
-        <Logger name="org.n52.youngs" level="trace" additivity="false">
+        <Logger name="org.n52.youngs" level="info" additivity="false">
             <AppenderRef ref="console"/>
             <AppenderRef ref="cswrollingfile"/>
         </Logger>
@@ -28,7 +17,6 @@
         </Logger>
         <Root level="warn">
             <AppenderRef ref="console"/>
-            <AppenderRef ref="cswrollingfile"/>
         </Root>
     </Loggers>
 </Configuration>
