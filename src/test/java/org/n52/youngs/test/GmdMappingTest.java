@@ -94,4 +94,16 @@ public class GmdMappingTest {
                         containsString("[ [ -11.1, 14.0 ], [ 12.22, -13.0 ] ]")));
     }
 
+    @Test
+    public void maintenanceFrequency() throws Exception {
+        Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso-2.xml")).openStream());
+        BuilderRecord mappedRecord = cswMapper.map(record.iterator().next());
+        String mappedRecordString = mappedRecord.getBuilder().string();
+
+        assertThat("Mapped record contains update frequency", mappedRecordString,
+                allOf(containsString("\"metadata_maintenance\" : \"asNeeded\"")));
+        assertThat("Mapped record contains next update", mappedRecordString,
+                allOf(containsString("\"metadata_next_update\" : \"2015-01-01\"")));
+    }
+
 }

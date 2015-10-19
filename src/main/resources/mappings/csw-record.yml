@@ -1,5 +1,5 @@
 ---
-
+# http://api.eurogeoss-broker.eu/dab/services/cswiso?service=CSW&version=2.0.2&request=GetRecords&resultType=results&ElementSetName=full&namespace=xmlns%28csw=http://www.opengis.net/cat/csw/2.0.2%29&typeNames=csw:Record
 name: "CSW Record Mapping"
 version: 1
 xpathversion: 2.0
@@ -12,7 +12,7 @@ namespaces:
     ows: http://www.opengis.net/ows
 index:
     create: true
-    name: csw
+    name: geodab
     type: dcrecord
 mappings:
     id:
@@ -73,11 +73,11 @@ mappings:
             type: date
             format: "YYYY-MM-DD'Z'"
             ignore_malformed: true
-    created_on:
+    youngs_created_on:
         xpath: "current-dateTime()"
         properties:
             type: date
-    used_mapping:
+    youngs_used_mapping:
         xpath: "string('CSW Record Mapping version 1')"
         properties:
             type: string
@@ -113,16 +113,16 @@ mappings:
         output_properties:
             - name: indent
               value: "yes"
-    raw_bbox:
-        xpath: "//ows:BoundingBox"
-        raw_xml: TRUE
-        properties:
-            type: string
-            index: no
-            index_name: bbox_xmldoc
-    replacer:
-        xpath: "//ows:BoundingBox/*/text()"
-        replacements:
-            - replace: "."
-              with: "_"
+#    raw_bbox:
+#        xpath: "//ows:BoundingBox"
+#        raw_xml: TRUE
+#        properties:
+#            type: string
+#            index: no
+#            index_name: bbox_xmldoc
+#    replacer:
+#        xpath: "//ows:BoundingBox/*/text()"
+#        replacements:
+#            - replace: "."
+#              with: "_"
         

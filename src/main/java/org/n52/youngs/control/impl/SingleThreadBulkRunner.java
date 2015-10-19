@@ -139,7 +139,7 @@ public class SingleThreadBulkRunner implements Runner {
             if (size <= 0) {
                 break;
             }
-            log.info("Requesting {} of {} records from {} starting at {}",
+            log.info("### Requesting {} of {} records from {} starting at {} ###",
                     size, limit, source.getEndpoint(), counter);
 
             try {

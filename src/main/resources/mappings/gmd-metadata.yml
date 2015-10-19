@@ -10,7 +10,7 @@ namespaces:
     gml: http://www.opengis.net/gml
 index:
     create: true
-    name: csw
+    name: geodab
     type: isorecord
 mappings:
     id:
@@ -24,34 +24,60 @@ mappings:
         xpath: "//gmd:language/gmd:LanguageCode/@codeListValue"
         properties:
             store: yes
+            type: string
+    type:
+        xpath: "//gmd:hierarchyLevelName/*/text()"
+        properties:
+            store: yes
+            type: string
     parent:
         xpath: "//gmd:parentIdentifier/gco:CharacterString/text()"
         properties:
             store: yes
+            type: string
     responsible_individual:
         xpath: "//gmd:contact/gmd:CI_ResponsibleParty/gmd:individualName/gco:CharacterString/text()"
         properties:
             store: yes
+            type: string
     responsible_org:
         xpath: "//gmd:contact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString/text()"
         properties:
             store: yes
+            type: string
     responsible_email:
         xpath: "//gmd:contact/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gco:CharacterString/text()"
         properties:
             store: yes
+            type: string
+    responsible_role:
+        xpath: "//gmd:contact/gmd:CI_ResponsibleParty/gmd:role/*/text()"
+        properties:
+            store: yes
+            type: string
+    # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
+    date:
+        xpath: "//gmd:dateStamp/gco:Date"
+        properties:
+            store: yes
+            type: date
+            ignore_malformed: true
     md_standard_name:
-        xpath: "//gmd:metadataStandardName/gco:CharacterString/text()"
+        xpath: "//gmd:metadataStandardName/*/text()"
         properties:
             store: yes
+            type: string
     md_standard_version:
-        xpath: "//gmd:metadataStandardVersion/gco:CharacterString/text()"
+        xpath: "//gmd:metadataStandardVersion/*/text()"
         properties:
             store: yes
+            type: string
     reference_system:
         xpath: "//gmd:referenceSystemInfo/gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gco:CharacterString"
         properties:
             store: yes
+            type: string
+    # citations
     title:
         xpath: "//gmd:identificationInfo/*/gmd:title/*/text()"
         properties:
@@ -68,16 +94,64 @@ mappings:
             store: yes
             type: string
             boost: 4.0
-    status:
-        xpath: "//gmd:identificationInfo/*/gmd:status/*/@codeListValue"
+    use_limitations:
+        xpath: "//gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:useLimitation/*/text()"
         properties:
             store: yes
+            type: string
+            boost: 4.0
+    contact_individual_name:
+        xpath: "//gmd:identificationInfo/*/gmd:pointOfContact/*/gmd:individualName/*/text()"
+        properties:
+            store: yes
+            type: string
+    contact_org_name:
+        xpath: "//gmd:identificationInfo/*/gmd:pointOfContact/*/gmd:organisationName/*/text()"
+        properties:
+            store: yes
+            type: string
+    contact_online:
+        xpath: "//gmd:identificationInfo/*/gmd:pointOfContact/*/gmd:contactInfo/*/gmd:onlineResource/*/gmd:linkage/*/text()"
+        properties:
+            store: yes
+            type: string
+    contact_role:
+        xpath: "//gmd:identificationInfo/*/gmd:pointOfContact/*/gmd:role/*/text()"
+        properties:
+            store: yes
+            type: string
+    status:
+        xpath: "//gmd:identificationInfo/*/gmd:status/*/text()"
+        properties:
+            store: yes
+            type: string
+    graphics_file:
+        xpath: "//gmd:identificationInfo/*/gmd:graphicOverview/*/gmd:fileName/*/text()"
+        properties:
+            store: yes
+            type: string
+    graphics_description:
+        xpath: "//gmd:identificationInfo/*/gmd:graphicOverview/*/gmd:fileDescription/*/text()"
+        properties:
+            store: yes
+            type: string
     keywords:
         # only works for first keyword: xpath: "//gmd:identificationInfo/*/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gco:CharacterString/concat(../../gmd:type/*/@codeListValue, ':', ./text())"
-        xpath: "//gmd:identificationInfo/*/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/*/text()"
+        xpath: "//gmd:identificationInfo/*/gmd:descriptiveKeywords/*/gmd:keyword/*/text()"
         properties:
             store: yes
-    # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
+    keywords_thesauri:
+        xpath: "//gmd:identificationInfo/*/gmd:descriptiveKeywords/*/gmd:thesaurusName/*/gmd:title/*/text()"
+        properties:
+            store: yes
+    use_constraints:
+        xpath: "//gmd:identificationInfo/*/gmd:resourceConstraints/*/gmd:useConstraints/*/text()"
+        properties:
+            store: yes
+    other_constraints:
+        xpath: "//gmd:identificationInfo/*/gmd:resourceConstraints/*/gmd:otherConstraints/*/text()"
+        properties:
+            store: yes
     language:
         xpath: "//gmd:language/*/text()"
         properties:
@@ -86,31 +160,17 @@ mappings:
         xpath: "//gmd:topicCategory/*/text()"
         properties:
             store: yes
-    extend_begin:
-        xpath: "//gmd:extent//gml:beginPosition/text()"
-        properties:
-            store: yes
-            type: date
-    extend_end:
-        xpath: "//gmd:extent//gml:endPosition/text()"
-        properties:
-            store: yes
-            type: date
-    date:
-        xpath: "//gmd:dateStamp/gco:DateTime"
-        properties:
-            store: yes
-            type: date
-            ignore_malformed: true
-    youngs_created_on:
-        xpath: "current-dateTime()"
-        properties:
-            store: yes
-            type: date
-    youngs_used_mapping:
-        xpath: "string('GMD Record Mapping version 1')"
-        properties:
-            type: string
+    # FIXME document does not contain a namespace for gml!
+#    extend_begin:
+#        xpath: "//gmd:extent/*/gmd:temporalElement//gml:begin/*/*/text()"
+#        properties:
+#            store: yes
+#            type: date
+#    extend_end:
+#        xpath: "//gmd:extent/*/gmd:temporalElement//gml:end/*/*/text()"
+#        properties:
+#            store: yes
+#            type: date
     # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-geo-shape-type.html#_envelope
     # FIXME this _probably_ does not support bounding boxes crossing the date line
     bbox:
@@ -132,7 +192,38 @@ mappings:
             type: geo_shape
             tree: quadtree
             precision: 1m
-    # distribution info
-    # data quality (lineage, scope)
+    supplemental:
+        xpath: "//gmd:supplementalInformation/*/text()"
+        properties:
+            store: yes
+    distribution_format_name:
+        xpath: "//gmd:distributionInfo/*/gmd:distributionFormat/*/gmd:name/*/text()"
+        properties:
+            store: yes
+    # more distribution info?
+    # data quality (scope, reports)
+    # metadata
+    lineage_statement:
+        xpath: "//gmd:dataQualityInfo/*/gmd:lineage/*/gmd:statement/*/text()"
+        properties:
+            store: yes
+    metadata_maintenance:
+        xpath: "//gmd:metadataMaintenance/*/gmd:maintenanceAndUpdateFrequency/*/text()"
+        properties:
+            store: yes
+    metadata_next_update:
+        xpath: "//gmd:metadataMaintenance/*/gmd:dateOfNextUpdate/*/text()"
+        properties:
+            store: yes
+            type: date
+    youngs_created_on:
+        xpath: "current-dateTime()"
+        properties:
+            store: yes
+            type: date
+    youngs_used_mapping:
+        xpath: "string('GMD Record Mapping version 1')"
+        properties:
+            type: string
         
         
