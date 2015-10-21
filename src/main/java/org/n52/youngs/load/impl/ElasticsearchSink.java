@@ -101,14 +101,18 @@ public abstract class ElasticsearchSink implements Sink {
                 request.setId(builderRecord.getId());
             }
 
-            IndexResponse response = request.execute().actionGet();
-            log.trace("Created [{}] with id {} @ {}/{}, version {}", response.isCreated(),
-                    response.getId(), response.getIndex(), response.getType(), response.getVersion());
+            try {
+                IndexResponse response = request.execute().actionGet();
+                log.trace("Created [{}] with id {} @ {}/{}, version {}", response.isCreated(),
+                        response.getId(), response.getIndex(), response.getType(), response.getVersion());
 
-            return response.isCreated() || (!response.isCreated() && (response.getVersion() > 1));
+                return response.isCreated() || (!response.isCreated() && (response.getVersion() > 1));
+            } catch (ElasticsearchException e) {
+                log.error("Could not store record {}", builderRecord.getId(), e);
+                return false;
+            }
         } else {
-            throw new InvalidParameterException(
-                    String.format("The provided record class '%s' is not supported", record.getClass()));
+            throw new SinkError("The provided record class '%s' is not supported", record.getClass());
         }
     }
 
@@ -335,7 +339,5 @@ public abstract class ElasticsearchSink implements Sink {
                 .add("client", getClient())
                 .toString();
     }
-    
-    
 
 }

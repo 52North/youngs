@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.n52.youngs.api.Report;
 import org.n52.youngs.control.Runner;
+import org.n52.youngs.exception.MappingError;
 import org.n52.youngs.exception.SinkError;
 import org.n52.youngs.harvest.Source;
 import org.n52.youngs.harvest.SourceRecord;
@@ -119,7 +120,6 @@ public class SingleThreadBulkRunner implements Runner {
                 report.addMessage(msg);
                 return report;
             }
-
         } catch (SinkError e) {
             log.error("Problem preparing sink", e);
             report.addMessage(String.format("Problem preparing sink: %s", e.getMessage()));
@@ -127,7 +127,7 @@ public class SingleThreadBulkRunner implements Runner {
         }
 
         final Stopwatch timer = Stopwatch.createStarted();
-        long counter = startPosition;
+        long pageStart = startPosition;
         long count = source.getRecordCount();
         long limit = Math.min(recordsLimit + startPosition, count);
 
@@ -138,26 +138,34 @@ public class SingleThreadBulkRunner implements Runner {
         double bulkTimeAvg = 0d;
         long runNumber = 0;
 
-        while (counter <= limit) {
+        while (pageStart <= limit) {
             currentBulkTimer.start();
-            
-            long recordsLeft = limit - counter;
+
+            long recordsLeft = limit - pageStart;
             long size = Math.min(recordsLeft, bulkSize);
             if (size <= 0) {
                 break;
             }
             log.info("### [{}] Requesting {} records from {} starting at {}, last requested record will be {} ###",
-                    runNumber, size, source.getEndpoint(), counter, limit);
+                    runNumber, size, source.getEndpoint(), pageStart, limit);
 
             try {
                 sourceTimer.start();
-                Collection<SourceRecord> records = source.getRecords(counter, size, report);
+                Collection<SourceRecord> records = source.getRecords(pageStart, size, report);
                 sourceTimer.stop();
 
                 log.debug("Mapping {} retrieved records.", records.size());
                 mappingTimer.start();
                 List<SinkRecord> mappedRecords = records.stream()
-                        .map(mapper::map)
+                        .map(record -> {
+                            try {
+                                return mapper.map(record);
+                            } catch (MappingError e) {
+                                report.addFailedRecord(record.toString(), "Problem during mapping: " + e.getMessage());
+                                return null;
+                            }
+                        })
+                        .filter(Objects::nonNull)
                         .collect(Collectors.toList());
                 mappingTimer.stop();
 
@@ -165,11 +173,15 @@ public class SingleThreadBulkRunner implements Runner {
                 if (!testRun) {
                     sinkTimer.start();
                     mappedRecords.forEach(record -> {
-                        boolean result = sink.store(record);
-                        if (result) {
-                            report.addSuccessfulRecord(record.getId());
-                        } else {
-                            report.addFailedRecord(record.getId(), "see Sink log");
+                        try {
+                            boolean result = sink.store(record);
+                            if (result) {
+                                report.addSuccessfulRecord(record.getId());
+                            } else {
+                                report.addFailedRecord(record.getId(), "see sink log");
+                            }
+                        } catch (SinkError e) {
+                            report.addFailedRecord(record.toString(), "Problem during mapping: " + e.getMessage());
                         }
                     });
                     sinkTimer.stop();
@@ -188,24 +200,25 @@ public class SingleThreadBulkRunner implements Runner {
                     sinkTimer.stop();
                 }
 
-                String msg = String.format("Problem processing records %s to %s: %s", counter, counter + size, e.getMessage());
+                String msg = String.format("Problem processing records %s to %s: %s", pageStart, pageStart + size, e.getMessage());
                 log.error(msg, e);
                 report.addMessage(msg);
             }
 
-            counter += bulkSize;
-            
+            pageStart += bulkSize;
+
             currentBulkTimer.stop();
             bulkTimeAvg = ((bulkTimeAvg * runNumber) + currentBulkTimer.elapsed(TimeUnit.SECONDS)) / (runNumber + 1);
-            updateAndLog(runNumber, counter, currentBulkTimer.elapsed(TimeUnit.SECONDS), bulkTimeAvg);
+            updateAndLog(runNumber, (runNumber + 1) * bulkSize, currentBulkTimer.elapsed(TimeUnit.SECONDS), bulkTimeAvg);
             currentBulkTimer.reset();
-            
+
             runNumber++;
         }
 
         timer.stop();
-        log.info("Completed harvesting for {} of {} records in {} minutes",
-                counter,
+        log.info("Completed harvesting for {} ({} failed) of {} records in {} minutes",
+                report.getNumberOfRecordsAdded(),
+                report.getNumberOfRecordsFailed(),
                 source.getRecordCount(),
                 timer.elapsed(TimeUnit.MINUTES));
         log.info("Time spent (minutes): source={}, mapping={}, sink={}", sourceTimer.elapsed(TimeUnit.MINUTES),
@@ -227,15 +240,13 @@ public class SingleThreadBulkRunner implements Runner {
                 .add("sink", sink).toString();
     }
 
-    private void updateAndLog(long run, long counter, long bulkSeconds, double bulkAverageSeconds) {
-        double percentageTask = (double) counter / this.recordsLimit * 100;
-        double percentageOverall = (double) counter / source.getRecordCount() * 100;
+    private void updateAndLog(long run, long pageStart, long bulkSeconds, double bulkAverageSeconds) {
+        double percentageTask = (double) pageStart / this.recordsLimit * 100;
         this.completedPercentage = Optional.of(percentageTask);
-        log.info("### [{}] Completed {}% of task [which is {}% overall] in {} seconds (avg: {} seconds) ###",
+        log.info("### [{}] Completed {}% of task in {} seconds (avg: {} seconds) ###",
                 run,
-                String.format("%1$,.5f", this.completedPercentage.get()),
-                String.format("%1$,.5f", percentageOverall),
-                bulkSeconds, 
+                String.format("%1$,.2f", getCompletedPercentage()),
+                bulkSeconds,
                 String.format("%1$,.2f", bulkAverageSeconds));
     }
 
