@@ -60,7 +60,5 @@ public class BuilderRecord implements SinkRecord {
                 .add("id", getId())
                 .toString();
     }
-    
-    
 
 }

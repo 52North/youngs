@@ -47,7 +47,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.n52.youngs.exception.MappingError;
-import org.n52.youngs.impl.NamespaceContextImpl;
 import org.n52.youngs.impl.XPathHelper;
 import org.n52.youngs.transform.MappingConfiguration;
 import org.slf4j.Logger;
@@ -57,7 +56,7 @@ import org.w3c.dom.Document;
 /**
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public class YamlMappingConfiguration implements MappingConfiguration {
+public class YamlMappingConfiguration extends NamespacedYamlConfiguration implements MappingConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(YamlMappingConfiguration.class);
 
@@ -108,25 +107,6 @@ public class YamlMappingConfiguration implements MappingConfiguration {
         log.info("Created configuration from stream {} with {} entries", input, entries.size());
     }
 
-    private NamespaceContext parseNamespaceContext(YamlNode configurationNodes) {
-        if (configurationNodes.hasNotNull("namespaces")) {
-            Map<String, String> nsMap = Maps.newHashMap();
-
-            final YamlMapNode valueMap = configurationNodes.path("namespaces").asMap();
-            valueMap.entries().stream().forEach(
-                    (Entry<YamlNode, YamlNode> e) -> {
-                        nsMap.put(e.getKey().asTextValue(), e.getValue().asTextValue());
-                    });
-
-            NamespaceContext nsc = new NamespaceContextImpl(nsMap);
-            log.trace("Created namespace context from mapping configuration: {}", nsc);
-            return nsc;
-        } else {
-            log.error("Requited namespace map missing in mapping file '{}'",
-                    configurationNodes.get("name"));
-            throw new MappingError("Mapping '%s' does not contain 'namespaces' map.", configurationNodes.get("name"));
-        }
-    }
 
     private void init(YamlNode configurationNodes, NamespaceContext nsContext) {
         // read the entries from the config file
@@ -161,7 +141,7 @@ public class YamlMappingConfiguration implements MappingConfiguration {
         if (configurationNodes.hasNotNull("mappings")) {
             YamlMapNode mappingsNode = configurationNodes.path("mappings").asMap();
             this.entries = Lists.newArrayList();
-            for (Entry<YamlNode, YamlNode> entry : mappingsNode.entries()) { // use old-style lood to forward exception
+            for (Entry<YamlNode, YamlNode> entry : mappingsNode.entries()) { // use old-style loop to forward exception
                 MappingEntry e = createEntry(entry.getKey().asTextValue(),
                         entry.getValue(), nsContext);
                 log.trace("Created entry: {}", e);
@@ -278,7 +258,7 @@ public class YamlMappingConfiguration implements MappingConfiguration {
                         expression, id);
             }
         }
-        throw new MappingError("The provided node class %s is not supported in the mapping '{}': %s",
+        throw new MappingError("The provided node class %s is not supported in the mapping '%s': %s",
                 node.getClass().toString(), id, node.toString());
     }
 
