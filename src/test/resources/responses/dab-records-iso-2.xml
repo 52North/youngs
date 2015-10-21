@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<csw:GetRecordsResponse xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:ogc="http://www.opengis.net/ogc" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:ows="http://www.opengis.net/ows" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0.2" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-discovery.xsd">
+<csw:GetRecordsResponse xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:ogc="http://www.opengis.net/ogc" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:ows="http://www.opengis.net/ows" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gml="http://www.opengis.net/gml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0.2" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-discovery.xsd">
     <csw:RequestId/>
     <csw:SearchStatus timestamp="2015-10-19T04:51:19.419-04:00"/>
     <csw:SearchResults nextRecord="11" numberOfRecordsMatched="5419320" numberOfRecordsReturned="10" recordSchema="http://www.isotc211.org/2005/gmd">
@@ -213,16 +213,16 @@
                     </gmd:citation>
                     <gmd:abstract>
                         <gco:CharacterString>The OMI/Aura Level-3e SO2 Data Product OMSO2e (Version 003) is now available from the NASA Goddard Earth Sciences Data and Information Services Center (GES DISC) for public access (http://disc.gsfc.nasa.gov/Aura/OMI/omso2e_v003.shtml)
-             
+
                             The Ozone Monitoring Instrument (OMI) was launched aboard the EOS-Aura satellite on July 15, 2004 (1:38 pm equator crossing time, ascending mode). OMI, with its 2600 km viewing swath width, provides almost daily global coverage. OMI is a contribution of the Netherlands Space Office (NSO) in collaboration with the Finish Meterological Institute (FMI), to the US EOS-Aura Mission. The principal investigator is Dr. Pieternel Levelt of the KNMI (Royal Netherlands Meteorological Institute). OMI is designed to monitor stratospheric and tropospheric ozone, clouds, aerosols and smoke from biomass burning, SO2 from volcanic eruptions, and key tropospheric pollutants (HCHO, NO2) and ozone depleting gases (OClO and BrO). OMI sensor counts, calibrated and geolocated radiances, and all derived geophysical atmospheric products are archived at the NASA Goddard DAAC.
-        
-                            (The shortname for this Level-3 OMI total column SO2 product is OMSO2e) 
+
+                            (The shortname for this Level-3 OMI total column SO2 product is OMSO2e)
                             The  lead algorithm scientist for this product is NASA/GSFC OMI scientist Dr. Nikolay Krotkov (nickolay.a.krotkov@nasa.gov).
-                            In this Level-3 daily global SO2 data product, each grid contains only one observation of Total Column Density of SO2 in the Planetary Boundary Layer (PBL,) based on an improved Band Residual Difference Algorithm (BRD). This single observation is the "best pixel", selected from all "good" L2 pixels of OMSO2 that overlap this grid and have UTC time betweeen UTC times of 00:00:00 and 23:59:59.9999. In addition to the SO2 Vertical column value some ancillary parameters e.g cloud fraction, terrain height, scene number, solar and satellite viewing angles, row anomaly flags, and quality flags have been also made available corresponding to the best selected SO2 data pixel in each grid.       
-   
-                            OMSO2e files are stored in EOS Hierarchical Data Format (HDF-EOS5). The maximum file size for the OMTO3e data product is about 7 Mbytes. A list of tools for browsing and extracting data from these files can be found from the site http://daac.gsfc.nasa.gov/Aura/tools.shtml 
+                            In this Level-3 daily global SO2 data product, each grid contains only one observation of Total Column Density of SO2 in the Planetary Boundary Layer (PBL,) based on an improved Band Residual Difference Algorithm (BRD). This single observation is the "best pixel", selected from all "good" L2 pixels of OMSO2 that overlap this grid and have UTC time betweeen UTC times of 00:00:00 and 23:59:59.9999. In addition to the SO2 Vertical column value some ancillary parameters e.g cloud fraction, terrain height, scene number, solar and satellite viewing angles, row anomaly flags, and quality flags have been also made available corresponding to the best selected SO2 data pixel in each grid.
+
+                            OMSO2e files are stored in EOS Hierarchical Data Format (HDF-EOS5). The maximum file size for the OMTO3e data product is about 7 Mbytes. A list of tools for browsing and extracting data from these files can be found from the site http://daac.gsfc.nasa.gov/Aura/tools.shtml
                             A short OMSO2e Readme Document that includes a brief algorithm description and documents that provide known data quality related issues are available from the OMI GES DISC site( http://disc.sci.gsfc.nasa.gov/Aura/data-holdings/OMI/omso2e_v003.shtml )
-                            [ This document was provided by NASA's Global Change Master Directory. 
+                            [ This document was provided by NASA's Global Change Master Directory.
                             For more information on the source of this metadata please visit
                             http://gcmd.nasa.gov/r/geoss/[GCMD]GES_DISC_OMSO2e_V003 ]</gco:CharacterString>
                     </gmd:abstract>
@@ -375,7 +375,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -388,7 +388,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -729,19 +729,19 @@
                     <gmd:supplementalInformation>
                         <gco:CharacterString>Ahmad, S. P., P. F. Levelt, P. K. Bhartia, E. Hilsenrath, G. W. Leppelmeier,and J. E. Johnson, Atmospheric Products from the Ozone Monitoring Instrument(OMI). Proceedings of SPIE conference on Earth Observing Systems VIII, San Diego, California, Aug 3-8, 2003. http://disc.sci.gsfc.nasa.gov/acdisc/ozone/docs/omi-spie-2003.doc
                             Brinksma, E. J., K. F. Boersma, and P. F. Levelt, OMI-Validation Requirements, May 16, 2003.
-  
+
                             Bogumil, K., J. Orphal, T. Homann, S. Voigt, P. Spietz, O.C. Fleischmann, A. Vogel, M. Hartmann, H. Kromminga, H. Bovensmann, J. Frerick, J.P. Burrows, Measurements of molecular absorption spectra with the SCIAMACHY pre-flight model: instrument characterization and reference data for atmospheric remote-sensing in the 230-2380nm region, Journal of Photochemistry and Photobiology, A:Chemistry, 157 , 167-184, 2003.
-                            Krotkov, N.A., S.A. Carn, A.J. Krueger, P.K. Bhartia, and K. Yang (2005). Band residual difference algorithm for retrieval of SO2 from the Aura Ozone Monitoring Instrument (OMI). IEEE Trans.Geosci. Remote Sensing, AURA special issue, 44(5), 1259-1266, doi:10.1109/TGRS.2005.861932, 2006        
-                            Krueger,A. J., N. A. Krotkov, S. Datta, D. Flittner, and O. Dubovik, SO2,  in Algorithm Theoretical Baseline Document: OMI Trace Gas Algorithms, K. Chance (ed.), vol. IV, ATBD-OMI-04, version 2.0,  Aug. 2002. 
-                                                      
+                            Krotkov, N.A., S.A. Carn, A.J. Krueger, P.K. Bhartia, and K. Yang (2005). Band residual difference algorithm for retrieval of SO2 from the Aura Ozone Monitoring Instrument (OMI). IEEE Trans.Geosci. Remote Sensing, AURA special issue, 44(5), 1259-1266, doi:10.1109/TGRS.2005.861932, 2006
+                            Krueger,A. J., N. A. Krotkov, S. Datta, D. Flittner, and O. Dubovik, SO2,  in Algorithm Theoretical Baseline Document: OMI Trace Gas Algorithms, K. Chance (ed.), vol. IV, ATBD-OMI-04, version 2.0,  Aug. 2002.
+
                             Krueger, A.J., L.S. Walter, P.K. Bhartia, C.C. Schnetzler, N.A. Krotkov, I. Sprod, and G.J.S. Bluth(1995). Volcanic sulfur dioxide measurements from the total ozone mapping spectrometer instruments. J. Geophys. Res., 100(D7), 14057-14076, 10.1029/95JD01222.
-                                                      
-                            Levelt, P.F., G.H.J. van den Oord, M.R. Dobber, A. Malkki, H. Visser, J. de Vries, P. Stammes, J. Lundell and H. Saari, The Ozone Monitoring Instrument, IEEE Trans. Geo. Rem. Sens., 2006, Vol. 44, No. 5, 1093-1101, doi:10.1109/TGRS.2006.872333. 
-                                                      
-                            Levelt, P.F., E. Hilsenrath, G.W. Leppelmeier, G.H.J. van den Oord, P.K. Bhartia, J. Tamminen, J.F. de Haan en J.P. Veefkind, Science Objectives of the Ozone Monitoring Instrument, IEEE Trans. Geo. Rem. Sens., 2006, Vol. 44, No. 5, 1199-1208, doi:10.1109/TGRS.2006.872336. 
-                                                      
+
+                            Levelt, P.F., G.H.J. van den Oord, M.R. Dobber, A. Malkki, H. Visser, J. de Vries, P. Stammes, J. Lundell and H. Saari, The Ozone Monitoring Instrument, IEEE Trans. Geo. Rem. Sens., 2006, Vol. 44, No. 5, 1093-1101, doi:10.1109/TGRS.2006.872333.
+
+                            Levelt, P.F., E. Hilsenrath, G.W. Leppelmeier, G.H.J. van den Oord, P.K. Bhartia, J. Tamminen, J.F. de Haan en J.P. Veefkind, Science Objectives of the Ozone Monitoring Instrument, IEEE Trans. Geo. Rem. Sens., 2006, Vol. 44, No. 5, 1199-1208, doi:10.1109/TGRS.2006.872336.
+
                             Levelt, P.F., J. P. Veefkind, R. H. M. Voors, and J. de Vries, Instrument Description; Algorithm Theoretical Baseline Document: OMI Instrument, Level 0 - 1B processor, Calibration &amp; Operations, P. F. Levelt (ed.), vol. I, ATBD-OMI-01, version 2, Aug. 2002. http://eospso.gsfc.nasa.gov/sites/default/files/atbd/ATBD-OMI-01.pdf
-                                                      
+
                             Schoeberl, M.R., A.R. Douglass, E. Hilsenrath, P.K. Bhartia, R. Beer, J.W. Waters, M.R. Gunson, L. Froidevaux, J.C. Gille, J.J. Barnett, P.F. Levelt and P. DeCola, Overview of the EOS aura mission, IEEE Trans. Geo. Rem. Sens., 2006, Vol. 44, No. 5, 1066-1074, doi:10.1109/TGRS.2005.861950.</gco:CharacterString>
                     </gmd:supplementalInformation>
                 </gmd:MD_DataIdentification>
@@ -1769,14 +1769,14 @@
                     </gmd:citation>
                     <gmd:abstract>
                         <gco:CharacterString>The AIRS Level 3 Monthly Gridded Retrieval Product contains standard retrieval means, standard deviations and input counts.  Each file covers a calendar month. The mean values are simply the arithmetic means of the daily products, weighted by the number of input counts for each day in that grid box.
-                  
+
                             The geophysical parameters have been averaged and binned into 1 x1 deg grid cells, from -180.0 to +180.0 deg longitude and from -90.0 to +90.0 deg latitude. For each grid map of 4-byte floating-point mean values there is a corresponding 4-byte floating-point map of standard deviation and a 2-byte integer grid map of counts. The counts map provides the user with the number of points per bin that were included in the mean and can be used to generate custom multi-day maps from the daily gridded products.
-                  
-                            The thermodynamic parameters are: Skin Temperature (land and sea surface), Air Temperature at the surface, Profiles of Air Temperature and Water Vapor, Tropopause Characteristics, Column Precipitable Water, Cloud Amount/Frequency, Cloud Height, Cloud Top Pressure, Cloud Top Temperature, Reflectance, Emissivity, Surface Pressure, Cloud Vertical Distribution. 
+
+                            The thermodynamic parameters are: Skin Temperature (land and sea surface), Air Temperature at the surface, Profiles of Air Temperature and Water Vapor, Tropopause Characteristics, Column Precipitable Water, Cloud Amount/Frequency, Cloud Height, Cloud Top Pressure, Cloud Top Temperature, Reflectance, Emissivity, Surface Pressure, Cloud Vertical Distribution.
                             The trace gases parameters are: Total Amounts and Vertical Profiles of Carbon Monoxide, Methane, and Ozone.
                             The actual names of the variables in the data files should be inferred from the Processing File Description document.
                             (The Shortname for this product is AIRX3STM).
-                            [ This document was provided by NASA's Global Change Master Directory. 
+                            [ This document was provided by NASA's Global Change Master Directory.
                             For more information on the source of this metadata please visit
                             http://gcmd.nasa.gov/r/geoss/[GCMD]GES_DISC_AIRX3STM_V006 ]</gco:CharacterString>
                     </gmd:abstract>
@@ -1864,7 +1864,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -1877,7 +1877,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -3596,14 +3596,14 @@
                     <gmd:abstract>
                         <gco:CharacterString>The OMI/Aura Level-3 Global Gridded(0.25x0.25 deg) Nitrogen Dioxide Product "OMNO2d" is now released (Jan 10, 2013) to the public from the NASA Goddard Earth Sciences Data and Information Services Center(GES DISC). The OMNO2 (Level-2) and OMNO2G (Level-2G, binned) processed earlier (in 2012) are also available from GES DISC. see http://disc.sci.gsfc.nasa.gov/Aura/data-holdings/OMI/
                             Nitrogen dioxide is an important chemical species in both, the stratosphere where it plays a key role in ozone chemistry, and in the troposphere where it is a precursor to ozone production. In the troposphere, it is produced in various combustion processes and in lightning and is an indicator of poor air quality.
-                              
-                            (The shortname for this Level-3 Global Gridded Nitrogen Dioxide Product is OMNO2d_V003) 
+
+                            (The shortname for this Level-3 Global Gridded Nitrogen Dioxide Product is OMNO2d_V003)
                             The algorithm leads for the NO2 products are NASA OMI scientist Dr. Nickolay Krotkov and KNMI scientist Dr. Pepijn Veefkind.
-                                          
-                            OMNO2d data product is a Level-3 Gridded Product where pixel level data of good quality are binned and "averaged" into 0.25x0.25 degree global grids. This product contains Total column NO2 and Total Tropospheric Column NO2, for all atmospheric conditions, and for sky conditions where cloud fraction is less than 30 percent.   Details are available in the documents provided on the NASA GES DISC OMI site http://disc.gsfc.nasa.gov/Aura/OMI/documents/v003/omno2d_v003.shtml 
-                              
+
+                            OMNO2d data product is a Level-3 Gridded Product where pixel level data of good quality are binned and "averaged" into 0.25x0.25 degree global grids. This product contains Total column NO2 and Total Tropospheric Column NO2, for all atmospheric conditions, and for sky conditions where cloud fraction is less than 30 percent.   Details are available in the documents provided on the NASA GES DISC OMI site http://disc.gsfc.nasa.gov/Aura/OMI/documents/v003/omno2d_v003.shtml
+
                             OMNO2d data are stored in EOS Hierarchical Data Format (HDF-EOS). Each file contains data from the day lit portion of the orbit (~14 orbits).  The average file size for the OMNO2d data product is about 6 Mbytes.
-                            [ This document was provided by NASA's Global Change Master Directory. 
+                            [ This document was provided by NASA's Global Change Master Directory.
                             For more information on the source of this metadata please visit
                             http://gcmd.nasa.gov/r/geoss/[GCMD]GES_DISC_OMNO2d_V003 ]</gco:CharacterString>
                     </gmd:abstract>
@@ -3756,7 +3756,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -3769,7 +3769,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -3782,7 +3782,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -3795,7 +3795,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -3808,7 +3808,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -3821,7 +3821,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -3834,7 +3834,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -3847,7 +3847,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -3860,7 +3860,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -3873,7 +3873,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -4210,47 +4210,47 @@
                     <gmd:supplementalInformation>
                         <gco:CharacterString>Ahmad, S. P., P. F. Levelt, P. K. Bhartia, E. Hilsenrath, G. W. Leppelmeier,and J. E. Johnson, "Atmospheric Products from the Ozone Monitoring Instrument(OMI)", Proceedings of SPIE conference on Earth Observing Systems VIII, San Diego,California, Aug 3-8, 2003.
                             http://disc.sci.gsfc.nasa.gov/acdisc/ozone/docs/omi-spie-2003.doc
-                            Boersma, K. F., E. J. Bucsela, E. J. Brinksma, J. F. Gleason, NO2 
-                            in Algorithm Theoretical Baseline Document: OMI Trace Gas Algorithms, K. Chance 
-                            (ed.), vol. IV, ATBD-OMI-04, version 2.0, Aug. 2002. 
-                            http://eospso.gsfc.nasa.gov/eos_homepage/for_scientists/atbd/docs/OMI/ATBD-OMI-04.pdf 
-                            Bucsela, E., E. Celarier, M. Wenig, J. Gleason, P. Veefkind, 
-                            K.F. Boersma, E. Brinksma, Algorithm for NO2 vertical column 
-                            retrieval from the Ozone Monitoring Instrument, IEEE 
-                            Transactions on Geoscience and Remote Sensing, 44, 1245-1258, 
-                            2006. 
-                            Burrows, J.P., A. Richter, A. Dehn, B. Deters, S. Himmelmann, 
-                            S. Voigt, and J. Orphal, Atmospheric remote sensing reference 
-                            data from GOME - 2. Temperature-dependent absorption 
-                            cross-sections of O3 in the 231-794 nm range, 
-                            J. Quant. Spectrosc. Radiat. Transfer 61, 509-517, 1999. 
-                            Chance, K. V., and R. J. D. Spurr, Ring effect studies: Rayleigh 
-                            scattering, including molecular parameters for rotational Raman 
-                            scattering, and the Fraunhofer spectrum, Applied Optics, 36, 
-                            5224, 1997. 
-                            Palmer, P.I., D.J. Jacob, K. Chance, R.V. Martin, R.J.D. Spurr, 
-                            T.P. Kurosu, I. Bey, R. Yantosca, A. Fiore, Air mass factor 
-                            formulation for spectroscopic measurements from satellites: 
-                            Application to formaldehyde retrievals from the Global Ozone 
-                            Monitoring Experiment, J. Geophys. Res., 106, 14539, 2001. 
-                            Levelt, P.F., G.H.J. van den Oord, M.R. Dobber, A. Malkki, H. Visser, J. de 
-                            Vries, P. Stammes, J. Lundell and H. Saari, The Ozone Monitoring Instrument, 
-                            IEEE Trans. Geo. Rem. Sens., 2006, Vol. 44, No. 5, 1093-1101, 
-                            doi:10.1109/TGRS.2006.872333. 
-                            Levelt, P.F., E. Hilsenrath, G.W. Leppelmeier, G.H.J. van den Oord, P.K. 
-                            Bhartia, J. Tamminen, J.F. de Haan en J.P. Veefkind, Science Objectives of the 
-                            Ozone Monitoring Instrument, IEEE Trans. Geo. Rem. Sens., 2006, Vol. 44, No. 5, 
-                            1199-1208, doi:10.1109/TGRS.2006.872336. 
-                            Schoeberl, M.R., A.R. Douglass, E. Hilsenrath, P.K. Bhartia, R. Beer, J.W. 
-                            Waters, M.R. Gunson, L. Froidevaux, J.C. Gille, J.J. Barnett, P.F. Levelt and 
-                            P. DeCola, Overview of the EOS aura mission, IEEE Trans. Geo. Rem. Sens., 2006, 
-                            Vol. 44, No. 5, 1066-1074, doi:10.1109/TGRS.2005.861950. 
-                            Schoeberl, M.R., A.R. Douglass, E. Hilsenrath, P.K. Bhartia, 
-                            J. Barnett, J. Gille, R. Beer, M. Gunson, J. Waters, 
-                            P.F. Levelt,P. DeCola, "The EOS Aura Mission," EOS, 
-                            Transactions, American Geophysical Union 85 , Number 18, 4 May 
-                            2004. [Preprint] 
-                            http://aura.gsfc.nasa.gov/project/eos-agu-aura-article.pdf 
+                            Boersma, K. F., E. J. Bucsela, E. J. Brinksma, J. F. Gleason, NO2
+                            in Algorithm Theoretical Baseline Document: OMI Trace Gas Algorithms, K. Chance
+                            (ed.), vol. IV, ATBD-OMI-04, version 2.0, Aug. 2002.
+                            http://eospso.gsfc.nasa.gov/eos_homepage/for_scientists/atbd/docs/OMI/ATBD-OMI-04.pdf
+                            Bucsela, E., E. Celarier, M. Wenig, J. Gleason, P. Veefkind,
+                            K.F. Boersma, E. Brinksma, Algorithm for NO2 vertical column
+                            retrieval from the Ozone Monitoring Instrument, IEEE
+                            Transactions on Geoscience and Remote Sensing, 44, 1245-1258,
+                            2006.
+                            Burrows, J.P., A. Richter, A. Dehn, B. Deters, S. Himmelmann,
+                            S. Voigt, and J. Orphal, Atmospheric remote sensing reference
+                            data from GOME - 2. Temperature-dependent absorption
+                            cross-sections of O3 in the 231-794 nm range,
+                            J. Quant. Spectrosc. Radiat. Transfer 61, 509-517, 1999.
+                            Chance, K. V., and R. J. D. Spurr, Ring effect studies: Rayleigh
+                            scattering, including molecular parameters for rotational Raman
+                            scattering, and the Fraunhofer spectrum, Applied Optics, 36,
+                            5224, 1997.
+                            Palmer, P.I., D.J. Jacob, K. Chance, R.V. Martin, R.J.D. Spurr,
+                            T.P. Kurosu, I. Bey, R. Yantosca, A. Fiore, Air mass factor
+                            formulation for spectroscopic measurements from satellites:
+                            Application to formaldehyde retrievals from the Global Ozone
+                            Monitoring Experiment, J. Geophys. Res., 106, 14539, 2001.
+                            Levelt, P.F., G.H.J. van den Oord, M.R. Dobber, A. Malkki, H. Visser, J. de
+                            Vries, P. Stammes, J. Lundell and H. Saari, The Ozone Monitoring Instrument,
+                            IEEE Trans. Geo. Rem. Sens., 2006, Vol. 44, No. 5, 1093-1101,
+                            doi:10.1109/TGRS.2006.872333.
+                            Levelt, P.F., E. Hilsenrath, G.W. Leppelmeier, G.H.J. van den Oord, P.K.
+                            Bhartia, J. Tamminen, J.F. de Haan en J.P. Veefkind, Science Objectives of the
+                            Ozone Monitoring Instrument, IEEE Trans. Geo. Rem. Sens., 2006, Vol. 44, No. 5,
+                            1199-1208, doi:10.1109/TGRS.2006.872336.
+                            Schoeberl, M.R., A.R. Douglass, E. Hilsenrath, P.K. Bhartia, R. Beer, J.W.
+                            Waters, M.R. Gunson, L. Froidevaux, J.C. Gille, J.J. Barnett, P.F. Levelt and
+                            P. DeCola, Overview of the EOS aura mission, IEEE Trans. Geo. Rem. Sens., 2006,
+                            Vol. 44, No. 5, 1066-1074, doi:10.1109/TGRS.2005.861950.
+                            Schoeberl, M.R., A.R. Douglass, E. Hilsenrath, P.K. Bhartia,
+                            J. Barnett, J. Gille, R. Beer, M. Gunson, J. Waters,
+                            P.F. Levelt,P. DeCola, "The EOS Aura Mission," EOS,
+                            Transactions, American Geophysical Union 85 , Number 18, 4 May
+                            2004. [Preprint]
+                            http://aura.gsfc.nasa.gov/project/eos-agu-aura-article.pdf
                             Vandaele A.C., C. Hermans, P.C. Simon, M. Carleer, R. Colin, S. Fally, M.F. M. Aerienne, A. Jenouvrier, and B. Coquart, Measurements of the NO2 absorption cross-section from 42000 cm-1 to 10000 cm-1 (238-1000 nm) at 220 K and 294 K, J. Quant. Spectrosc. Radiat. Transfer 59, 171-184, 1998</gco:CharacterString>
                     </gmd:supplementalInformation>
                 </gmd:MD_DataIdentification>
@@ -5806,14 +5806,14 @@
                     </gmd:citation>
                     <gmd:abstract>
                         <gco:CharacterString xmlns:gco="http://www.isotc211.org/2005/gco">The AIRS Only Level 3 Daily Gridded Product contains standard retrieval means,  standard deviations and input counts. Each file covers a temporal period of 24  hours for either the descending (equatorial crossing North to South @1:30 AM  local time) or ascending (equatorial crossing South to North @1:30 PM local  time) orbit. The data starts at the international dateline and progresses  westward (as do the subsequent orbits of the satellite) so that neighboring  gridded cells of data are no more than a swath of time apart (about 90  minutes). The two parts of a scan line crossing the dateline are included in  separate L3 files, according to the date, so that data points in a grid box are  always coincident in time. The edge of the AIRS Level 3 gridded cells is at  the date line (the 180E/W longitude boundary). When plotted, this produces a  map with 0 degrees longitude in the center of the image unless the bins are  reordered. This method is preferred because the left (West) side of the image  and the right (East) side of the image contain data farthest apart in time. The  gridding scheme used by AIRS is the same as used by TOVS Pathfinder to create  Level 3 products. The daily Level 3 products have gores between satellite paths  where there is no coverage for that day.
-                  
+
                             The geophysical parameters have been averaged and binned into 1 x 1 deg grid cells,  from -180.0 to +180.0 deg longitude and from -90.0 to +90.0 deg latitude. For each  grid map of 4-byte floating-point mean values there is a corresponding 4-byte  floating-point map of standard deviation and a 2-byte integer grid map of  counts. The counts map provides the user with the number of points per bin that  were included in the mean and can be used to generate custom multi-day maps  from the daily gridded products.
-                  
-                            The thermodynamic parameters are: Skin Temperature (land and sea surface), Air Temperature at the surface, Profiles of Air Temperature and Water Vapor, Tropopause Characteristics, Column Precipitable Water, Cloud Amount/Frequency, Cloud Height, Cloud Top Pressure, Cloud Top Temperature, Reflectance, Emissivity, Surface Pressure, Cloud Vertical Distribution. 
+
+                            The thermodynamic parameters are: Skin Temperature (land and sea surface), Air Temperature at the surface, Profiles of Air Temperature and Water Vapor, Tropopause Characteristics, Column Precipitable Water, Cloud Amount/Frequency, Cloud Height, Cloud Top Pressure, Cloud Top Temperature, Reflectance, Emissivity, Surface Pressure, Cloud Vertical Distribution.
                             The trace gases parameters are: Total Amounts and Vertical Profiles of Carbon Monoxide, Methane, and Ozone.
                             The actual names of the variables in the data files should be inferred from the Processing File Description document.
                             (The Shortname for this product is AIRS3STD).
-                            [ This document was provided by NASA's Global Change Master Directory. 
+                            [ This document was provided by NASA's Global Change Master Directory.
                             For more information on the source of this metadata please visit
                             http://gcmd.nasa.gov/r/geoss/[GCMD]GES_DISC_AIRS3STD_V005 ]</gco:CharacterString>
                     </gmd:abstract>
@@ -5901,7 +5901,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -5914,7 +5914,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -5927,7 +5927,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -5940,7 +5940,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -5953,7 +5953,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -5966,7 +5966,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -5979,7 +5979,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -5992,7 +5992,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -6005,7 +6005,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -6018,7 +6018,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -6031,7 +6031,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -6044,7 +6044,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -6057,7 +6057,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -6070,7 +6070,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -6083,7 +6083,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -6096,7 +6096,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -8619,20 +8619,20 @@
                         </gmd:CI_Citation>
                     </gmd:citation>
                     <gmd:abstract>
-                        <gco:CharacterString>The Total Ozone Mapping Spectrometer (TOMS) version 8 Daily Gridded Data consist of daily, global coverage of total column ozone, aerosol index, Lambertian effective reflectivity(Rayleigh corrected) and surface UV-B Erythemal irradiances. 
-      
+                        <gco:CharacterString>The Total Ozone Mapping Spectrometer (TOMS) version 8 Daily Gridded Data consist of daily, global coverage of total column ozone, aerosol index, Lambertian effective reflectivity(Rayleigh corrected) and surface UV-B Erythemal irradiances.
+
                             (The shortname for this Level-3 Nimbus-7 TOMS Product is TOMSN7L3)
-                            Four TOMS instruments have been successfully flown in orbit aboard the Nimbus-7 (Nov. 1978 - May 1993), Meteor-3 (Aug. 1991 - Dec. 1994), ADEOS (Sep. 1996 - June 1997) and Earth Probe (July 1996 - 2005) satellites. 
-      
+                            Four TOMS instruments have been successfully flown in orbit aboard the Nimbus-7 (Nov. 1978 - May 1993), Meteor-3 (Aug. 1991 - Dec. 1994), ADEOS (Sep. 1996 - June 1997) and Earth Probe (July 1996 - 2005) satellites.
+
                             The temporal coverage of the Nimbus-7 TOMS data is from Nov 1978 to May 1993. Nimbus-7, Meteor-3, and Earth Probe TOMS data have been reprocessed using version-8 algorithm.
-      
+
                             The total ozone, aerosol index, reflectivity data and UV-B Erythemal irradiances are mapped to a global grid of size 180 x 288 with a lat-long resolution of 1.00 x 1.25 degrees. These data are stored in the EOS version of Hierarchical Data Format (HDF-EOS). HDF was developed by the National Center for Supercomputer Applications (NCSA) at the University of Illinois at Urbana-Champaign.
-       
+
                             TOMS data are produced by the Laboratory for Atmospheres at NASA Goddard Space Flight Center (Code 613). The Version-8 Algorithm Theoretical Basis Document (ATBD) is available from the TOMS site http://ozoneaq.gsfc.nasa.gov/doc/v8toms_atbd.pdf
-      
+
                             The Level-3 data from Nimbus-7 TOMS, Meteor-3 TOMS and Earth Probe TOMS are also made available from the Code 916 TOMS site in the ASCII format. For detailed information about the TOMS instrument, data, and ozone see the TOMS official Home Page at: http://ozoneaq.gsfc.nasa.gov/
-   
-                            [ This document was provided by NASA's Global Change Master Directory. 
+
+                            [ This document was provided by NASA's Global Change Master Directory.
                             For more information on the source of this metadata please visit
                             http://gcmd.nasa.gov/r/geoss/[GCMD]GES_DISC_TOMSN7L3_V008 ]</gco:CharacterString>
                     </gmd:abstract>
@@ -8785,7 +8785,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -8798,7 +8798,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -9225,49 +9225,49 @@
                         <gco:CharacterString>Bowman, K.P., and A.J. Krueger, August 20, 1985.  'A Global Climatology of
                             Total Ozone from the Nimbus-7 Total Ozone Mapping Spectrophotometer,'
                             J. Geophys. Res. 90:7967-7976.
-                              
-                            Eck, T. F., Bhartia, P. K., Kerr, J. B., Satellite estimation of spectral UVB 
-                            irradiance using TOMS derived total ozone and UV reflectivity, Geophysical 
+
+                            Eck, T. F., Bhartia, P. K., Kerr, J. B., Satellite estimation of spectral UVB
+                            irradiance using TOMS derived total ozone and UV reflectivity, Geophysical
                             Research Letters 1995, 22, 611-614
-                                          
+
                             Fleig, A.J., D.S. Silberstein, C.G. Wellemeyer, R.P. Cebula, and P.K. Bhartia,
                             1988.  'An Assessment of the Long-Term Drift in TOMS Total Ozone data, Based on
                             Comparison with the Dobson Network,' Geophys. Res. Letters, 15:1133-1136.
-                                    
+
                             Frederick, J.E. and G.N. Serafino, September 1985.  'The Detection of Long-Term
                             Changes in Stratospheric Ozone Scientific Requirements and Current Results from
                             Satellite-based Measurement Systems,' J. of Clim. and Appl. Meteor. 24:904-914.
-                                    
+
                             Gleason, J.F., P.K. Bhartia, J.R.Herman, R.McPeters, P.Newman,
                             R.S.Stolarski, L.Flynn, G.Labow, D.Larko, C.Seftor, C.Wellemeyer,
                             W.D.Komhyr, A.J.Miller, and W.Planet, April 1993. 'Record Low Global
                             Ozone in 1992', Science, 260: 523-526 (23 April 1993)
-                                    
+
                             Herman, J.R., et al., "Meteor-3 Total Ozone Mapping Spectrometer (TOMS)
                             Data Products User's Guide." NASA Reference Publication, 1996.
-                                    
+
                             Herman,J.R., R.McPeters, R.Stolarski, D.Larko, and R.Hudson,  September 1991.
                             'Global Average Ozone Change from November 1978 to May 1990', J. Geophys.
                             Res., 96,D9:17,297-17,305.
-                                    
+
                             Krueger, A., M. Schoeberl, P.Newman, and R.Stolarski, June 1992. ' The
                             1991 Antarctic Ozone Hole; TOMS Observations', Geophys. Res. Letters,
                             19: 1215-1218
-                                
+
                             McPeters, R.D., et al., "Nimbus-7 Total Ozone Mapping Spectrometer (TOMS)
                             Data Products User's Guide." NASA Reference Publication 1384, April 1996.
                             ftp://toms.gsfc.nasa.gov/pub/nimbus7/NIMBUS7_USERGUIDE.PDF
-                              
+
                             McPeters, R.D., et al., "Eart-Probe Total Ozone Mapping Spectrometer (TOMS)
                             Data Products User's Guide." NASA Reference Publication 206895, April 1998.
-                                    
+
                             Schoeberl, M.R., A.J. Krueger, and P.A. Newman, 1986.  'The Morphology of
                             Antarctic Total Ozone As Seen by TOMS,' Geophys. Res. Letters, 13:1217-1220.
-                                    
+
                             Stolarski, R.S., A.J. Krueger, M.R. Schoeberl, R.D. McPeters, P.A. Newman,
                             and J.C. Alpert, 1986. 'Nimbus-7 Satellite Measurements of the Springtime
                             Antarctic Ozone Decrease,' Nature 322:808-811.
-                                    
+
                             Stolarski, R.S., P. Bloomfield, R.D.McPeters, J.R.Herman, June 1991. '
                             Total Ozone Trands Deduced from Nimbus-7 TOMS Data', Geophys. Res.
                             Letters, 18: 1015-1018.</gco:CharacterString>
@@ -10377,14 +10377,14 @@
                     </gmd:citation>
                     <gmd:abstract>
                         <gco:CharacterString>The AIRS Only Level 3 Monthly Gridded Retrieval Product contains standard retrieval means, standard deviations and input counts.  Each file covers a calendar month. The mean values are simply the arithmetic means of the daily products, weighted by the number of input counts for each day in that grid box.
-            
+
                             The geophysical parameters have been averaged and binned into 1 x 1 deg grid cells, from -180.0 to +180.0 deg longitude and from -90.0 to +90.0 deg latitude. For each grid map of 4-byte floating-point mean values there is a corresponding 4-byte floating-point map of standard deviation and a 2-byte integer grid map of counts. The counts map provides the user with the number of points per bin that were included in the mean and can be used to generate custom multi-day maps from the daily gridded products.
-            
-                            The thermodynamic parameters are: Skin Temperature (land and sea surface), Air Temperature at the surface, Profiles of Air Temperature and Water Vapor, Tropopause Characteristics, Column Precipitable Water, Cloud Amount/Frequency, Cloud Height, Cloud Top Pressure, Cloud Top Temperature, Reflectance, Emissivity, Surface Pressure, Cloud Vertical Distribution. 
+
+                            The thermodynamic parameters are: Skin Temperature (land and sea surface), Air Temperature at the surface, Profiles of Air Temperature and Water Vapor, Tropopause Characteristics, Column Precipitable Water, Cloud Amount/Frequency, Cloud Height, Cloud Top Pressure, Cloud Top Temperature, Reflectance, Emissivity, Surface Pressure, Cloud Vertical Distribution.
                             The trace gases parameters are: Total Amounts and Vertical Profiles of Carbon Monoxide, Methane, and Ozone.
                             The actual names of the variables in the data files should be inferred from the Processing File Description document.
                             (The Shortname for this product is AIRS3STM).
-                            [ This document was provided by NASA's Global Change Master Directory. 
+                            [ This document was provided by NASA's Global Change Master Directory.
                             For more information on the source of this metadata please visit
                             http://gcmd.nasa.gov/r/geoss/[GCMD]GES_DISC_AIRS3STM_V005 ]</gco:CharacterString>
                     </gmd:abstract>
@@ -10472,7 +10472,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -10485,7 +10485,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -10498,7 +10498,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -10511,7 +10511,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -10524,7 +10524,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -10537,7 +10537,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -10550,7 +10550,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -10563,7 +10563,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -10576,7 +10576,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -10589,7 +10589,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -10602,7 +10602,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -10615,7 +10615,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -10628,7 +10628,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -10641,7 +10641,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -10654,7 +10654,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -10667,7 +10667,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -13123,22 +13123,22 @@
                         </gmd:CI_Citation>
                     </gmd:citation>
                     <gmd:abstract>
-                        <gco:CharacterString>The Metero-3 Total Ozone Mapping Spectrometer (TOMS) version 8 Daily Gridded Data consist of daily, global coverage of total column ozone and UV-B  Lambertian effective surface reflectivity (Rayleigh corrected).       Four TOMS instruments have been successfully flown in orbit aboard the Nimbus-7 (Nov. 1978 - May 1993), Meteor-3 (Aug. 1991 - Dec. 1994), ADEOS (Sep. 1996 - June 1997) and Earth Probe (July 1996 - 2005) satellites. 
+                        <gco:CharacterString>The Metero-3 Total Ozone Mapping Spectrometer (TOMS) version 8 Daily Gridded Data consist of daily, global coverage of total column ozone and UV-B  Lambertian effective surface reflectivity (Rayleigh corrected).       Four TOMS instruments have been successfully flown in orbit aboard the Nimbus-7 (Nov. 1978 - May 1993), Meteor-3 (Aug. 1991 - Dec. 1994), ADEOS (Sep. 1996 - June 1997) and Earth Probe (July 1996 - 2005) satellites.
                             (The shortname for this Meteor-3 TOMS Product is TOMSM3L3)
-                        
-                            The temporal coverage of the Meteor-3 TOMS data is from Aug 1991 to Dec 1994. Nimbus-7, Meteor-3, and Earth Probe TOMS data have been reprocessed using version-8 algorithm. These data are archived at the Goddard Distributed Active Archive Center (DAAC). 
-                        
+
+                            The temporal coverage of the Meteor-3 TOMS data is from Aug 1991 to Dec 1994. Nimbus-7, Meteor-3, and Earth Probe TOMS data have been reprocessed using version-8 algorithm. These data are archived at the Goddard Distributed Active Archive Center (DAAC).
+
                             The Total column ozone and Effective surface reflectivity data for the Meteor-3 TOMS are mapped to a global grid of size 180 x 288 with a lat-long resolution of 1.00 x 1.25 degrees. These data are stored in the EOS version of Hierarchical Data Format (HDF-EOS). HDF was developed by the National Center for Supercomputer Applications (NCSA) at the University of Illinois at Urbana-Champaign.
-                        
+
                             TOMS data are produced by the Laboratory for Atmospheres at NASA Goddard
                             Space Flight Center (Code 613.1). The Version-8 Algorithm Theoretical Basis
                             Document (ATBD)is available from the TOMS site
                             http://ozoneaq.gsfc.nasa.gov/m3sat.md
-                        
+
                             The Level-3 data from Nimbus-7 TOMS, Meteor-3 TOMS and Earth Probe
                             TOMS are also made available from the Code 916 TOMS site in the ASCII format.
                             TOMS official Home Page at: http://ozoneaq.gsfc.nasa.gov/
-                            [ This document was provided by NASA's Global Change Master Directory. 
+                            [ This document was provided by NASA's Global Change Master Directory.
                             For more information on the source of this metadata please visit
                             http://gcmd.nasa.gov/r/geoss/[GCMD]GES_DISC_TOMSM3L3_V008 ]</gco:CharacterString>
                     </gmd:abstract>
@@ -13291,7 +13291,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -13304,7 +13304,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -13317,7 +13317,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -13330,7 +13330,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -13751,49 +13751,49 @@
                         <gco:CharacterString>Bowman, K.P., and A.J. Krueger, August 20, 1985.  'A Global Climatology of
                             Total Ozone from the Nimbus-7 Total Ozone Mapping Spectrophotometer,'
                             J. Geophys. Res. 90:7967-7976.
-                        
-                            Eck, T. F., Bhartia, P. K., Kerr, J. B., Satellite estimation of spectral UVB 
-                            irradiance using TOMS derived total ozone and UV reflectivity, Geophysical 
+
+                            Eck, T. F., Bhartia, P. K., Kerr, J. B., Satellite estimation of spectral UVB
+                            irradiance using TOMS derived total ozone and UV reflectivity, Geophysical
                             Research Letters 1995, 22, 611-614
-                                    
+
                             Fleig, A.J., D.S. Silberstein, C.G. Wellemeyer, R.P. Cebula, and P.K. Bhartia,
                             1988.  'An Assessment of the Long-Term Drift in TOMS Total Ozone data, Based on
                             Comparison with the Dobson Network,' Geophys. Res. Letters, 15:1133-1136.
-                              
+
                             Frederick, J.E. and G.N. Serafino, September 1985.  'The Detection of Long-Term
                             Changes in Stratospheric Ozone Scientific Requirements and Current Results from
                             Satellite-based Measurement Systems,' J. of Clim. and Appl. Meteor. 24:904-914.
-                              
+
                             Gleason, J.F., P.K. Bhartia, J.R.Herman, R.McPeters, P.Newman,
                             R.S.Stolarski, L.Flynn, G.Labow, D.Larko, C.Seftor, C.Wellemeyer,
                             W.D.Komhyr, A.J.Miller, and W.Planet, April 1993. 'Record Low Global
                             Ozone in 1992', Science, 260: 523-526 (23 April 1993)
-                              
+
                             Herman, J.R., et al., "Meteor-3 Total Ozone Mapping Spectrometer (TOMS)
                             Data Products User's Guide." NASA Reference Publication, 1996.
                             ftp://toms.gsfc.nasa.gov/pub/meteor3/METEOR3_USERGUIDE.PDF
-                                    
+
                             Herman,J.R., R.McPeters, R.Stolarski, D.Larko, and R.Hudson,  September 1991.
                             'Global Average Ozone Change from November 1978 to May 1990', J. Geophys.
                             Res., 96,D9:17,297-17,305.
-                              
+
                             Krueger, A., M. Schoeberl, P.Newman, and R.Stolarski, June 1992. ' The
                             1991 Antarctic Ozone Hole; TOMS Observations', Geophys. Res. Letters,
                             19: 1215-1218
-                          
+
                             McPeters, R.D., et al., "Nimbus-7 Total Ozone Mapping Spectrometer (TOMS)
                             Data Products User's Guide." NASA Reference Publication 1384, April 1996.
-                              
+
                             McPeters, R.D., et al., "Eart-Probe Total Ozone Mapping Spectrometer (TOMS)
                             Data Products User's Guide." NASA Reference Publication 206895, April 1998.
-                              
+
                             Schoeberl, M.R., A.J. Krueger, and P.A. Newman, 1986.  'The Morphology of
                             Antarctic Total Ozone As Seen by TOMS,' Geophys. Res. Letters, 13:1217-1220.
-                              
+
                             Stolarski, R.S., A.J. Krueger, M.R. Schoeberl, R.D. McPeters, P.A. Newman,
                             and J.C. Alpert, 1986. 'Nimbus-7 Satellite Measurements of the Springtime
                             Antarctic Ozone Decrease,' Nature 322:808-811.
-                              
+
                             Stolarski, R.S., P. Bloomfield, R.D.McPeters, J.R.Herman, June 1991. '
                             Total Ozone Trands Deduced from Nimbus-7 TOMS Data', Geophys. Res.
                             Letters, 18: 1015-1018.</gco:CharacterString>
@@ -14912,15 +14912,15 @@
                         </gmd:CI_Citation>
                     </gmd:citation>
                     <gmd:abstract>
-                        <gco:CharacterString>The OMI-Aura level-3 daily global gridded (1x1 deg) near-UV Aerosol data product OMAERUVd based on the enhanced algorithm is available from the NASA Goddard Earth Sciences Data and Information Services Center (GES DISC), http://disc.gsfc.nasa.gov/Aura/OMI/omaeruvd_v003.shtml 
-             
-                            This Level-3 daily global gridded product OMAERUVd is produced from the pixel level OMI Level-2 Aerosol data product OMAERUV. The OMAERUV data product is based on the enhanced TOMS version-8 algorithm that essentially uses the ultraviolet radiance data. OMI provides two aerosol products OMAERUV and OMAERO at the pixel resolution (13 x 24 km at nadir) that are based on two different algorithms. The OMAERUVd data product contains extinction and absorption optical depths at three wavelenghts (355 nm, 388 nm and 500 nm). 
+                        <gco:CharacterString>The OMI-Aura level-3 daily global gridded (1x1 deg) near-UV Aerosol data product OMAERUVd based on the enhanced algorithm is available from the NASA Goddard Earth Sciences Data and Information Services Center (GES DISC), http://disc.gsfc.nasa.gov/Aura/OMI/omaeruvd_v003.shtml
+
+                            This Level-3 daily global gridded product OMAERUVd is produced from the pixel level OMI Level-2 Aerosol data product OMAERUV. The OMAERUV data product is based on the enhanced TOMS version-8 algorithm that essentially uses the ultraviolet radiance data. OMI provides two aerosol products OMAERUV and OMAERO at the pixel resolution (13 x 24 km at nadir) that are based on two different algorithms. The OMAERUVd data product contains extinction and absorption optical depths at three wavelenghts (355 nm, 388 nm and 500 nm).
                             OMAERUVd data product is a Level-3 gridded product where all data pixels that fall in a grid box are quality filtered and then averaged. The GES DISC developed interactive tool Giovanni (http://giovanni.gsfc.nasa.gov/ ) provides web based capabilities to browse and explore these data.
-                                          
-                            (The shortname for this Level-3 Global Gridded near-UV Aerosol Product is OMAERUVd_V003)  
-                                          
+
+                            (The shortname for this Level-3 Global Gridded near-UV Aerosol Product is OMAERUVd_V003)
+
                             OMAERUVd files are stored in EOS Hierarchical Data Format (HDF-EOS5). Each file contains daily data from approximately 15 orbits. The maximum file size for the OMTO3G data product is about 0.2 Mbytes.
-                            [ This document was provided by NASA's Global Change Master Directory. 
+                            [ This document was provided by NASA's Global Change Master Directory.
                             For more information on the source of this metadata please visit
                             http://gcmd.nasa.gov/r/geoss/[GCMD]GES_DISC_OMAERUVd_V003 ]</gco:CharacterString>
                     </gmd:abstract>
@@ -15073,7 +15073,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -15086,7 +15086,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -15099,7 +15099,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -15112,7 +15112,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -15125,7 +15125,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -15138,7 +15138,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -15151,7 +15151,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -15164,7 +15164,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -15177,7 +15177,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -15190,7 +15190,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -15203,7 +15203,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -15216,7 +15216,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -15229,7 +15229,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -15242,7 +15242,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -15584,31 +15584,31 @@
                             conference on Earth Observing Systems VIII, San Diego,
                             California, Aug 3-8, 2003.
                             http://disc.sci.gsfc.nasa.gov/acdisc/ozone/docs/omi-spie-2003.doc
-                                                                  
+
                             Brinksma, E. J., K. F. Boersma, and P. F. Levelt, OMI-Validation
                             Requirements, May 16, 2003.
-                                                 
+
                             Herman, J.R., and E. A. Celarier, Earth surface reflectivity
                             climatology at 340 and 380 nm from TOMS data, J. Geophys. Res.,
                             102, 28,003-28,011, 1997
-                                          
+
                             Torres O., P.K. Bhartia, J.R. Herman and Z. Ahmad, Derivation of
                             aerosol properties from satellite measurements of backscattered
                             ultraviolet radiation.  Theoretical Basis, J. Geophys. Res.,
                             103, 17099-17110, 1998
-                                          
+
                             Torres, O., P.K. Bhartia, A. Syniuk, and E. Welton, TOMS
                             Measurements of Aerosol Absorption from Space: Comparison to
                             SAFARI 2000 Ground based Observations, J. Geophys. Res., 110,
                             D10S18, doi:10.10129/2004JD004611, 2005
-                                          
+
                             Levelt, P. F., B. van den Oord, E. Hilsenrath,
                             G. W. Leppelmeier, P. K.  Bhartia, A. Malkki, H. Kelder,
                             R. J. van der A, E. J. Brinksma, R. van Oss, P.  Veefkind,
                             M. van Weele, and R. Noordhoek, Science Objectives of
                             EOS-Aura's Ozone Monitoring Instrument (OMI), Proc. Quad. Ozone
                             Symposium, Sapporo, Japan, pp. 127-128, 2000.
-                                                     
+
                             Schoeberl, M.R., A.R. Douglass, E. Hilsenrath, P.K. Bhartia,
                             J. Barnett, J.  Gille, R. Beer, M. Gunson, J. Waters,
                             P.F. Levelt,P. DeCola, The EOS Aura Mission, EOS,
@@ -17900,16 +17900,16 @@
                     </gmd:citation>
                     <gmd:abstract>
                         <gco:CharacterString>This product is similar to AIRX3STD. However, it contains science retrievals that use the Humidity Sounder for Brazil (HSB). Because the HSB instrument lived only from September 2002 through January 2003 when it terminally failed, the data set covers these five months only.
-                        
+
                             The AIRS Level 3 Daily Gridded Product contains standard retrieval means, standard deviations and input counts.  Each file covers a temporal period of 24 hours for either the descending (equatorial crossing North to South @1:30 AM local time) or ascending (equatorial crossing South to North @1:30 PM local time) orbit. The data starts at the international dateline and progresses westward (as do the subsequent orbits of the satellite) so that neighboring gridded cells of data are no more than a swath of time apart (about 90 minutes). The two parts of a scan line crossing the dateline are included in separate L3 files, according to the date, so that data points in a grid box are always coincident in time.  The edge of the AIRS Level 3 gridded cells is at the date line (the 180E/W longitude boundary). When plotted, this produces a map with 0 degrees longitude in the center of the image unless the bins are reordered. This method is preferred because the left (West) side of the image and the right (East) side of the image contain data farthest apart in time. The gridding scheme used by AIRS is the same as used by TOVS Pathfinder to create Level 3 products. The daily Level 3 products have gores between satellite paths where there is no coverage for that day.
-                        
+
                             The geophysical parameters have been averaged and binned into 1 x 1 grid cells, from -180.0 to +180.0 deg longitude and from -90.0 to +90.0 deg latitude. For each grid map of 4-byte floating-point mean values there is a corresponding 4-byte floating-point map of standard deviation and a 2-byte integer grid map of counts. The counts map provides the user with the number of points per bin that were included in the mean and can be used to generate custom multi-day maps from the daily gridded products.
-                        
-                            The thermodynamic parameters are: Skin Temperature (land and sea surface), Air Temperature at the surface, Profiles of Air Temperature and Water Vapor, Tropopause Characteristics, Column Precipitable Water, Cloud Amount/Frequency, Cloud Height, Cloud Top Pressure, Cloud Top Temperature, Reflectance, Emissivity, Surface Pressure, Cloud Vertical Distribution. 
+
+                            The thermodynamic parameters are: Skin Temperature (land and sea surface), Air Temperature at the surface, Profiles of Air Temperature and Water Vapor, Tropopause Characteristics, Column Precipitable Water, Cloud Amount/Frequency, Cloud Height, Cloud Top Pressure, Cloud Top Temperature, Reflectance, Emissivity, Surface Pressure, Cloud Vertical Distribution.
                             The trace gases parameters are: Total Amounts and Vertical Profiles of Carbon Monoxide, Methane, and Ozone.
                             The actual names of the variables in the data files should be inferred from the Processing File Description document.
                             (The Shortname for this product is AIRH3STD).
-                            [ This document was provided by NASA's Global Change Master Directory. 
+                            [ This document was provided by NASA's Global Change Master Directory.
                             For more information on the source of this metadata please visit
                             http://gcmd.nasa.gov/r/geoss/[GCMD]GES_DISC_AIRH3STD_V005 ]</gco:CharacterString>
                     </gmd:abstract>
@@ -17997,7 +17997,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -18010,7 +18010,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -18023,7 +18023,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -18036,7 +18036,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -18049,7 +18049,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -18062,7 +18062,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -18075,7 +18075,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -18088,7 +18088,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -18101,7 +18101,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -18114,7 +18114,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -18127,7 +18127,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -18140,7 +18140,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -18153,7 +18153,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -18166,7 +18166,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -18179,7 +18179,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -18192,7 +18192,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -18205,7 +18205,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -18218,7 +18218,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -18231,7 +18231,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -18244,7 +18244,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -20594,13 +20594,13 @@
                         <gmd:LI_Lineage>
                             <gmd:statement>
                                 <gco:CharacterString>The V5 Level 3 gridded products are derived from the Level 2 standard swath products. The Level 2 quality indicators determine which of the Level 2 Standard Product data are combined to create the Level 3 Product. It is important that the user of Level 3 Products become familiar with these quality indicators, and we urge the user to read the documentation describing the AIRS Level 2 Standard Products and the AIRS Level 2 Quality Control and Error Estimation for a description of the quality indicators, how they are set and how to use them.
-                                                                                                                                                                                                                                                                                    
+
                                     V5_L2_Standard Product_QuickStart.pdf
                                     (http://disc.sci.gsfc.nasa.gov/AIRS/documentation/v5_docs/AIRS_V5_Release_User_Docs/V5_L2_Standard_Product_QuickStart.pdf)
-                                                                                                                                                                                                                                                                                    
+
                                     V5_L2_Quality_Control_and_Error_Estimation.pdf
                                     (http://disc.sci.gsfc.nasa.gov/AIRS/documentation/v5_docs/AIRS_V5_Release_User_Docs/V5_L2_Quality_Control_and_Error_Estimation.pdf)
-                                                                                                                                                                                                                                                                                    
+
                                     As a general rule, Level 2 retrieved quantities whose quality indicators are ?best? (=0) or ?good? (=1) are included in the sums that generate the Level 3 product.</gco:CharacterString>
                             </gmd:statement>
                         </gmd:LI_Lineage>
@@ -21020,10 +21020,10 @@
                         </gmd:CI_Citation>
                     </gmd:citation>
                     <gmd:abstract>
-                        <gco:CharacterString>The Level-3 Aura/OMI daily global TOMS-Like Total Column Ozone gridded product (OMTO3d) is generated by the NASA OMI science team by gridding and averaging only good quality level-2 total column ozone orbital swath data (OMTO3, based on the enhanced TOMS version-8 algorithm) on the 1x1 degree global grids. OMTO3d product is made available from the GES DISC ( http://mirador.gsfc.nasa.gov/) for the public access. The documents giving the details of data filtering and the data read and visualization software are also made available from the GES DISC site: http://disc.gsfc.nasa.gov/Aura/OMI/omto3d_v003.shtml . 
-                            (The shortname for this Level-3 TOMS-Like total column ozone product is OMTO3d_V003) 
+                        <gco:CharacterString>The Level-3 Aura/OMI daily global TOMS-Like Total Column Ozone gridded product (OMTO3d) is generated by the NASA OMI science team by gridding and averaging only good quality level-2 total column ozone orbital swath data (OMTO3, based on the enhanced TOMS version-8 algorithm) on the 1x1 degree global grids. OMTO3d product is made available from the GES DISC ( http://mirador.gsfc.nasa.gov/) for the public access. The documents giving the details of data filtering and the data read and visualization software are also made available from the GES DISC site: http://disc.gsfc.nasa.gov/Aura/OMI/omto3d_v003.shtml .
+                            (The shortname for this Level-3 TOMS-Like total column ozone product is OMTO3d_V003)
                             There are two Aura/OMI daily global TOMS-Like Total Column Ozone gridded products, OMTO3e is gridded in 0.25x0.25 degree, and OMTO3d is gridded in 1x1 degree.
-                            [ This document was provided by NASA's Global Change Master Directory. 
+                            [ This document was provided by NASA's Global Change Master Directory.
                             For more information on the source of this metadata please visit
                             http://gcmd.nasa.gov/r/geoss/[GCMD]GES_DISC_OMTO3d_V003 ]</gco:CharacterString>
                     </gmd:abstract>
@@ -21176,7 +21176,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -21189,7 +21189,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -21202,7 +21202,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -21215,7 +21215,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -21228,7 +21228,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>
@@ -21241,7 +21241,7 @@
                                 <gco:CharacterString>Pictorial preview of the dataset. Generated by Access Validator</gco:CharacterString>
                             </gmd:fileDescription>
                             <gmd:fileType>
-			 
+
                             </gmd:fileType>
                         </gmd:MD_BrowseGraphic>
                     </gmd:graphicOverview>

@@ -160,17 +160,16 @@ mappings:
         xpath: "//gmd:topicCategory/*/text()"
         properties:
             store: yes
-    # FIXME document does not contain a namespace for gml!
-#    extend_begin:
-#        xpath: "//gmd:extent/*/gmd:temporalElement//gml:begin/*/*/text()"
-#        properties:
-#            store: yes
-#            type: date
-#    extend_end:
-#        xpath: "//gmd:extent/*/gmd:temporalElement//gml:end/*/*/text()"
-#        properties:
-#            store: yes
-#            type: date
+    extent_begin:
+        xpath: "(//gmd:extent/*/gmd:temporalElement/*/gmd:extent/*/gml:begin/*/gml:timePosition/text() | //gmd:extent/*/gmd:temporalElement/*/gmd:extent/*/gml:beginPosition/text() )"
+        properties:
+            store: yes
+            type: date
+    extent_end:
+        xpath: "(//gmd:extent/*/gmd:temporalElement/*/gmd:extent/*/gml:end/*/gml:timePosition/text() | //gmd:extent/*/gmd:temporalElement/*/gmd:extent/*/gml:endPosition/text() )"
+        properties:
+            store: yes
+            type: date
     # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-geo-shape-type.html#_envelope
     # FIXME this _probably_ does not support bounding boxes crossing the date line
     bbox:
