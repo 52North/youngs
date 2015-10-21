@@ -23,11 +23,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import org.n52.youngs.api.Record;
 import org.n52.youngs.api.Report;
 import org.n52.youngs.control.Runner;
 import org.n52.youngs.exception.SinkError;
@@ -41,9 +38,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A harvesting runner that downloads a fixed number of records at a time from the source, transforms these, and loads them into the sink.
+ * A harvesting runner that downloads a fixed number of records at a time from
+ * the source, transforms these, and loads them into the sink.
  *
- * Everything happens within one thread and consequtively when the method "load" is called.
+ * Everything happens within one thread and consequtively when the method "load"
+ * is called.
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
@@ -128,30 +127,43 @@ public class SingleThreadBulkRunner implements Runner {
         }
 
         final Stopwatch timer = Stopwatch.createStarted();
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         long counter = startPosition;
         long count = source.getRecordCount();
         long limit = Math.min(recordsLimit + startPosition, count);
 
+        final Stopwatch sourceTimer = Stopwatch.createUnstarted();
+        final Stopwatch mappingTimer = Stopwatch.createUnstarted();
+        final Stopwatch sinkTimer = Stopwatch.createUnstarted();
+        final Stopwatch currentBulkTimer = Stopwatch.createUnstarted();
+        double bulkTimeAvg = 0d;
+        long runNumber = 0;
+
         while (counter <= limit) {
+            currentBulkTimer.start();
+            
             long recordsLeft = limit - counter;
             long size = Math.min(recordsLeft, bulkSize);
             if (size <= 0) {
                 break;
             }
-            log.info("### Requesting {} of {} records from {} starting at {} ###",
-                    size, limit, source.getEndpoint(), counter);
+            log.info("### [{}] Requesting {} records from {} starting at {}, last requested record will be {} ###",
+                    runNumber, size, source.getEndpoint(), counter, limit);
 
             try {
+                sourceTimer.start();
                 Collection<SourceRecord> records = source.getRecords(counter, size, report);
+                sourceTimer.stop();
 
                 log.debug("Mapping {} retrieved records.", records.size());
+                mappingTimer.start();
                 List<SinkRecord> mappedRecords = records.stream()
                         .map(mapper::map)
                         .collect(Collectors.toList());
+                mappingTimer.stop();
 
                 log.debug("Storing {} mapped records.", mappedRecords.size());
                 if (!testRun) {
+                    sinkTimer.start();
                     mappedRecords.forEach(record -> {
                         boolean result = sink.store(record);
                         if (result) {
@@ -160,32 +172,44 @@ public class SingleThreadBulkRunner implements Runner {
                             report.addFailedRecord(record.getId(), "see Sink log");
                         }
                     });
+                    sinkTimer.stop();
                 } else {
                     log.info("TESTRUN, created documents are:\n{}", Arrays.toString(mappedRecords.toArray()));
                 }
 
             } catch (RuntimeException e) {
+                if (sourceTimer.isRunning()) {
+                    sourceTimer.stop();
+                }
+                if (mappingTimer.isRunning()) {
+                    mappingTimer.stop();
+                }
+                if (sinkTimer.isRunning()) {
+                    sinkTimer.stop();
+                }
+
                 String msg = String.format("Problem processing records %s to %s: %s", counter, counter + size, e.getMessage());
                 log.error(msg, e);
                 report.addMessage(msg);
             }
 
             counter += bulkSize;
-            updateCompletedPercentage(counter);
-        }
-
-        executor.shutdown();
-        try {
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        } catch (InterruptedException e) {
-            log.error("during shut down of map executor", e);
+            
+            currentBulkTimer.stop();
+            bulkTimeAvg = ((bulkTimeAvg * runNumber) + currentBulkTimer.elapsed(TimeUnit.SECONDS)) / (runNumber + 1);
+            updateAndLog(runNumber, counter, currentBulkTimer.elapsed(TimeUnit.SECONDS), bulkTimeAvg);
+            currentBulkTimer.reset();
+            
+            runNumber++;
         }
 
         timer.stop();
-        log.info("Completed harvesting for {} of {} records in {} seconds",
+        log.info("Completed harvesting for {} of {} records in {} minutes",
                 counter,
                 source.getRecordCount(),
-                timer.elapsed(TimeUnit.SECONDS));
+                timer.elapsed(TimeUnit.MINUTES));
+        log.info("Time spent (minutes): source={}, mapping={}, sink={}", sourceTimer.elapsed(TimeUnit.MINUTES),
+                mappingTimer.elapsed(TimeUnit.MINUTES), sinkTimer.elapsed(TimeUnit.MINUTES));
 
         return report;
     }
@@ -203,13 +227,16 @@ public class SingleThreadBulkRunner implements Runner {
                 .add("sink", sink).toString();
     }
 
-    private void updateCompletedPercentage(long counter) {
+    private void updateAndLog(long run, long counter, long bulkSeconds, double bulkAverageSeconds) {
         double percentageTask = (double) counter / this.recordsLimit * 100;
         double percentageOverall = (double) counter / source.getRecordCount() * 100;
         this.completedPercentage = Optional.of(percentageTask);
-        log.info("Completed {}% of task [which is {}% overall]",
+        log.info("### [{}] Completed {}% of task [which is {}% overall] in {} seconds (avg: {} seconds) ###",
+                run,
                 String.format("%1$,.5f", this.completedPercentage.get()),
-                String.format("%1$,.5f", percentageOverall));
+                String.format("%1$,.5f", percentageOverall),
+                bulkSeconds, 
+                String.format("%1$,.2f", bulkAverageSeconds));
     }
 
 }

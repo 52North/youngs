@@ -30,9 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -52,7 +50,6 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 import org.n52.youngs.load.impl.BuilderRecord;
 import org.n52.youngs.harvest.SourceRecord;
 import org.n52.youngs.harvest.NodeSourceRecord;
-import org.n52.youngs.impl.XPathHelper;
 import org.n52.youngs.transform.Mapper;
 import org.n52.youngs.transform.MappingConfiguration;
 import org.n52.youngs.transform.MappingEntry;
@@ -98,26 +95,27 @@ public class CswToBuilderMapper implements Mapper {
     }
 
     /**
+     * @param sourceRecord the record to map
      * @return a record containing a builder of the provided SourceRecord, or null if the mapper could not be completed.
      */
     @Override
-    public BuilderRecord map(SourceRecord source) {
-        Objects.nonNull(source);
+    public BuilderRecord map(SourceRecord sourceRecord) {
+        Objects.nonNull(sourceRecord);
         BuilderRecord record = null;
 
-        if (source instanceof NodeSourceRecord) {
+        if (sourceRecord instanceof NodeSourceRecord) {
             try {
-                NodeSourceRecord object = (NodeSourceRecord) source;
+                NodeSourceRecord object = (NodeSourceRecord) sourceRecord;
                 IdAndBuilder mappedRecord = mapNodeToBuilder(object.getRecord());
 
                 record = new BuilderRecord(mappedRecord.id, mappedRecord.builder);
                 return record;
             } catch (IOException e) {
-                log.warn("Error mapping the source {}", source, e);
+                log.warn("Error mapping the source {}", sourceRecord, e);
                 return null;
             }
         } else {
-            log.warn("The SourceRecord class {} is not supported", source.getClass().getName());
+            log.warn("The SourceRecord class {} is not supported", sourceRecord.getClass().getName());
         }
 
         return record;
@@ -416,7 +414,10 @@ public class CswToBuilderMapper implements Mapper {
         @Override
         public String toString() {
             return MoreObjects.toStringHelper(this)
-                    .add("name", name).add("value", value).omitNullValues().toString();
+                    .add("name", name)
+                    .add("value", value)
+                    .omitNullValues()
+                    .toString();
         }
 
     }

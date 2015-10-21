@@ -16,6 +16,7 @@
  */
 package org.n52.youngs.load.impl;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -324,5 +325,17 @@ public abstract class ElasticsearchSink implements Sink {
             return true;
         }
     }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("cluster", cluster)
+                .add("index", index)
+                .add("type", type)
+                .add("client", getClient())
+                .toString();
+    }
+    
+    
 
 }

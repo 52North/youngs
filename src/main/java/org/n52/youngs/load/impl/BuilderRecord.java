@@ -16,6 +16,7 @@
  */
 package org.n52.youngs.load.impl;
 
+import com.google.common.base.MoreObjects;
 import java.util.Optional;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.n52.youngs.load.SinkRecord;
@@ -52,5 +53,14 @@ public class BuilderRecord implements SinkRecord {
     public boolean hasId() {
         return id.isPresent();
     }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("id", getId())
+                .toString();
+    }
+    
+    
 
 }
