@@ -69,9 +69,9 @@ public class Main {
         Sink sink = new ElasticsearchRemoteHttpSink(host, port, cluster, index, type);
 
         Runner runner = new SingleThreadBulkRunner()
-                .setBulkSize(5)
-                .setRecordsLimit(10)
-                .setStartPosition(11045)
+                .setBulkSize(10)
+                .setRecordsLimit(10000)
+                .setStartPosition(10000)
                 .harvest(source)
                 .transform(mapper);
         Report report = runner.load(sink);
