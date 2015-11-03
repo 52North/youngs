@@ -253,7 +253,7 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
 
                 return entry;
             } catch (XPathExpressionException e) {
-                log.error("Could not create XPath for provided expression '{}' in field {}", expression, e, id);
+                log.error("Could not create XPath for provided expression '{}' in field {}", expression, id, e);
                 throw new MappingError(e, "Could not create XPath for provided expression '%s' in field %s",
                         expression, id);
             }

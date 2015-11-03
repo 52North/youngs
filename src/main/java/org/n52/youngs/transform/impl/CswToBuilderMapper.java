@@ -253,7 +253,7 @@ public class CswToBuilderMapper implements Mapper {
             try {
                 Object value = result.get().value;
                 builder.field(result.get().name, value);
-                log.debug("Added field: {}", (value instanceof Object[]) ? Arrays.toString((Object[]) value) : value);
+                log.debug("Added field: {} = {}", result.get().name, (value instanceof Object[]) ? Arrays.toString((Object[]) value) : value);
             } catch (IOException e) {
                 log.warn("Error adding field {}: {}", entry.getFieldName(), e);
             }
