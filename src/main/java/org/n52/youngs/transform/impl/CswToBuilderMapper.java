@@ -387,6 +387,15 @@ public class CswToBuilderMapper implements Mapper {
         return sw.toString();
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("mapping", this.mapper)
+                .add("transformerFactory", this.tFactory)
+                .omitNullValues()
+                .toString();
+    }
+
     private static class IdAndBuilder {
 
         protected final String id;

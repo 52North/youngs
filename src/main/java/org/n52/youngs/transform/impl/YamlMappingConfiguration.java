@@ -25,6 +25,7 @@ import com.github.autermann.yaml.nodes.YamlMapNode;
 import com.github.autermann.yaml.nodes.YamlSeqNode;
 import com.github.autermann.yaml.nodes.YamlTextNode;
 import com.google.common.base.Joiner;
+import com.google.common.base.MoreObjects;
 import org.n52.youngs.transform.MappingEntry;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -106,7 +107,6 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
 
         log.info("Created configuration from stream {} with {} entries", input, entries.size());
     }
-
 
     private void init(YamlNode configurationNodes, NamespaceContext nsContext) {
         // read the entries from the config file
@@ -391,6 +391,19 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
     @Override
     public MappingEntry getEntry(String name) {
         return this.entries.stream().filter(e -> e.getFieldName().equals(name)).findFirst().get();
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("version", this.version)
+                .add("index", this.index)
+                .add("name", this.name)
+                .add("type", this.type)
+                .add("XPath version", this.xpathVersion)
+                .add("applicability", this.applicabilityExpression)
+                .omitNullValues()
+                .toString();
     }
 
 }
