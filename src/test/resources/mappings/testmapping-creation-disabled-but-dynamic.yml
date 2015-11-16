@@ -24,6 +24,7 @@ mappings:
     id:
         xpath: "//gmd:fileIdentifier"
         isoqueryable: false
+        identifier: true
         properties:
             type: string
             store: *STORE

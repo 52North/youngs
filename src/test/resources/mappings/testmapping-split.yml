@@ -10,3 +10,4 @@ mappings:
         xpath: "string-join(for $n in /*/gmd:identificationInfo/*/gmd:descriptiveKeywords/gmd:MD_Keywords
                         return string-join(($n/gmd:type/*/@codeListValue, ':', $n/gmd:keyword/*/text()), ''), '__split__')"
         split: "__split__"
+        identifier: true

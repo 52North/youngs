@@ -85,6 +85,8 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
 
     private final XPathHelper xpathHelper;
 
+    private String identifierField;
+
     public YamlMappingConfiguration(String fileName, XPathHelper xpathHelper) throws IOException {
         this(Resources.asByteSource(Resources.getResource(fileName)).openStream(), xpathHelper);
         log.info("Created configuration from filename {}", fileName);
@@ -156,6 +158,14 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
                 log.error("Found more than one entries marked as 'identifier': {}", Arrays.toString(entriesWithId.toArray()));
                 throw new MappingError("More than one fields are marked as 'identifier'. Found {} in {}", idCount,
                         Arrays.toString(entriesWithId.toArray()));
+            }
+            Optional<MappingEntry> identifier = this.entries.stream().filter(MappingEntry::isIdentifier).findFirst();
+            if (identifier.isPresent()) {
+                this.identifierField = identifier.get().getFieldName();
+                log.trace("Found identifier field '{}'", this.identifierField);
+            }
+            else {
+                throw new MappingError("No field is marked as 'identifier', exactly one must be.");
             }
 
             // sort list by field name
@@ -398,6 +408,11 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
     @Override
     public MappingEntry getEntry(String name) {
         return this.entries.stream().filter(e -> e.getFieldName().equals(name)).findFirst().get();
+    }
+
+    @Override
+    public String getIdentifierField() {
+        return this.identifierField;
     }
 
     @Override

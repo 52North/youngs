@@ -235,6 +235,12 @@ public class YamlConfigurationTest {
         assertNotNull(m);
     }
 
+    @Test(expected = MappingError.class)
+    public void testMissingIdentifier() throws Exception {
+        YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-missing-id.yml", helper);
+        assertNotNull(m);
+    }
+
     @Test
     public void testIndexSettings() throws IOException {
         assertThat("name is correct", config.getIndex(), is("testindex"));
@@ -343,6 +349,12 @@ public class YamlConfigurationTest {
         assertThat("omit value is correct", entry.getOutputProperties().get("omit-xml-declaration"), is("yes"));
         assertThat("has indent", entry.getOutputProperties().keySet().contains("indent"), is(true));
         assertThat("indent value is correct", entry.getOutputProperties().get("indent"), is("no"));
+    }
+
+    @Test
+    public void testIdentifierField() throws IOException, XPathExpressionException {
+        String idField = config.getIdentifierField();
+        assertThat("id field is set", idField, is(equalTo("id")));
     }
 
     private Document getDocument(String xmlString) throws Exception {

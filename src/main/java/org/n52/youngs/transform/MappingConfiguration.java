@@ -64,6 +64,8 @@ public interface MappingConfiguration {
 
     public String getType();
 
+    public String getIdentifierField();
+
     public String getXPathVersion();
 
     public boolean isApplicable(Document doc);
