@@ -322,6 +322,16 @@ public class YamlConfigurationTest {
     }
 
     @Test
+    public void testSplit() throws IOException {
+        YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-split.yml", helper);
+        assertThat("split field is found", m.getEntries().stream().filter(e -> e.hasSplit()).count(), is(1l));
+
+        MappingEntry entry = m.getEntries().stream().filter(e -> e.hasSplit()).findFirst().get();
+        assertThat("fieldname is correct", entry.getFieldName(), is("splitter"));
+        assertThat("split field value is correct", entry.getSplit(), is("__split__"));
+    }
+
+    @Test
     public void testOutputProperties() throws IOException {
         YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-raw-outputproperties.yml", helper);
         assertThat("outputproperties field is found", m.getEntries().stream().filter(e -> e.hasOutputProperties()).count(), is(1l));

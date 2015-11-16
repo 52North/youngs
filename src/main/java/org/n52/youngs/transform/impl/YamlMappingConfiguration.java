@@ -235,6 +235,13 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
                     entry.setReplacements(replacements);
                 }
 
+                if (mapNode.hasNotNull("split")) {
+                    YamlNode sNode = mapNode.path("split");
+                    String split = sNode.asTextValue();
+                    log.trace("Parsed split: {}", split);
+                    entry.setSplit(split);
+                }
+
                 // for raw types
                 if (mapNode.hasNotNull("output_properties")) {
                     YamlSeqNode rMap = (YamlSeqNode) mapNode.path("output_properties");
@@ -395,15 +402,17 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
+        MoreObjects.ToStringHelper s = MoreObjects.toStringHelper(this)
                 .add("version", this.version)
                 .add("index", this.index)
                 .add("name", this.name)
                 .add("type", this.type)
-                .add("XPath version", this.xpathVersion)
-                .add("applicability", this.applicabilityExpression)
-                .omitNullValues()
-                .toString();
+                .add("XPath version", this.xpathVersion);
+        if (this.applicabilityExpression.isPresent()) {
+            s.add("applicability", this.applicabilityExpression.get());
+        }
+
+        return s.omitNullValues().toString();
     }
 
 }

@@ -62,6 +62,10 @@ public interface MappingEntry {
 
     public Map<String, String> getReplacements();
 
+    public boolean hasSplit();
+
+    public String getSplit();
+
     public boolean hasOutputProperties();
 
     public Map<? extends String, ? extends String> getOutputProperties();

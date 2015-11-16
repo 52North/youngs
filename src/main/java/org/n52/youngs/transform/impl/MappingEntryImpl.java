@@ -47,6 +47,8 @@ public class MappingEntryImpl implements MappingEntry {
 
     private Optional<Map<String, String>> outputProperties = Optional.empty();
 
+    private Optional<String> split = Optional.empty();
+
     public MappingEntryImpl(XPathExpression xPath, Map<String, Object> indexProperties,
             boolean identifier, boolean rawXml) {
         this.xPath = xPath;
@@ -158,5 +160,20 @@ public class MappingEntryImpl implements MappingEntry {
 
     public void setOutputProperties(Map<String, String> properties) {
         this.outputProperties = Optional.of(properties);
+    }
+
+    @Override
+    public boolean hasSplit() {
+        return this.split.isPresent();
+    }
+
+    @Override
+    public String getSplit() {
+        return split.get();
+    }
+
+    public MappingEntryImpl setSplit(String split) {
+        this.split = Optional.of(split);
+        return this;
     }
 }
