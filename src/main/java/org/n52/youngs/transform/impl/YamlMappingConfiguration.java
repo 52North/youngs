@@ -165,8 +165,7 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
             if (identifier.isPresent()) {
                 this.identifierField = identifier.get().getFieldName();
                 log.trace("Found identifier field '{}'", this.identifierField);
-            }
-            else {
+            } else {
                 throw new MappingError("No field is marked as 'identifier', exactly one must be.");
             }
 
@@ -183,8 +182,7 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
             if (location.isPresent()) {
                 this.locationField = Optional.of(location.get().getFieldName());
                 log.trace("Found location field '{}'", this.locationField.get());
-            }
-            else {
+            } else {
                 log.warn("No field is marked as 'location'.");
             }
 
