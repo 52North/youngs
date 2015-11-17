@@ -56,7 +56,6 @@ public class NamespaceContextImpl implements NamespaceContext {
         return Collections.singleton(getPrefix(namespaceURI)).iterator();
     }
 
-    // TODO use constants classes from iceland
     public static NamespaceContext create() {
         return new NamespaceContextImpl(new ImmutableMap.Builder<String, String>().
                 put("gmd", "http://www.isotc211.org/2005/gmd").

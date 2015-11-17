@@ -87,6 +87,8 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
 
     private String identifierField;
 
+    private Optional<String> locationField = Optional.empty();
+
     public YamlMappingConfiguration(String fileName, XPathHelper xpathHelper) throws IOException {
         this(Resources.asByteSource(Resources.getResource(fileName)).openStream(), xpathHelper);
         log.info("Created configuration from filename {}", fileName);
@@ -156,7 +158,7 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
                 List<String> entriesWithId = this.entries.stream().filter(MappingEntry::isIdentifier)
                         .map(MappingEntry::getFieldName).collect(Collectors.toList());
                 log.error("Found more than one entries marked as 'identifier': {}", Arrays.toString(entriesWithId.toArray()));
-                throw new MappingError("More than one fields are marked as 'identifier'. Found {} in {}", idCount,
+                throw new MappingError("More than one field are marked as 'identifier'. Found {}: {}", idCount,
                         Arrays.toString(entriesWithId.toArray()));
             }
             Optional<MappingEntry> identifier = this.entries.stream().filter(MappingEntry::isIdentifier).findFirst();
@@ -166,6 +168,24 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
             }
             else {
                 throw new MappingError("No field is marked as 'identifier', exactly one must be.");
+            }
+
+            // ensure not more than one field is location
+            long locationCount = this.entries.stream().filter(MappingEntry::isLocation).count();
+            if (locationCount > 1) {
+                List<String> entriesWithLocation = this.entries.stream().filter(MappingEntry::isIdentifier)
+                        .map(MappingEntry::getFieldName).collect(Collectors.toList());
+                log.error("Found more than one entries marked as 'location': {}", Arrays.toString(entriesWithLocation.toArray()));
+                throw new MappingError("More than one field are marked as 'location'. Found {}: {}", idCount,
+                        Arrays.toString(entriesWithLocation.toArray()));
+            }
+            Optional<MappingEntry> location = this.entries.stream().filter(MappingEntry::isLocation).findFirst();
+            if (location.isPresent()) {
+                this.locationField = Optional.of(location.get().getFieldName());
+                log.trace("Found location field '{}'", this.locationField.get());
+            }
+            else {
+                log.warn("No field is marked as 'location'.");
             }
 
             // sort list by field name
@@ -183,6 +203,7 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
             Map<String, Object> indexProperties = createIndexProperties(id, node);
 
             boolean isIdentifier = mapNode.path("identifier").asBooleanValue(false);
+            boolean isLocation = mapNode.path("location").asBooleanValue(false);
             boolean isXml = mapNode.path("raw_xml").asBooleanValue(false);
 
             String expression = mapNode.path("xpath").asTextValue();
@@ -192,7 +213,9 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
                 MappingEntryImpl entry = new MappingEntryImpl(compiledExpression,
                         indexProperties,
                         isIdentifier,
+                        isLocation,
                         isXml);
+                log.trace("Starting new entry: {}", entry);
 
                 // geo types
                 if (mapNode.hasNotNull("coordinates")) {
@@ -413,6 +436,16 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
     @Override
     public String getIdentifierField() {
         return this.identifierField;
+    }
+
+    @Override
+    public boolean hasLocationField() {
+        return this.locationField.isPresent();
+    }
+
+    @Override
+    public String getLocationField() {
+        return this.locationField.get();
     }
 
     @Override

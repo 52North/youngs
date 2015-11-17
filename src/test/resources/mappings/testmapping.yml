@@ -85,4 +85,7 @@ mappings:
             store: *STOREDEFAULT
             index: no
             index_name: xmldoc
+    loc:
+        xpath: "."
+        location: true
 

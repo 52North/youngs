@@ -44,6 +44,8 @@ public interface MappingEntry {
 
     public boolean isIdentifier();
 
+    public boolean isLocation();
+
     public boolean hasCoordinates();
 
     /**

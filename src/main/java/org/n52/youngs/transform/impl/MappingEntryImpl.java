@@ -37,6 +37,8 @@ public class MappingEntryImpl implements MappingEntry {
 
     private Optional<Boolean> identifier = Optional.empty();
 
+    private Optional<Boolean> location = Optional.empty();
+
     private Optional<List<XPathExpression[]>> coordinates = Optional.empty();
 
     private Optional<String> coordinatesType = Optional.empty();
@@ -50,10 +52,11 @@ public class MappingEntryImpl implements MappingEntry {
     private Optional<String> split = Optional.empty();
 
     public MappingEntryImpl(XPathExpression xPath, Map<String, Object> indexProperties,
-            boolean identifier, boolean rawXml) {
+            boolean identifier, boolean location, boolean rawXml) {
         this.xPath = xPath;
         this.indexProperties.putAll(indexProperties);
         this.identifier = Optional.of(identifier);
+        this.location = Optional.of(location);
         this.raw = Optional.of(rawXml);
     }
 
@@ -86,8 +89,9 @@ public class MappingEntryImpl implements MappingEntry {
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("xpath", xPath)
-                .add("identifer", identifier)
-                .add("raw", raw)
+                .add("identifer", identifier.orElse(null))
+                .add("location", location.orElse(null))
+                .add("raw", raw.orElse(null))
                 .add("properties", Arrays.deepToString(indexProperties.entrySet().toArray()))
                 .omitNullValues()
                 .toString();
@@ -96,6 +100,11 @@ public class MappingEntryImpl implements MappingEntry {
     @Override
     public boolean isIdentifier() {
         return identifier.isPresent() && identifier.get();
+    }
+
+    @Override
+    public boolean isLocation() {
+        return location.isPresent() && location.get();
     }
 
     @Override
