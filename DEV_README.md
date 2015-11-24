@@ -58,18 +58,28 @@ Now start the release process with
 
 ```sh
 mvn release:prepare
+```
+
+The `release` commands are interactive and allow you to set the release version and next development version. Have your GitHub credentials ready, because the plugin will create the required tags and push changes to the repo.
+
+After this command, reset the `master` branch to the version with the release tag, e.g. `v1.1.0`. Create a pull request from your fork's `master` branch to the main repository `master` branch.
+
+Then switch to the develop branch and merge with `release-prepare` branch, so that you have the current development version.
+
+Next, switch back to the `master` branch to perform the actual release (check for the correct version in the POM file to make sure).
+
+```sh
 mvn release:perform -P sign
 ```
 
-The `release` commands are interactive and allow you to set the release version and next development version.
+Finally, delete the `release-prepare` branch and checkout the development branch.
 
 After performing the release on the command line, log in to Sonatype Nexus at https://oss.sonatype.org/ and complete the following steps:
 
 * Locate the project in the the staging repository: https://oss.sonatype.org/#stagingRepositories
 * Check it contains the required files (pom, asc, sources, javadoc, ...)
-* "Close" the staging repository
-* Click on "release"
-* Wait... then refresh - the staging repo should be gone.
-* Check after a short delay for the published modules at http://repo1.maven.org/maven2/org/n52/youngs/
+* "Close" the staging repository to continue the process by selecting the checkbox and clicking the respective buttom at the top. Wait for the closing to finish - you can observe the progress in the "Activity" tab, but you might have to refresh the page. A successful close ends with the message "Repository closed"
+* Select the repository and click on "Release", then refresh - the staging repo should be gone.
+* Check after a short delay (few minutes) for the published modules at http://repo1.maven.org/maven2/org/n52/youngs/
 
 
