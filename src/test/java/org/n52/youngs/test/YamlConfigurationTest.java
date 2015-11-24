@@ -172,7 +172,7 @@ public class YamlConfigurationTest {
     @Test
     public void testEntriesLoading() throws IOException, XPathExpressionException {
         Collection<MappingEntry> entries = config.getEntries();
-        assertThat("all entries are loaded", entries.size(), is(equalTo(6)));
+        assertThat("all entries are loaded", entries.size(), is(equalTo(7)));
     }
 
     @Test
@@ -182,6 +182,7 @@ public class YamlConfigurationTest {
         assertThat("first entry fieldname", iter.next().getFieldName(), is(equalTo("date")));
         assertThat("second entry fieldname", iter.next().getFieldName(), is(equalTo("id")));
         assertThat("third entry fieldname", iter.next().getFieldName(), is(equalTo("language")));
+        assertThat("fourth entry fieldname", iter.next().getFieldName(), is(equalTo("loc")));
         assertThat("fourth entry fieldname", iter.next().getFieldName(), is(equalTo("title")));
     }
 
@@ -193,6 +194,26 @@ public class YamlConfigurationTest {
         assertThat("second entry (id) is identifier", iter.next().isIdentifier(), is(equalTo(true)));
         assertThat("third entry (language) is not identifier", iter.next().isIdentifier(), is(equalTo(false)));
         assertThat("fourth entry (title) is not identifier", iter.next().isIdentifier(), is(equalTo(false)));
+    }
+
+    @Test
+    public void testEntriesNonLocations() throws IOException, XPathExpressionException {
+        Collection<MappingEntry> entries = config.getEntries();
+        Iterator<MappingEntry> iter = entries.iterator();
+        assertThat("first entry (date) is not location", iter.next().isLocation(), is(equalTo(false)));
+        assertThat("second entry (id) is not location", iter.next().isLocation(), is(equalTo(false)));
+        assertThat("third entry (language) is not location", iter.next().isLocation(), is(equalTo(false)));
+        assertThat("fourth entry (loc) is location", iter.next().isLocation(), is(equalTo(true)));
+        assertThat("fourth entry (title) is not location", iter.next().isLocation(), is(equalTo(false)));
+    }
+
+    @Test
+    public void testEntryLocation() throws IOException, XPathExpressionException {
+        Collection<MappingEntry> entries = config.getEntries();
+
+        assertThat("one location field found", entries.stream().filter(e -> e.isLocation()).count(), is(1l));
+        assertThat("the one location field has correct name", entries.stream()
+                .filter(e -> e.isLocation()).findFirst().get().getFieldName(), is("loc"));
     }
 
     @Test
@@ -232,6 +253,12 @@ public class YamlConfigurationTest {
     @Test(expected = MappingError.class)
     public void testMultipleIdentifiers() throws Exception {
         YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-multiple-ids.yml", helper);
+        assertNotNull(m);
+    }
+
+    @Test(expected = MappingError.class)
+    public void testMissingIdentifier() throws Exception {
+        YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-missing-id.yml", helper);
         assertNotNull(m);
     }
 
@@ -322,6 +349,16 @@ public class YamlConfigurationTest {
     }
 
     @Test
+    public void testSplit() throws IOException {
+        YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-split.yml", helper);
+        assertThat("split field is found", m.getEntries().stream().filter(e -> e.hasSplit()).count(), is(1l));
+
+        MappingEntry entry = m.getEntries().stream().filter(e -> e.hasSplit()).findFirst().get();
+        assertThat("fieldname is correct", entry.getFieldName(), is("splitter"));
+        assertThat("split field value is correct", entry.getSplit(), is("__split__"));
+    }
+
+    @Test
     public void testOutputProperties() throws IOException {
         YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-raw-outputproperties.yml", helper);
         assertThat("outputproperties field is found", m.getEntries().stream().filter(e -> e.hasOutputProperties()).count(), is(1l));
@@ -333,6 +370,12 @@ public class YamlConfigurationTest {
         assertThat("omit value is correct", entry.getOutputProperties().get("omit-xml-declaration"), is("yes"));
         assertThat("has indent", entry.getOutputProperties().keySet().contains("indent"), is(true));
         assertThat("indent value is correct", entry.getOutputProperties().get("indent"), is("no"));
+    }
+
+    @Test
+    public void testIdentifierField() throws IOException, XPathExpressionException {
+        String idField = config.getIdentifierField();
+        assertThat("id field is set", idField, is(equalTo("id")));
     }
 
     private Document getDocument(String xmlString) throws Exception {

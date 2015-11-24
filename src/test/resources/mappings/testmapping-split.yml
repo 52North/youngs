@@ -1,0 +1,13 @@
+---
+name: split-test
+xpathversion: 2.0
+namespaces:
+    gmi: http://www.isotc211.org/2005/gmi
+    gmd: http://www.isotc211.org/2005/gmd
+    eum: http://www.eumetsat.int/2008/gmi
+mappings:
+    splitter:
+        xpath: "string-join(for $n in /*/gmd:identificationInfo/*/gmd:descriptiveKeywords/gmd:MD_Keywords
+                        return string-join(($n/gmd:type/*/@codeListValue, ':', $n/gmd:keyword/*/text()), ''), '__split__')"
+        split: "__split__"
+        identifier: true

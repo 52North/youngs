@@ -25,6 +25,7 @@ import com.github.autermann.yaml.nodes.YamlMapNode;
 import com.github.autermann.yaml.nodes.YamlSeqNode;
 import com.github.autermann.yaml.nodes.YamlTextNode;
 import com.google.common.base.Joiner;
+import com.google.common.base.MoreObjects;
 import org.n52.youngs.transform.MappingEntry;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -47,7 +48,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.n52.youngs.exception.MappingError;
-import org.n52.youngs.impl.NamespaceContextImpl;
 import org.n52.youngs.impl.XPathHelper;
 import org.n52.youngs.transform.MappingConfiguration;
 import org.slf4j.Logger;
@@ -57,7 +57,7 @@ import org.w3c.dom.Document;
 /**
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public class YamlMappingConfiguration implements MappingConfiguration {
+public class YamlMappingConfiguration extends NamespacedYamlConfiguration implements MappingConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(YamlMappingConfiguration.class);
 
@@ -85,6 +85,10 @@ public class YamlMappingConfiguration implements MappingConfiguration {
 
     private final XPathHelper xpathHelper;
 
+    private String identifierField;
+
+    private Optional<String> locationField = Optional.empty();
+
     public YamlMappingConfiguration(String fileName, XPathHelper xpathHelper) throws IOException {
         this(Resources.asByteSource(Resources.getResource(fileName)).openStream(), xpathHelper);
         log.info("Created configuration from filename {}", fileName);
@@ -106,26 +110,6 @@ public class YamlMappingConfiguration implements MappingConfiguration {
         }
 
         log.info("Created configuration from stream {} with {} entries", input, entries.size());
-    }
-
-    private NamespaceContext parseNamespaceContext(YamlNode configurationNodes) {
-        if (configurationNodes.hasNotNull("namespaces")) {
-            Map<String, String> nsMap = Maps.newHashMap();
-
-            final YamlMapNode valueMap = configurationNodes.path("namespaces").asMap();
-            valueMap.entries().stream().forEach(
-                    (Entry<YamlNode, YamlNode> e) -> {
-                        nsMap.put(e.getKey().asTextValue(), e.getValue().asTextValue());
-                    });
-
-            NamespaceContext nsc = new NamespaceContextImpl(nsMap);
-            log.trace("Created namespace context from mapping configuration: {}", nsc);
-            return nsc;
-        } else {
-            log.error("Requited namespace map missing in mapping file '{}'",
-                    configurationNodes.get("name"));
-            throw new MappingError("Mapping '%s' does not contain 'namespaces' map.", configurationNodes.get("name"));
-        }
     }
 
     private void init(YamlNode configurationNodes, NamespaceContext nsContext) {
@@ -161,7 +145,7 @@ public class YamlMappingConfiguration implements MappingConfiguration {
         if (configurationNodes.hasNotNull("mappings")) {
             YamlMapNode mappingsNode = configurationNodes.path("mappings").asMap();
             this.entries = Lists.newArrayList();
-            for (Entry<YamlNode, YamlNode> entry : mappingsNode.entries()) { // use old-style lood to forward exception
+            for (Entry<YamlNode, YamlNode> entry : mappingsNode.entries()) { // use old-style loop to forward exception
                 MappingEntry e = createEntry(entry.getKey().asTextValue(),
                         entry.getValue(), nsContext);
                 log.trace("Created entry: {}", e);
@@ -174,8 +158,32 @@ public class YamlMappingConfiguration implements MappingConfiguration {
                 List<String> entriesWithId = this.entries.stream().filter(MappingEntry::isIdentifier)
                         .map(MappingEntry::getFieldName).collect(Collectors.toList());
                 log.error("Found more than one entries marked as 'identifier': {}", Arrays.toString(entriesWithId.toArray()));
-                throw new MappingError("More than one fields are marked as 'identifier'. Found {} in {}", idCount,
+                throw new MappingError("More than one field are marked as 'identifier'. Found {}: {}", idCount,
                         Arrays.toString(entriesWithId.toArray()));
+            }
+            Optional<MappingEntry> identifier = this.entries.stream().filter(MappingEntry::isIdentifier).findFirst();
+            if (identifier.isPresent()) {
+                this.identifierField = identifier.get().getFieldName();
+                log.trace("Found identifier field '{}'", this.identifierField);
+            } else {
+                throw new MappingError("No field is marked as 'identifier', exactly one must be.");
+            }
+
+            // ensure not more than one field is location
+            long locationCount = this.entries.stream().filter(MappingEntry::isLocation).count();
+            if (locationCount > 1) {
+                List<String> entriesWithLocation = this.entries.stream().filter(MappingEntry::isIdentifier)
+                        .map(MappingEntry::getFieldName).collect(Collectors.toList());
+                log.error("Found more than one entries marked as 'location': {}", Arrays.toString(entriesWithLocation.toArray()));
+                throw new MappingError("More than one field are marked as 'location'. Found {}: {}", idCount,
+                        Arrays.toString(entriesWithLocation.toArray()));
+            }
+            Optional<MappingEntry> location = this.entries.stream().filter(MappingEntry::isLocation).findFirst();
+            if (location.isPresent()) {
+                this.locationField = Optional.of(location.get().getFieldName());
+                log.trace("Found location field '{}'", this.locationField.get());
+            } else {
+                log.warn("No field is marked as 'location'.");
             }
 
             // sort list by field name
@@ -193,6 +201,7 @@ public class YamlMappingConfiguration implements MappingConfiguration {
             Map<String, Object> indexProperties = createIndexProperties(id, node);
 
             boolean isIdentifier = mapNode.path("identifier").asBooleanValue(false);
+            boolean isLocation = mapNode.path("location").asBooleanValue(false);
             boolean isXml = mapNode.path("raw_xml").asBooleanValue(false);
 
             String expression = mapNode.path("xpath").asTextValue();
@@ -202,7 +211,9 @@ public class YamlMappingConfiguration implements MappingConfiguration {
                 MappingEntryImpl entry = new MappingEntryImpl(compiledExpression,
                         indexProperties,
                         isIdentifier,
+                        isLocation,
                         isXml);
+                log.trace("Starting new entry: {}", entry);
 
                 // geo types
                 if (mapNode.hasNotNull("coordinates")) {
@@ -255,6 +266,13 @@ public class YamlMappingConfiguration implements MappingConfiguration {
                     entry.setReplacements(replacements);
                 }
 
+                if (mapNode.hasNotNull("split")) {
+                    YamlNode sNode = mapNode.path("split");
+                    String split = sNode.asTextValue();
+                    log.trace("Parsed split: {}", split);
+                    entry.setSplit(split);
+                }
+
                 // for raw types
                 if (mapNode.hasNotNull("output_properties")) {
                     YamlSeqNode rMap = (YamlSeqNode) mapNode.path("output_properties");
@@ -273,12 +291,12 @@ public class YamlMappingConfiguration implements MappingConfiguration {
 
                 return entry;
             } catch (XPathExpressionException e) {
-                log.error("Could not create XPath for provided expression '{}' in field {}", expression, e, id);
+                log.error("Could not create XPath for provided expression '{}' in field {}", expression, id, e);
                 throw new MappingError(e, "Could not create XPath for provided expression '%s' in field %s",
                         expression, id);
             }
         }
-        throw new MappingError("The provided node class %s is not supported in the mapping '{}': %s",
+        throw new MappingError("The provided node class %s is not supported in the mapping '%s': %s",
                 node.getClass().toString(), id, node.toString());
     }
 
@@ -411,6 +429,36 @@ public class YamlMappingConfiguration implements MappingConfiguration {
     @Override
     public MappingEntry getEntry(String name) {
         return this.entries.stream().filter(e -> e.getFieldName().equals(name)).findFirst().get();
+    }
+
+    @Override
+    public String getIdentifierField() {
+        return this.identifierField;
+    }
+
+    @Override
+    public boolean hasLocationField() {
+        return this.locationField.isPresent();
+    }
+
+    @Override
+    public String getLocationField() {
+        return this.locationField.get();
+    }
+
+    @Override
+    public String toString() {
+        MoreObjects.ToStringHelper s = MoreObjects.toStringHelper(this)
+                .add("version", this.version)
+                .add("index", this.index)
+                .add("name", this.name)
+                .add("type", this.type)
+                .add("XPath version", this.xpathVersion);
+        if (this.applicabilityExpression.isPresent()) {
+            s.add("applicability", this.applicabilityExpression.get());
+        }
+
+        return s.omitNullValues().toString();
     }
 
 }

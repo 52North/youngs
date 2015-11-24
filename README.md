@@ -185,6 +185,34 @@ classes:
 ```
 
 
+#### Mapping with splitting
+
+XPath (even 2.0) cannot create new nodes. So if we want to concatenate two fields and do that multiple times, we need a workaround in Java.
+
+The following configuration uses the ``string-join`` function to concatenate multiple keywords with their types.
+
+```yaml
+    typed_keywords:
+        # only works for first, because xpath cannot create new nodes: http://stackoverflow.com/questions/9031727/converting-the-result-type-of-string-join-to-nodelist
+        xpath: "string-join(for $n in /*/gmd:identificationInfo/*/gmd:descriptiveKeywords/gmd:MD_Keywords
+                        return string-join(($n/gmd:type/*/@codeListValue, ':', $n/gmd:keyword/*/text()), ''), '__new_item__')"
+        split: "__new_item__"
+        properties:
+            store: yes
+            index: not_analyzed
+            include_in_all: false
+```
+
+The intermediate string ``theme:Atmospheric conditions__split__socialBenefitArea:Weather__split__place:Archive`` is then split into three items and results in the following field (JSON snippet):
+
+```json
+typed_keywords": [
+    "theme:Atmospheric conditions",
+    "socialBenefitArea:Weather",
+    "place:Archive"
+]
+```
+
 ### General notes
 
 * If an XPath expression yields multiple results, the corresponding field will contain an array.

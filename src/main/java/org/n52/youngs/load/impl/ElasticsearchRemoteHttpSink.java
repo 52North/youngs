@@ -16,40 +16,11 @@
  */
 package org.n52.youngs.load.impl;
 
-import com.google.common.collect.Maps;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
-import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.indices.IndexMissingException;
-import org.joda.time.DateTimeZone;
-import org.n52.iceland.statistics.api.mappings.MetadataDataMapping;
-import org.n52.iceland.statistics.api.parameters.AbstractEsParameter;
-import org.n52.iceland.statistics.api.parameters.ObjectEsParameter;
-import org.n52.iceland.statistics.api.parameters.SingleEsParameter;
-import org.n52.youngs.exception.SinkError;
-import org.n52.youngs.transform.MappingConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

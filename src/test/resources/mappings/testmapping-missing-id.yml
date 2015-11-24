@@ -1,0 +1,7 @@
+---
+name: test-missing-id-error
+mappings:
+    id:
+        xpath: "//fileIdentifier"
+    title:
+        xpath: "//title"
