@@ -62,16 +62,16 @@ public class Main {
         Mapper mapper = new CswToBuilderMapper(configuration);
 
         String host = "localhost";
-        String cluster = "elasticsearch";
-        String index = "csw";
-        String type = "record";
-        int port = 9300;
+        String cluster = "ConnectinGEO";
+        String index = "geodab";
+        String type = "isorecord";
+        int port = 9301;
         Sink sink = new ElasticsearchRemoteHttpSink(host, port, cluster, index, type);
 
         Runner runner = new SingleThreadBulkRunner()
-                .setBulkSize(20)
-                .setRecordsLimit(2000)
-                .setStartPosition(200)
+                .setBulkSize(10)
+                .setRecordsLimit(10000)
+                .setStartPosition(10000)
                 .harvest(source)
                 .transform(mapper);
         Report report = runner.load(sink);
@@ -92,15 +92,15 @@ public class Main {
         Mapper mapper = new CswToBuilderMapper(configuration);
 
         String host = "localhost";
-        String cluster = "elasticsearch";
-        String index = "csw";
-        String type = "record";
-        int port = 9300;
+        String cluster = "ConnectinGEO";
+        String index = "geodab";
+        String type = "dcrecord";
+        int port = 9301;
         Sink sink = new ElasticsearchRemoteHttpSink(host, port, cluster, index, type);
 
         Runner runner = new SingleThreadBulkRunner()
                 .setBulkSize(20)
-                .setRecordsLimit(100)
+                .setRecordsLimit(10)
                 .setStartPosition(1)
                 .harvest(source)
                 .transform(mapper);

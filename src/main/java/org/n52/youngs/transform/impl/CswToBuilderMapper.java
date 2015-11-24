@@ -30,9 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -52,7 +50,6 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 import org.n52.youngs.load.impl.BuilderRecord;
 import org.n52.youngs.harvest.SourceRecord;
 import org.n52.youngs.harvest.NodeSourceRecord;
-import org.n52.youngs.impl.XPathHelper;
 import org.n52.youngs.transform.Mapper;
 import org.n52.youngs.transform.MappingConfiguration;
 import org.n52.youngs.transform.MappingEntry;
@@ -98,26 +95,27 @@ public class CswToBuilderMapper implements Mapper {
     }
 
     /**
+     * @param sourceRecord the record to map
      * @return a record containing a builder of the provided SourceRecord, or null if the mapper could not be completed.
      */
     @Override
-    public BuilderRecord map(SourceRecord source) {
-        Objects.nonNull(source);
+    public BuilderRecord map(SourceRecord sourceRecord) {
+        Objects.nonNull(sourceRecord);
         BuilderRecord record = null;
 
-        if (source instanceof NodeSourceRecord) {
+        if (sourceRecord instanceof NodeSourceRecord) {
             try {
-                NodeSourceRecord object = (NodeSourceRecord) source;
+                NodeSourceRecord object = (NodeSourceRecord) sourceRecord;
                 IdAndBuilder mappedRecord = mapNodeToBuilder(object.getRecord());
 
                 record = new BuilderRecord(mappedRecord.id, mappedRecord.builder);
                 return record;
             } catch (IOException e) {
-                log.warn("Error mapping the source {}", source, e);
+                log.warn("Error mapping the source {}", sourceRecord, e);
                 return null;
             }
         } else {
-            log.warn("The SourceRecord class {} is not supported", source.getClass().getName());
+            log.warn("The SourceRecord class {} is not supported", sourceRecord.getClass().getName());
         }
 
         return record;
@@ -249,41 +247,51 @@ public class CswToBuilderMapper implements Mapper {
             EvalResult er = result.get();
 
             if (entry.hasReplacements()) {
-                result = handleReplacements(entry, er, result);
+                er = handleReplacements(entry, er);
+            }
+            if (entry.hasSplit()) {
+                er = handleSplit(entry, er);
             }
 
             try {
-                Object value = result.get().value;
-                builder.field(result.get().name, value);
-                log.debug("Added field: {}", (value instanceof Object[]) ? Arrays.toString((Object[]) value) : value);
+                Object value = er.value;
+                builder.field(er.name, value);
+                log.debug("Added field: {} = {}", er.name, (value instanceof Object[]) ? Arrays.toString((Object[]) value) : value);
             } catch (IOException e) {
                 log.warn("Error adding field {}: {}", entry.getFieldName(), e);
             }
         }
     }
 
-    private Optional<EvalResult> handleReplacements(MappingEntry entry, EvalResult er, Optional<EvalResult> result) {
+    private EvalResult handleReplacements(MappingEntry entry, EvalResult er) {
+        EvalResult result = null;
         Map<String, String> replacements = entry.getReplacements();
         log.trace("Applying replacements in {}: {}", er.name, Arrays.toString(replacements.entrySet().toArray()));
         if (er.value instanceof String) {
-            result = Optional.of(new EvalResult(er.name, applyReplacements(replacements, (String) er.value)));
+            result = new EvalResult(er.name, applyReplacements(replacements, (String) er.value));
         } else if (er.value instanceof String[]) {
             String[] val = (String[]) er.value;
-            result = Optional.of(new EvalResult(er.name, Arrays.stream(val).map(currentVal -> {
+            result = new EvalResult(er.name, Arrays.stream(val).map(currentVal -> {
                 return applyReplacements(replacements, currentVal);
-            }).collect(Collectors.toList()).toArray()));
+            }).collect(Collectors.toList()).toArray());
         } else if (er.value instanceof Object[]) {
             Object[] val = (Object[]) er.value;
-            result = Optional.of(new EvalResult(er.name, Arrays.stream(val)
+            result = new EvalResult(er.name, Arrays.stream(val)
                     .filter(v -> v instanceof String)
                     .filter(Objects::nonNull)
                     .map(v -> (String) v)
                     .map(currentVal -> {
                         return applyReplacements(replacements, currentVal);
-                    }).collect(Collectors.toList()).toArray()));
+                    }).collect(Collectors.toList()).toArray());
         }
-        log.trace("Result after replacements: {}", result.get());
-        return result;
+
+        log.trace("Result after replacements: {} (if null, then the original is returned)", result);
+        if (result != null) {
+            return result;
+        }
+
+        log.debug("No handling of replacement for given result implemented, returning input again: {}", er);
+        return er;
     }
 
     private String applyReplacements(Map<String, String> replacements, String in) {
@@ -292,6 +300,20 @@ public class CswToBuilderMapper implements Mapper {
             out = out.replace(replacement.getKey(), replacement.getValue());
         }
         return out;
+    }
+
+    private EvalResult handleSplit(MappingEntry entry, EvalResult er) {
+        if (er.value instanceof String) {
+            String value = (String) er.value;
+            log.trace("Applying split in field {} with '{}' on {}", entry.getFieldName(), entry.getSplit(), value);
+            String[] split = value.split(entry.getSplit());
+            List<String> list = Arrays.asList(split);
+            log.trace("Split resulted in {} items: {}", list.size(), Arrays.toString(list.toArray()));
+            return new EvalResult(er.name, list);
+        } else {
+            log.trace("Split can only be applied to string value, but result was {} ({})", er.value, er.value.getClass());
+            return er;
+        }
     }
 
     private void mapRawEntry(MappingEntry entry, Node node, XContentBuilder builder) {
@@ -389,6 +411,15 @@ public class CswToBuilderMapper implements Mapper {
         return sw.toString();
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("mapping", this.mapper)
+                .add("transformerFactory", this.tFactory)
+                .omitNullValues()
+                .toString();
+    }
+
     private static class IdAndBuilder {
 
         protected final String id;
@@ -416,7 +447,10 @@ public class CswToBuilderMapper implements Mapper {
         @Override
         public String toString() {
             return MoreObjects.toStringHelper(this)
-                    .add("name", name).add("value", value).omitNullValues().toString();
+                    .add("name", name)
+                    .add("value", value)
+                    .omitNullValues()
+                    .toString();
         }
 
     }

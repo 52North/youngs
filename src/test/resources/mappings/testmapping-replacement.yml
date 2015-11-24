@@ -5,6 +5,7 @@ namespaces:
     test: http://test
 mappings:
     replacer:
+        identifier: true
         xpath: "/*"
         replacements:
             - replace: "."

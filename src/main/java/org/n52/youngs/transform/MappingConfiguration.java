@@ -64,6 +64,12 @@ public interface MappingConfiguration {
 
     public String getType();
 
+    public String getIdentifierField();
+
+    public boolean hasLocationField();
+
+    public String getLocationField();
+
     public String getXPathVersion();
 
     public boolean isApplicable(Document doc);

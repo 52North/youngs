@@ -16,6 +16,7 @@
  */
 package org.n52.youngs.harvest;
 
+import com.google.common.base.MoreObjects;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -31,7 +32,6 @@ import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.n52.youngs.api.Record;
 import org.n52.youngs.api.Report;
 import org.n52.youngs.exception.SourceError;
 import org.slf4j.Logger;
@@ -143,5 +143,16 @@ public class DirectorySource implements Source {
         NodeSourceRecord record = new NodeSourceRecord(elem);
         return record;
     }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("directory", this.directory)
+                .add("filter", this.filter)
+                .omitNullValues()
+                .toString();
+    }
+
+
 
 }

@@ -16,6 +16,7 @@
  */
 package org.n52.youngs.load.impl;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -100,14 +101,18 @@ public abstract class ElasticsearchSink implements Sink {
                 request.setId(builderRecord.getId());
             }
 
-            IndexResponse response = request.execute().actionGet();
-            log.trace("Created [{}] with id {} @ {}/{}, version {}", response.isCreated(),
-                    response.getId(), response.getIndex(), response.getType(), response.getVersion());
+            try {
+                IndexResponse response = request.execute().actionGet();
+                log.trace("Created [{}] with id {} @ {}/{}, version {}", response.isCreated(),
+                        response.getId(), response.getIndex(), response.getType(), response.getVersion());
 
-            return response.isCreated() || (!response.isCreated() && (response.getVersion() > 1));
+                return response.isCreated() || (!response.isCreated() && (response.getVersion() > 1));
+            } catch (ElasticsearchException e) {
+                log.error("Could not store record {}", builderRecord.getId(), e);
+                return false;
+            }
         } else {
-            throw new InvalidParameterException(
-                    String.format("The provided record class '%s' is not supported", record.getClass()));
+            throw new SinkError("The provided record class '%s' is not supported", record.getClass());
         }
     }
 
@@ -323,6 +328,16 @@ public abstract class ElasticsearchSink implements Sink {
             log.info("Index does not exist, no need to delete: {}", e.getMessage());
             return true;
         }
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("cluster", cluster)
+                .add("index", index)
+                .add("type", type)
+                .add("client", getClient())
+                .toString();
     }
 
 }

@@ -20,6 +20,7 @@ import org.n52.youngs.impl.SourceRecordHelper;
 import com.google.common.io.Resources;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Iterator;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
@@ -63,14 +64,34 @@ public class GmdMappingTest {
     }
 
     @Test
-    public void temporalExtent() throws Exception {
+    public void temporalExtentWithPositions() throws Exception {
         Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
         BuilderRecord mappedRecord = cswMapper.map(record.iterator().next());
         String mappedRecordString = mappedRecord.getBuilder().string();
 
         assertThat("Mapped record contains extend timestamps", mappedRecordString,
-                allOf(containsString("extend_begin"), containsString("extend_end"), containsString("1985-01-01T00:00:00"),
-                        containsString("2005-12-31T23:45:00")));
+                allOf(containsString("\"extent_begin\" : \"1985-01-01T00:00:00\""),
+                        containsString("\"extent_end\" : \"2005-12-31T23:45:00\"")));
+    }
+
+    @Test
+    public void temporalExtentWithBeginEnd() throws Exception {
+        Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso-2.xml")).openStream());
+        Iterator<SourceRecord> iter = record.iterator();
+        // 7th record has end extent != "unknown"
+        iter.next();
+        iter.next();
+        iter.next();
+        iter.next();
+        iter.next();
+        iter.next();
+
+        BuilderRecord mappedRecord = cswMapper.map(iter.next());
+        String mappedRecordString = mappedRecord.getBuilder().string();
+
+        assertThat("Mapped record contains extend timestamps", mappedRecordString,
+                allOf(containsString("\"extent_begin\" : \"1991-08-22\""),
+                        containsString("\"extent_end\" : \"1994-11-24\"")));
     }
 
     @Test
@@ -92,6 +113,18 @@ public class GmdMappingTest {
         assertThat("Mapped record contains envelope", mappedRecordString,
                 allOf(containsString("location"), containsString("envelope"),
                         containsString("[ [ -11.1, 14.0 ], [ 12.22, -13.0 ] ]")));
+    }
+
+    @Test
+    public void maintenanceFrequency() throws Exception {
+        Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso-2.xml")).openStream());
+        BuilderRecord mappedRecord = cswMapper.map(record.iterator().next());
+        String mappedRecordString = mappedRecord.getBuilder().string();
+
+        assertThat("Mapped record contains update frequency", mappedRecordString,
+                allOf(containsString("\"metadata_maintenance\" : \"asNeeded\"")));
+        assertThat("Mapped record contains next update", mappedRecordString,
+                allOf(containsString("\"metadata_next_update\" : \"2015-01-01\"")));
     }
 
 }

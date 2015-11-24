@@ -44,6 +44,8 @@ public interface MappingEntry {
 
     public boolean isIdentifier();
 
+    public boolean isLocation();
+
     public boolean hasCoordinates();
 
     /**
@@ -61,6 +63,10 @@ public interface MappingEntry {
     public boolean hasReplacements();
 
     public Map<String, String> getReplacements();
+
+    public boolean hasSplit();
+
+    public String getSplit();
 
     public boolean hasOutputProperties();
 

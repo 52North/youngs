@@ -82,9 +82,9 @@ public class ReportImpl implements Report {
         sb.append("### Report ###\n");
         sb.append(" Added: ").append(getNumberOfRecordsAdded()).append("\n");
         sb.append(" Failed: ").append(getNumberOfRecordsFailed()).append("\n").append("\n");
-        sb.append(" Added IDs: ").append(Joiner.on(",").join(added)).append("\n");
-        sb.append(" Faild IDs: ").append(Joiner.on(",").withKeyValueSeparator(": ").join(failed)).append("\n");
-        sb.append(" Messages: ").append(Joiner.on(";").withKeyValueSeparator(": ").join(messages)).append("\n");
+        sb.append(" Added IDs: ").append(Joiner.on(", ").join(added)).append("\n");
+        sb.append(" Faild IDs: ").append(Joiner.on(", ").withKeyValueSeparator(": ").join(failed)).append("\n");
+        sb.append(" Messages: ").append(Joiner.on("; ").withKeyValueSeparator(": ").join(messages)).append("\n");
 
         return sb.toString();
     }
