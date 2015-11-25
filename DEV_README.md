@@ -48,7 +48,7 @@ You also need a public key on a keyserver (see [here](https://www.debian-adminis
 
 ### Release
 
-First switch to a special branch to prepare the release. Afterward you can merge this into the master or develop branch.
+First switch to a special branch to prepare the release. Afterward you can merge this into the master or develop branch. This means that the release is performed against the default remote (normally a fork).
 
 ```sh
 git checkout -b release-prepare
@@ -72,7 +72,7 @@ Next, switch back to the `master` branch to perform the actual release (check fo
 mvn release:perform -P sign
 ```
 
-Finally, delete the `release-prepare` branch and checkout the development branch.
+Finally, delete the `release-prepare` branch and checkout the development branch. You might need to pull changes into your master branch before you can push new local changes.
 
 After performing the release on the command line, log in to Sonatype Nexus at https://oss.sonatype.org/ and complete the following steps:
 
@@ -81,5 +81,4 @@ After performing the release on the command line, log in to Sonatype Nexus at ht
 * "Close" the staging repository to continue the process by selecting the checkbox and clicking the respective buttom at the top. Wait for the closing to finish - you can observe the progress in the "Activity" tab, but you might have to refresh the page. A successful close ends with the message "Repository closed"
 * Select the repository and click on "Release", then refresh - the staging repo should be gone.
 * Check after a short delay (few minutes) for the published modules at http://repo1.maven.org/maven2/org/n52/youngs/
-
 
