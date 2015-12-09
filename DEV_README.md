@@ -72,7 +72,13 @@ Next, switch back to the `master` branch to perform the actual release (check fo
 mvn release:perform -P sign
 ```
 
-Finally, delete the `release-prepare` branch and checkout the development branch. You might need to pull changes into your master branch before you can push new local changes.
+Finally, delete the `release-prepare` branch and checkout the development branch.
+
+```sh
+git branch -d release-prepare
+```
+
+Note: You might need to pull changes into your master branch before you can push new local changes.
 
 After performing the release on the command line, log in to Sonatype Nexus at https://oss.sonatype.org/ and complete the following steps:
 
