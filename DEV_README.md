@@ -48,7 +48,14 @@ You also need a public key on a keyserver (see [here](https://www.debian-adminis
 
 ### Release
 
-First switch to a special branch to prepare the release. Afterward you can merge this into the master or develop branch. This means that the release is performed against the default remote (normally a fork).
+First, merge your development branch with the upstream's master branch.
+
+```sh
+git checkout develop
+git merge upstream/master
+```
+
+Optional: Switch to a special branch to prepare the release. Afterward you can merge this new branch into you local master or develop branch. This means that the release is performed against the default remote (normally a fork). Otherwise, the upstream repo will have a develop branch, which can also be fine.
 
 ```sh
 git checkout -b release-prepare
@@ -57,16 +64,29 @@ git checkout -b release-prepare
 Now start the release process with
 
 ```sh
-mvn release:prepare
+mvn release:clean elease:prepare
 ```
 
 The `release` commands are interactive and allow you to set the release version and next development version. Have your GitHub credentials ready, because the plugin will create the required tags and push changes to the repo.
 
-After this command, reset the `master` branch to the version with the release tag, e.g. `v1.1.0`. Create a pull request from your fork's `master` branch to the main repository `master` branch.
+After this command, set the `master` branch to the version with the release tag, e.g. `v1.1.0`.
 
-Then switch to the develop branch and merge with `release-prepare` branch, so that you have the current development version.
+```sh
+git checkout master
+git reset --hard v1.1.0
+```
 
-Next, switch back to the `master` branch to perform the actual release (check for the correct version in the POM file to make sure).
+Push the changes to your fork.
+
+```sh
+git push origin
+```
+
+Create a pull request from your fork's `master` branch to the main repository `master` branch.
+
+Optional (see above): Switch to the develop branch and merge with `release-prepare` branch, so that you have the current development version.
+
+Next, switch back to the `master` branch to perform the actual release, i.e. uploading to Maven Central. Please check for the correct version in the POM file to make sure.
 
 ```sh
 mvn release:perform -P sign
