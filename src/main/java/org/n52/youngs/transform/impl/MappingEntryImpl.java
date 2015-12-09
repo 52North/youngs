@@ -67,7 +67,7 @@ public class MappingEntryImpl implements MappingEntry {
 
     @Override
     public String getFieldName() {
-        return (String) indexProperties.get(INDEX_NAME);
+        return (String) indexProperties.get(INDEX_NAME_MAPPING_ATTRIBUTE);
     }
 
     public MappingEntryImpl addIndexProperty(String key, Object value) {
@@ -92,6 +92,7 @@ public class MappingEntryImpl implements MappingEntry {
                 .add("identifer", identifier.orElse(null))
                 .add("location", location.orElse(null))
                 .add("raw", raw.orElse(null))
+                .add("analyzed", isAnalyzed())
                 .add("properties", Arrays.deepToString(indexProperties.entrySet().toArray()))
                 .omitNullValues()
                 .toString();
@@ -140,6 +141,18 @@ public class MappingEntryImpl implements MappingEntry {
     @Override
     public boolean isRawXml() {
         return raw.isPresent() && raw.get();
+    }
+
+    @Override
+    public boolean isAnalyzed() {
+        // https://www.elastic.co/guide/en/elasticsearch/reference/1.7/mapping.html
+        boolean analyzed = true;
+        if (indexProperties.containsKey(INDEX_MAPPING_ATTRIBUTE)) {
+            analyzed = !(indexProperties.get(INDEX_MAPPING_ATTRIBUTE).equals("not_analyzed")
+                    || indexProperties.get(INDEX_MAPPING_ATTRIBUTE).equals("no"));
+        }
+
+        return analyzed;
     }
 
     @Override

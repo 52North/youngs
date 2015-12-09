@@ -61,7 +61,7 @@ namespaces:
     csw: http://www.opengis.net/cat/csw/2.0.2
 ```
 
-*Index configuration*: Settings for the Elasticsearch index, such as name, type to be used for storing records, etc. A string field even contains (in this case YAML) markup that will be send to the node at index creation. Creation of the index with the schema can be enabled/disabld.
+*Index configuration*: Settings for the Elasticsearch index, such as name, type to be used for storing records, etc. A string field even contains (in this case YAML) markup that will be send to the node at index creation. Creation of the index with the schema can be enabled/disabled.
 
 ```yaml
 index:
@@ -76,7 +76,7 @@ index:
 
 *Mappings*: A map of the actual mappings. If no `index_name` is provided, then the map identifier is used. The contents of the `properties` field are directly inserted into the schema as field properties.
 
-An example mapping definition and corresponding Elasticsearch type deffinition is as follows:
+An example mapping definition and corresponding Elasticsearch type definition is as follows:
 
 ```yaml
 mappings:

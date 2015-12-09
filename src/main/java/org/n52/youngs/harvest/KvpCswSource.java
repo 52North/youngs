@@ -52,6 +52,8 @@ public class KvpCswSource extends CswSource {
 
     private static final Logger log = LoggerFactory.getLogger(KvpCswSource.class);
 
+    private static final Joiner.MapJoiner urlParameterJoiner = Joiner.on("&").withKeyValueSeparator("=");
+
     public KvpCswSource(String url, NamespaceContext nsContext) throws MalformedURLException, JAXBException {
         super(url, nsContext);
     }
@@ -122,14 +124,14 @@ public class KvpCswSource extends CswSource {
         if (!url.toString().endsWith("?")) {
             recordsRequest.append("?");
         }
-        String fixedParameters = Joiner.on("&").withKeyValueSeparator("=").join(
+        String fixedParameters = urlParameterJoiner.join(
                 ImmutableMap.of("service", "CSW",
                         "version", "2.0.2",
                         "request", "GetRecords",
                         "resultType", "results",
                         "ElementSetName", "full"));
         recordsRequest.append(fixedParameters);
-        String parameters = Joiner.on("&").withKeyValueSeparator("=").join(
+        String parameters = urlParameterJoiner.join(
                 ImmutableMap.of("namespace", getNamespacesParameter(),
                         "typeNames", getTypeNamesParameter(),
                         "outputSchema", getOutputSchemaParameter(),
@@ -166,14 +168,14 @@ public class KvpCswSource extends CswSource {
             if (!url.toString().endsWith("?")) {
                 hitsRequest.append("?");
             }
-            String fixedParameters = Joiner.on("&").withKeyValueSeparator("=").join(
+            String fixedParameters = urlParameterJoiner.join(
                     ImmutableMap.of("service", "CSW",
                             "version", "2.0.2",
                             "request", "GetRecords",
                             "resultType", "hits",
                             "ElementSetName", "summary"));
             hitsRequest.append(fixedParameters);
-            String parameters = Joiner.on("&").withKeyValueSeparator("=").join(
+            String parameters = urlParameterJoiner.join(
                     ImmutableMap.of("namespace", getNamespacesParameter(),
                             "typeNames", getTypeNamesParameter()));
             hitsRequest.append("&").append(parameters);

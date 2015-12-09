@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPathConstants;
@@ -81,6 +82,29 @@ public class YamlConfigurationTest {
 
         MappingEntry rawEntry = config.getEntries().stream().filter(e -> e.isRawXml()).findFirst().get();
         assertThat("one raw field is found", rawEntry.getFieldName(), is("xmldoc"));
+    }
+
+    @Test
+    public void testAnalyzedField() throws IOException {
+        assertThat("two not analyzed fields are found", config.getEntries().stream().filter(e -> !e.isAnalyzed()).count(), is(2l));
+        assertThat("two not analyzed fields are found", config.getEntries().stream().filter(e -> e.isAnalyzed()).count(), is(5l));
+
+        List<MappingEntry> notAnalyzedEntries = config.getEntries().stream().filter(e -> !e.isAnalyzed()).collect(Collectors.toList());
+        assertThat("raw_xml field is found", notAnalyzedEntries.stream()
+                .filter(e -> e.getFieldName().equals("xmldoc")).count(), is(1l));
+        assertThat("language field is found", notAnalyzedEntries.stream()
+                .filter(e -> e.getFieldName().equals("language")).count(), is(1l));
+    }
+
+    @Test
+    public void testDefaultAnalyzed() throws Exception {
+        Collection<MappingEntry> entries = config.getEntries();
+        Iterator<MappingEntry> iter = entries.iterator();
+        assertThat("date entry index type", iter.next().isAnalyzed(), is(equalTo(true)));
+        assertThat("id entry index type", iter.next().isAnalyzed(), is(equalTo(true)));
+        assertThat("language index field type", iter.next().isAnalyzed(), is(equalTo(false)));
+        assertThat("title entry index type", iter.next().isAnalyzed(), is(equalTo(true)));
+        assertThat("xtitle entry index type", iter.next().isAnalyzed(), is(equalTo(true)));
     }
 
     @Test

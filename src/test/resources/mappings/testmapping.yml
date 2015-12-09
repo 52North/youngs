@@ -67,6 +67,7 @@ mappings:
         isoqueryableName: language
         properties:
             index_name: language
+            index: "not_analyzed"
             null_value: "N/A"
     date:
         xpath: "//date"
@@ -83,7 +84,7 @@ mappings:
         properties:
             type: string
             store: *STOREDEFAULT
-            index: no
+            index: "no"
             index_name: xmldoc
     loc:
         xpath: "."

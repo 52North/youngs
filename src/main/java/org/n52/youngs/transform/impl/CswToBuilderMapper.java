@@ -171,7 +171,7 @@ public class CswToBuilderMapper implements Mapper {
             Object coordsNode = entry.getXPath().evaluate(node, XPathConstants.NODE);
             if (coordsNode != null) {
                 String geoType = (String) entry.getIndexPropery(MappingEntry.IndexProperties.TYPE);
-                String field = (String) entry.getIndexPropery(MappingEntry.INDEX_NAME);
+                String field = (String) entry.getIndexPropery(MappingEntry.INDEX_NAME_MAPPING_ATTRIBUTE);
 
                 List<XPathExpression[]> pointsXPaths = entry.getCoordinatesXPaths();
 
