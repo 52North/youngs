@@ -32,7 +32,9 @@ public interface MappingEntry {
 
     }
 
-    public static final String INDEX_NAME = "index_name";
+    public static final String INDEX_NAME_MAPPING_ATTRIBUTE = "index_name";
+
+    public static final String INDEX_MAPPING_ATTRIBUTE = "index";
 
     public XPathExpression getXPath();
 
@@ -71,5 +73,13 @@ public interface MappingEntry {
     public boolean hasOutputProperties();
 
     public Map<? extends String, ? extends String> getOutputProperties();
+
+    /**
+     *
+     * @return true if the field is stored "analyzed" (default, often set to "not_analyzed" though),
+     *              which has implications for queries (lowercasing part of default analyzer). Returns also
+     *              false when the field is not indexed at all.
+     */
+    public boolean isAnalyzed();
 
 }

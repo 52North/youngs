@@ -336,11 +336,11 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
         }
 
         // make sure index name is a string
-        if (props.containsKey(MappingEntry.INDEX_NAME)) {
-            Object nameObj = props.get(MappingEntry.INDEX_NAME);
+        if (props.containsKey(MappingEntry.INDEX_NAME_MAPPING_ATTRIBUTE)) {
+            Object nameObj = props.get(MappingEntry.INDEX_NAME_MAPPING_ATTRIBUTE);
             if (!(nameObj instanceof String)) {
                 log.debug("Index name '{}' of field {} is not a string, falling back to id!", name, id);
-                props.put(MappingEntry.INDEX_NAME, id);
+                props.put(MappingEntry.INDEX_NAME_MAPPING_ATTRIBUTE, id);
             }
         }
 
@@ -350,8 +350,8 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
         }
 
         // handle defaulting to parent node name for id
-        if (!props.containsKey(MappingEntry.INDEX_NAME)) {
-            props.put(MappingEntry.INDEX_NAME, id);
+        if (!props.containsKey(MappingEntry.INDEX_NAME_MAPPING_ATTRIBUTE)) {
+            props.put(MappingEntry.INDEX_NAME_MAPPING_ATTRIBUTE, id);
         }
 
         return props;
