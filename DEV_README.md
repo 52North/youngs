@@ -92,13 +92,13 @@ Next, switch back to the `master` branch to perform the actual release, i.e. upl
 mvn release:perform -P sign
 ```
 
-Finally, delete the `release-prepare` branch and checkout the development branch.
+Finally, delete the `release-prepare` branch if you used it, checkout the development branch, and merge with upstream master to continue the development.
 
 ```sh
 git branch -d release-prepare
+git checkout develop
+git merge upstream/master
 ```
-
-Note: You might need to pull changes into your master branch before you can push new local changes.
 
 After performing the release on the command line, log in to Sonatype Nexus at https://oss.sonatype.org/ and complete the following steps:
 
