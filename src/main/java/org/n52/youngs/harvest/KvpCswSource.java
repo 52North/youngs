@@ -18,6 +18,7 @@ package org.n52.youngs.harvest;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -38,7 +39,6 @@ import javax.xml.transform.stream.StreamSource;
 import net.opengis.csw.v_2_0_2.AbstractRecordType;
 import net.opengis.csw.v_2_0_2.GetRecordsResponseType;
 import org.apache.http.client.fluent.Request;
-import org.elasticsearch.common.collect.Lists;
 import org.n52.youngs.api.Report;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
