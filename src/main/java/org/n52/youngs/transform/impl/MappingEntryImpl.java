@@ -51,8 +51,11 @@ public class MappingEntryImpl implements MappingEntry {
 
     private Optional<String> split = Optional.empty();
 
-    public MappingEntryImpl(XPathExpression xPath, Map<String, Object> indexProperties,
+    private final String fieldName;
+
+    public MappingEntryImpl(String fieldName, XPathExpression xPath, Map<String, Object> indexProperties,
             boolean identifier, boolean location, boolean rawXml) {
+        this.fieldName = fieldName;
         this.xPath = xPath;
         this.indexProperties.putAll(indexProperties);
         this.identifier = Optional.of(identifier);
@@ -67,7 +70,7 @@ public class MappingEntryImpl implements MappingEntry {
 
     @Override
     public String getFieldName() {
-        return (String) indexProperties.get(INDEX_NAME_MAPPING_ATTRIBUTE);
+        return this.fieldName;
     }
 
     public MappingEntryImpl addIndexProperty(String key, Object value) {
