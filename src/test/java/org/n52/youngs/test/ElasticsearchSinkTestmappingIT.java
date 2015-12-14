@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Map;
 import org.apache.http.StatusLine;
 import org.apache.http.client.fluent.Request;
+import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsAction;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequestBuilder;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
 import org.elasticsearch.client.IndicesAdminClient;
@@ -75,7 +76,7 @@ public class ElasticsearchSinkTestmappingIT {
         sink.prepare(mapping);
 
         IndicesAdminClient indicesClient = sink.getClient().admin().indices();
-        GetMappingsRequestBuilder builder = new GetMappingsRequestBuilder(indicesClient, mapping.getIndex())
+        GetMappingsRequestBuilder builder = new GetMappingsRequestBuilder(indicesClient, GetMappingsAction.INSTANCE, mapping.getIndex())
                 .addTypes(mapping.getType());
         GetMappingsResponse response = indicesClient.getMappings(builder.request()).actionGet();
         ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>> mappings = response.getMappings();

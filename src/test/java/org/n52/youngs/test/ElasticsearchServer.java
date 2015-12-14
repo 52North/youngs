@@ -18,7 +18,6 @@ package org.n52.youngs.test;
 
 import java.util.Optional;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
@@ -61,7 +60,8 @@ public class ElasticsearchServer extends ExternalResource {
                         System.getProperty(SYSTEM_PROPERTY_START_ES))
                 .orElse(startElasticsearch.toString()));
         if (startEs) {
-            Settings settings = ImmutableSettings.settingsBuilder().loadFromClasspath("elasticsearch-it.yml").build();
+            String fileName = "elasticsearch-it.yml";
+            Settings settings = Settings.settingsBuilder().loadFromStream(fileName, getClass().getResourceAsStream(fileName)).build();
             cluster = settings.get("cluster.name");
 
             embeddedNode = NodeBuilder.nodeBuilder().settings(settings).build();

@@ -19,6 +19,7 @@ package org.n52.youngs.transform.impl;
 import com.google.common.base.Charsets;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Resources;
 import java.io.IOException;
@@ -44,7 +45,6 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
-import org.elasticsearch.common.collect.Maps;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.n52.youngs.load.impl.BuilderRecord;
@@ -171,7 +171,7 @@ public class CswToBuilderMapper implements Mapper {
             Object coordsNode = entry.getXPath().evaluate(node, XPathConstants.NODE);
             if (coordsNode != null) {
                 String geoType = (String) entry.getIndexPropery(MappingEntry.IndexProperties.TYPE);
-                String field = (String) entry.getIndexPropery(MappingEntry.INDEX_NAME_MAPPING_ATTRIBUTE);
+                String field = entry.getFieldName();
 
                 List<XPathExpression[]> pointsXPaths = entry.getCoordinatesXPaths();
 

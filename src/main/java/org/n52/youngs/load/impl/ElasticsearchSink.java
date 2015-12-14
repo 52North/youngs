@@ -43,7 +43,6 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
-import org.elasticsearch.indices.IndexMissingException;
 import org.joda.time.DateTimeZone;
 import org.n52.iceland.statistics.api.mappings.MetadataDataMapping;
 import org.n52.iceland.statistics.api.parameters.AbstractEsParameter;
@@ -324,7 +323,7 @@ public abstract class ElasticsearchSink implements Sink {
             DeleteIndexResponse delete = getClient().admin().indices().delete(request).actionGet();
             log.info("Delete acknowledged: {}", delete.isAcknowledged());
             return delete.isAcknowledged();
-        } catch (IndexMissingException e) {
+        } catch (Exception e) {
             log.info("Index does not exist, no need to delete: {}", e.getMessage());
             return true;
         }

@@ -32,8 +32,6 @@ public interface MappingEntry {
 
     }
 
-    public static final String INDEX_NAME_MAPPING_ATTRIBUTE = "index_name";
-
     public static final String INDEX_MAPPING_ATTRIBUTE = "index";
 
     public XPathExpression getXPath();

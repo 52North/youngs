@@ -208,7 +208,8 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
             XPath xPath = newXPath(nsContext);
             try {
                 XPathExpression compiledExpression = xPath.compile(expression);
-                MappingEntryImpl entry = new MappingEntryImpl(compiledExpression,
+                MappingEntryImpl entry = new MappingEntryImpl(id,
+                        compiledExpression,
                         indexProperties,
                         isIdentifier,
                         isLocation,
@@ -335,23 +336,9 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
             });
         }
 
-        // make sure index name is a string
-        if (props.containsKey(MappingEntry.INDEX_NAME_MAPPING_ATTRIBUTE)) {
-            Object nameObj = props.get(MappingEntry.INDEX_NAME_MAPPING_ATTRIBUTE);
-            if (!(nameObj instanceof String)) {
-                log.debug("Index name '{}' of field {} is not a string, falling back to id!", name, id);
-                props.put(MappingEntry.INDEX_NAME_MAPPING_ATTRIBUTE, id);
-            }
-        }
-
         // set default type
         if (!props.containsKey(MappingEntry.IndexProperties.TYPE)) {
             props.put(MappingEntry.IndexProperties.TYPE, DEFAULT_INDEXPROPERTY_TYPE);
-        }
-
-        // handle defaulting to parent node name for id
-        if (!props.containsKey(MappingEntry.INDEX_NAME_MAPPING_ATTRIBUTE)) {
-            props.put(MappingEntry.INDEX_NAME_MAPPING_ATTRIBUTE, id);
         }
 
         return props;
