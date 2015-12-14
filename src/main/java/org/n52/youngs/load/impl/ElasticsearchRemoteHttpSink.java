@@ -16,9 +16,10 @@
  */
 package org.n52.youngs.load.impl;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.slf4j.Logger;
@@ -43,10 +44,14 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
         this.host = host;
         this.port = port;
 
-        Settings settings = ImmutableSettings.settingsBuilder()
+        Settings settings = Settings.settingsBuilder()
                 .put("cluster.name", getCluster()).build();
-        this.client = new TransportClient(settings).addTransportAddress(
-                new InetSocketTransportAddress(this.host, this.port));
+        try {
+            this.client = TransportClient.builder().settings(settings).build().addTransportAddress(
+                    new InetSocketTransportAddress(InetAddress.getByName(this.host), this.port));
+        } catch (UnknownHostException ex) {
+            throw new RuntimeException(ex);
+        }
         log.info("Created new client with settings {}", settings);
     }
 

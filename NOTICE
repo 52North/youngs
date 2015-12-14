@@ -24,8 +24,8 @@ This project further includes:
 
   52°North Iceland under The Apache Software License, Version 2.0
   52°North Iceland Statistics under The Apache Software License, Version 2.0
-  ANTLR 3 Runtime under BSD licence
   AOP alliance under Public Domain
+  Apache Commons CLI under Apache License, Version 2.0
   Apache Commons Codec under The Apache Software License, Version 2.0
   Apache Commons Compress under The Apache Software License, Version 2.0
   Apache Commons Logging under The Apache Software License, Version 2.0
@@ -35,25 +35,32 @@ This project further includes:
   Apache Log4j API under The Apache Software License, Version 2.0
   Apache Log4j Core under The Apache Software License, Version 2.0
   Apache Log4j SLF4J Binding under The Apache Software License, Version 2.0
-  ASM Commons under BSD
   ASM Core under BSD
   ASM helper Minidev under The Apache Software License, Version 2.0
   ClassLoader leak prevention under Apache 2
   Commons IO under The Apache Software License, Version 2.0
-  elasticsearch under The Apache Software License, Version 2.0
+  Compress-LZF under Apache License 2.0
+  Elasticsearch: Core under The Apache Software License, Version 2.0
   Guava: Google Core Libraries for Java under The Apache Software License, Version 2.0
   Hamcrest All under New BSD License
   Hamcrest Core under New BSD License
   Hamcrest library under New BSD License
+  HdrHistogram under Public Domain, per Creative Commons CC0
+  HPPC Collections under The Apache Software License, Version 2.0
   Jackson-annotations under The Apache Software License, Version 2.0
   Jackson-core under The Apache Software License, Version 2.0
   jackson-databind under The Apache Software License, Version 2.0
+  Jackson-dataformat-CBOR under The Apache Software License, Version 2.0
+  Jackson-dataformat-Smile under The Apache Software License, Version 2.0
+  Jackson-dataformat-YAML under The Apache Software License, Version 2.0
   javax.inject under The Apache Software License, Version 2.0
   JAXB2 Basics - Runtime under BSD-Style License
+  Joda convert under Apache 2
   Joda-Time under Apache 2
   Json Path under The Apache Software License, Version 2.0
   JSON Small and Fast Parser under The Apache Software License, Version 2.0
   JsonPath Assert under The Apache Software License, Version 2.0
+  JSR166e under CC0 1.0 Universal
   JTS Topology Suite under Lesser General Public License (LGPL)
   JUnit under Eclipse Public License 1.0
   Lucene Common Analyzers under Apache 2
@@ -67,7 +74,9 @@ This project further includes:
   Lucene QueryParsers under Apache 2
   Lucene Sandbox under Apache 2
   Lucene Spatial under Apache 2
+  Lucene Spatial 3D under Apache 2
   Lucene Suggest under Apache 2
+  Netty under Apache License, Version 2.0
   OGC CSW 2.0.2 under BSD-Style License
   OGC Filter 1.1.0 under BSD-Style License
   OGC GML 3.1.1 under BSD-Style License
@@ -85,6 +94,7 @@ This project further includes:
   Spring Expression Language (SpEL) under The Apache Software License, Version 2.0
   Spring Web under The Apache Software License, Version 2.0
   StAX API under The Apache Software License, Version 2.0
+  T-Digest under The Apache Software License, Version 2.0
   W3C XLink 1.0 under BSD-Style License
   YAML API under Apache License, Version 2.0
   Youngs under The Apache Software License, Version 2.0
