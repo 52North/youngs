@@ -57,16 +57,14 @@ mappings:
         isoqueryable: false
         properties:
             store: *STOREDEFAULT
-            index_name: title
             boost: 10
             #copy_to: autocomplete_field
             term_vector: "yes"
-    lang:
+    language:
         xpath: "//gmi:MI_Metadata/gmd:language"
         isoqueryable: true
         isoqueryableName: language
         properties:
-            index_name: language
             index: "not_analyzed"
             null_value: "N/A"
     date:
@@ -85,7 +83,6 @@ mappings:
             type: string
             store: *STOREDEFAULT
             index: "no"
-            index_name: xmldoc
     loc:
         xpath: "."
         location: true

@@ -70,7 +70,7 @@ public class CswMappingTest {
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 
-        assertThat("Mapped record contains xmldoc field name", mappedRecordString, containsString("xmldoc"));
+        assertThat("Mapped record contains xml field name", mappedRecordString, containsString("raw_xml"));
         assertThat("Mapped record contains xml snippets", mappedRecordString,
                 allOf(containsString("<dc:type>http://purl.org/dc/dcmitype/Service</dc:type>"),
                         containsString("tifier>urn:uuid:1ef3"),
@@ -83,9 +83,9 @@ public class CswMappingTest {
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 
-        assertThat("Mapped record contains xmldoc field name", mappedRecordString, containsString("bbox_xmldoc"));
+        assertThat("Mapped record contains xmldoc field name", mappedRecordString, containsString("raw_bbox"));
         assertThat("Mapped record contains xml snippets", mappedRecordString,
-                JsonMatchers.hasJsonPath("bbox_xmldoc",
+                JsonMatchers.hasJsonPath("raw_bbox",
                         allOf(containsString("<ows:BoundingBox xmlns:"),
                                 containsString("<ows:LowerCorner>60.042 13.754</ows:LowerCorner>"),
                                 not(containsString("csw:Record")),

@@ -27,7 +27,7 @@ This project further includes:
   AOP alliance under Public Domain
   Apache Commons CLI under Apache License, Version 2.0
   Apache Commons Codec under The Apache Software License, Version 2.0
-  Apache Commons Compress under The Apache Software License, Version 2.0
+  Apache Commons Compress under Apache License, Version 2.0
   Apache Commons Logging under The Apache Software License, Version 2.0
   Apache HttpClient under Apache License, Version 2.0
   Apache HttpClient Fluent API under Apache License, Version 2.0
@@ -37,7 +37,6 @@ This project further includes:
   Apache Log4j SLF4J Binding under The Apache Software License, Version 2.0
   ASM Core under BSD
   ASM helper Minidev under The Apache Software License, Version 2.0
-  ClassLoader leak prevention under Apache 2
   Commons IO under The Apache Software License, Version 2.0
   Compress-LZF under Apache License 2.0
   Elasticsearch: Core under The Apache Software License, Version 2.0
@@ -82,7 +81,6 @@ This project further includes:
   OGC GML 3.1.1 under BSD-Style License
   OGC OWS 1.0.0 under BSD-Style License
   Saxon-HE under Mozilla Public License Version 2.0
-  servlet-api under CDDL 1.1 or GPL2 w/ CPE
   SLF4J API Module under MIT License
   SLF4J Simple Binding under MIT License
   SnakeYAML under Apache License Version 2.0

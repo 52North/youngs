@@ -172,7 +172,7 @@ mappings:
             type: date
     # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-geo-shape-type.html#_envelope
     # FIXME this _probably_ does not support bounding boxes crossing the date line
-    bbox:
+    location:
         xpath: "//gmd:extent/gmd:EX_Extent/gmd:geographicElement"
         coordinates:
             points:
@@ -186,8 +186,6 @@ mappings:
                     lon: "normalize-space(//gmd:EX_GeographicBoundingBox/gmd:eastBoundLongitude/gco:Decimal/text())"
         coordinates_type: envelope
         properties:
-            store: yes
-            index_name: location
             type: geo_shape
             tree: quadtree
             precision: 1m

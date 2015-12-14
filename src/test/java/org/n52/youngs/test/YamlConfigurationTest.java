@@ -31,6 +31,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathFactoryConfigurationException;
+import org.hamcrest.CoreMatchers;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -66,7 +67,7 @@ public class YamlConfigurationTest {
     @Test
     public void entryByName() throws IOException {
         assertThat("name is correct", config.getEntry("title").getFieldName(), is(equalTo("title")));
-        assertThat("name is correct", config.getEntry("title").getIndexProperties().size(), is(equalTo(5)));
+        assertThat("name is correct", config.getEntry("title").getIndexProperties().size(), is(equalTo(4)));
     }
 
     @Test
@@ -81,7 +82,7 @@ public class YamlConfigurationTest {
         assertThat("one raw field is found", config.getEntries().stream().filter(e -> e.isRawXml()).count(), is(1l));
 
         MappingEntry rawEntry = config.getEntries().stream().filter(e -> e.isRawXml()).findFirst().get();
-        assertThat("one raw field is found", rawEntry.getFieldName(), is("xmldoc"));
+        assertThat("one raw field is found", rawEntry.getFieldName(), is("raw_xml"));
     }
 
     @Test
@@ -91,7 +92,7 @@ public class YamlConfigurationTest {
 
         List<MappingEntry> notAnalyzedEntries = config.getEntries().stream().filter(e -> !e.isAnalyzed()).collect(Collectors.toList());
         assertThat("raw_xml field is found", notAnalyzedEntries.stream()
-                .filter(e -> e.getFieldName().equals("xmldoc")).count(), is(1l));
+                .filter(e -> e.getFieldName().equals("raw_xml")).count(), is(1l));
         assertThat("language field is found", notAnalyzedEntries.stream()
                 .filter(e -> e.getFieldName().equals("language")).count(), is(1l));
     }
@@ -99,12 +100,12 @@ public class YamlConfigurationTest {
     @Test
     public void testDefaultAnalyzed() throws Exception {
         Collection<MappingEntry> entries = config.getEntries();
-        Iterator<MappingEntry> iter = entries.iterator();
-        assertThat("date entry index type", iter.next().isAnalyzed(), is(equalTo(true)));
-        assertThat("id entry index type", iter.next().isAnalyzed(), is(equalTo(true)));
-        assertThat("language index field type", iter.next().isAnalyzed(), is(equalTo(false)));
-        assertThat("title entry index type", iter.next().isAnalyzed(), is(equalTo(true)));
-        assertThat("xtitle entry index type", iter.next().isAnalyzed(), is(equalTo(true)));
+
+        List<String> notAnalyzedFields = entries.stream().filter(e -> {
+            return !e.isAnalyzed();
+        }).map(MappingEntry::getFieldName).collect(Collectors.toList());
+        assertThat(notAnalyzedFields.size(), is(2));
+        assertThat(notAnalyzedFields, CoreMatchers.hasItems("raw_xml", "language"));
     }
 
     @Test
@@ -200,17 +201,6 @@ public class YamlConfigurationTest {
     }
 
     @Test
-    public void testEntriesFieldname() throws IOException, XPathExpressionException {
-        Collection<MappingEntry> entries = config.getEntries();
-        Iterator<MappingEntry> iter = entries.iterator();
-        assertThat("first entry fieldname", iter.next().getFieldName(), is(equalTo("date")));
-        assertThat("second entry fieldname", iter.next().getFieldName(), is(equalTo("id")));
-        assertThat("third entry fieldname", iter.next().getFieldName(), is(equalTo("language")));
-        assertThat("fourth entry fieldname", iter.next().getFieldName(), is(equalTo("loc")));
-        assertThat("fourth entry fieldname", iter.next().getFieldName(), is(equalTo("title")));
-    }
-
-    @Test
     public void testEntriesIdentifier() throws IOException, XPathExpressionException {
         Collection<MappingEntry> entries = config.getEntries();
         Iterator<MappingEntry> iter = entries.iterator();
@@ -247,7 +237,7 @@ public class YamlConfigurationTest {
         iter.next();
         MappingEntry second = iter.next();
         Map<String, Object> props = second.getIndexProperties();
-        assertThat("id entry index properties size", props.size(), is(equalTo(5)));
+        assertThat("id entry index properties size", props.size(), is(equalTo(4)));
         assertThat("id entry property type", props.get("type"), is(equalTo("string")));
         assertThat("id entry property type", props.get("store"), is(equalTo(true)));
         assertThat("id entry property type", props.get("index"), is(equalTo("analyzed")));
@@ -326,10 +316,8 @@ public class YamlConfigurationTest {
     public void testEnvelope() throws Exception {
         YamlMappingConfiguration m = new YamlMappingConfiguration("mappings/testmapping-gmd-bbox.yml", helper);
 
-        Iterator<MappingEntry> iter = m.getEntries().iterator();
-        iter.next();
-        iter.next();
-        MappingEntry bbox = iter.next();
+        MappingEntry bbox = m.getEntries().stream()
+                .filter(e -> e.getFieldName().equals("location")).findFirst().get();
         assertThat("has coords", bbox.hasCoordinates(), is(true));
         assertThat("has coords", bbox.hasCoordinatesType(), is(true));
         assertThat("envelope field name", bbox.getFieldName(), is("location"));
