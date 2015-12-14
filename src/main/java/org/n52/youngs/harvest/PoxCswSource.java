@@ -24,7 +24,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.math.BigInteger;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
@@ -76,7 +75,7 @@ public class PoxCswSource extends CswSource {
     @Override
     public Collection<SourceRecord> getRecords(long startPosition, long maxRecords, Report report) {
         log.debug("Requesting {} records from catalog starting at {}", maxRecords, startPosition);
-        Collection<SourceRecord> records = org.elasticsearch.common.collect.Lists.newArrayList();
+        Collection<SourceRecord> records = Lists.newArrayList();
 
         HttpEntity entity = createRequest(startPosition, maxRecords);
 

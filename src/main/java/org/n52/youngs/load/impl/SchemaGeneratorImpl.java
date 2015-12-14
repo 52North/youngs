@@ -17,14 +17,9 @@
 package org.n52.youngs.load.impl;
 
 import com.google.common.collect.Maps;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
-import static javax.management.Query.value;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
-import org.n52.youngs.exception.SinkError;
 import org.n52.youngs.load.SchemaGenerator;
 import org.n52.youngs.transform.MappingConfiguration;
 import org.n52.youngs.transform.MappingEntry;
