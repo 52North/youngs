@@ -60,6 +60,8 @@ import org.n52.youngs.transform.impl.YamlMappingConfiguration;
 /**
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
+ * 
+ * TODO: Fix this, it is platform-dependent!
  */
 public class DirectorySourceTest {
 
