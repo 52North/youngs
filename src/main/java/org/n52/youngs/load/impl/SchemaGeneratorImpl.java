@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2015 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2016 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,6 @@ package org.n52.youngs.load.impl;
 import com.google.common.collect.Maps;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.n52.youngs.load.SchemaGenerator;
 import org.n52.youngs.transform.MappingConfiguration;
 import org.n52.youngs.transform.MappingEntry;
@@ -46,9 +45,9 @@ public class SchemaGeneratorImpl implements SchemaGenerator {
         Map<String, Object> fields = Maps.newHashMap();
         mapping.getEntries().forEach((MappingEntry entry) -> {
             Map<String, Object> properties = Maps.newHashMap();
-            for (Entry<String, Object> entryProps : entry.getIndexProperties().entrySet()) {
+            entry.getIndexProperties().entrySet().stream().forEach((entryProps) -> {
                 properties.put(entryProps.getKey(), entryProps.getValue());
-            }
+            });
             fields.put(entry.getFieldName(), properties);
         });
         schema.put("properties", fields);

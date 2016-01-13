@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2015 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2016 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,6 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -101,6 +100,7 @@ public abstract class ElasticsearchSink implements Sink {
             }
 
             try {
+                log.trace("Sending record to sink...");
                 IndexResponse response = request.execute().actionGet();
                 log.trace("Created [{}] with id {} @ {}/{}, version {}", response.isCreated(),
                         response.getId(), response.getIndex(), response.getType(), response.getVersion());

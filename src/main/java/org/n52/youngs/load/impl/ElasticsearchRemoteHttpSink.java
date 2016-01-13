@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2015 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2016 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,12 +16,16 @@
  */
 package org.n52.youngs.load.impl;
 
+import com.google.common.io.Files;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.node.Node;
+import org.elasticsearch.node.NodeBuilder;
+import org.n52.youngs.exception.SinkError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,28 +35,57 @@ import org.slf4j.LoggerFactory;
  */
 public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
 
+    public static enum Mode {
+
+        NODE, TRANSPORT;
+    }
+
     private static final Logger log = LoggerFactory.getLogger(ElasticsearchRemoteHttpSink.class);
 
     private final String host;
 
     private final int port;
 
-    private final TransportClient client;
+    private final Client client;
 
     public ElasticsearchRemoteHttpSink(String host, int port, String cluster, String index, String type) {
+        this(host, port, cluster, index, type, Mode.TRANSPORT);
+    }
+
+    public ElasticsearchRemoteHttpSink(String host, int port, String cluster, String index, String type,
+            Mode mode) {
         super(cluster, index, type);
         this.host = host;
         this.port = port;
 
-        Settings settings = Settings.settingsBuilder()
-                .put("cluster.name", getCluster()).build();
+        Settings.Builder settings = Settings.settingsBuilder()
+                .put("cluster.name", getCluster());
+
         try {
-            this.client = TransportClient.builder().settings(settings).build().addTransportAddress(
-                    new InetSocketTransportAddress(InetAddress.getByName(this.host), this.port));
+            switch (mode) {
+                case TRANSPORT:
+                    TransportClient tClient = TransportClient.builder().settings(settings).build();
+                    tClient.addTransportAddress(
+                            new InetSocketTransportAddress(InetAddress.getByName(this.host), this.port));
+                    this.client = tClient;
+                    break;
+                case NODE:
+                    settings.put("http.enabled", false);
+                    settings.put("path.home", Files.createTempDir());
+                    Node node = NodeBuilder.nodeBuilder()
+                            .settings(settings)
+                            .data(false)
+                            .client(true)
+                            .node();
+                    this.client = node.client();
+                    break;
+                default:
+                    throw new SinkError("Unsupported mode %s", mode);
+            }
         } catch (UnknownHostException ex) {
             throw new RuntimeException(ex);
         }
-        log.info("Created new client with settings {}", settings);
+        log.info("Created new client with settings {}:\n{}", settings, client);
     }
 
     @Override
