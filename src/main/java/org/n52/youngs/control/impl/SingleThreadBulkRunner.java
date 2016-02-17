@@ -129,7 +129,7 @@ public class SingleThreadBulkRunner implements Runner {
         final Stopwatch timer = Stopwatch.createStarted();
         long pageStart = startPosition;
         long count = source.getRecordCount();
-        long limit = Math.min(recordsLimit + startPosition, count);
+        final long limit = Math.min(recordsLimit + startPosition, count);
 
         final Stopwatch sourceTimer = Stopwatch.createUnstarted();
         final Stopwatch mappingTimer = Stopwatch.createUnstarted();
@@ -141,7 +141,7 @@ public class SingleThreadBulkRunner implements Runner {
         while (pageStart <= limit) {
             currentBulkTimer.start();
 
-            long recordsLeft = limit - pageStart;
+            long recordsLeft = limit - pageStart + 1;
             long size = Math.min(recordsLeft, bulkSize);
             if (size <= 0) {
                 break;
