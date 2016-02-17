@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2015 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2016 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,12 +56,16 @@ import org.n52.youngs.transform.Mapper;
 import org.n52.youngs.transform.MappingConfiguration;
 import org.n52.youngs.transform.impl.CswToBuilderMapper;
 import org.n52.youngs.transform.impl.YamlMappingConfiguration;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertThat;
 
 /**
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
-public class DirectorySourceTest {
+public class DirectorySourceTestDisabled {
 
     private static Path baseDirectory;
 
