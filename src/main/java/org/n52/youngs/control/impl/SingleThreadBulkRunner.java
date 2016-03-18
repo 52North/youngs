@@ -18,12 +18,14 @@ package org.n52.youngs.control.impl;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.Lists;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.n52.youngs.api.Report;
 import org.n52.youngs.control.Runner;
@@ -169,21 +171,30 @@ public class SingleThreadBulkRunner implements Runner {
                         .collect(Collectors.toList());
                 mappingTimer.stop();
 
-                log.debug("Storing {} mapped records.", mappedRecords.size());
+                log.error("Storing {} mapped records.", mappedRecords.size());
                 if (!testRun) {
                     sinkTimer.start();
-                    mappedRecords.forEach(record -> {
-                        try {
-                            boolean result = sink.store(record);
-                            if (result) {
-                                report.addSuccessfulRecord(record.getId());
-                            } else {
-                                report.addFailedRecord(record.getId(), "see sink log");
+                    int iterations = 50000;
+                    log.error("doing {} iterations of mapping", iterations);
+                    AtomicInteger atom = new AtomicInteger();
+                    for (int i = 0; i < iterations; i++) {
+                        mappedRecords.forEach(record -> {
+                            String oldId = record.getId();
+                            record.setId(record.getId().concat("_"+atom.incrementAndGet()));
+                            try {
+                                boolean result = sink.store(record);
+                                if (result) {
+                                    report.addSuccessfulRecord(record.getId());
+                                } else {
+                                    report.addFailedRecord(record.getId(), "see sink log");
+                                }
+                            } catch (SinkError e) {
+                                report.addFailedRecord(record.toString(), "Problem during mapping: " + e.getMessage());
                             }
-                        } catch (SinkError e) {
-                            report.addFailedRecord(record.toString(), "Problem during mapping: " + e.getMessage());
-                        }
-                    });
+                            record.setId(oldId);
+                        });
+                    }
+
                     sinkTimer.stop();
                 } else {
                     log.info("TESTRUN, created documents are:\n{}", Arrays.toString(mappedRecords.toArray()));

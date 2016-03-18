@@ -28,4 +28,6 @@ public interface SinkRecord extends Record {
 
     abstract String getId();
 
+    void setId(String id);
+
 }

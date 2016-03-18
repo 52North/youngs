@@ -70,6 +70,7 @@ public class CswToBuilderMapper implements Mapper {
 
     private final TransformerFactory tFactory = TransformerFactory.newInstance();
 
+    private int simulIdCount = 0;
     private static final Map<String, String> DEFAULT_OUTPUT_PROPERTIES = ImmutableMap.of(
             OutputKeys.OMIT_XML_DECLARATION, "no",
             OutputKeys.INDENT, "no",

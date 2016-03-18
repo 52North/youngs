@@ -61,4 +61,9 @@ public class BuilderRecord implements SinkRecord {
                 .toString();
     }
 
+    @Override
+    public void setId(String id) {
+        this.id = Optional.of(id);
+    }
+
 }
