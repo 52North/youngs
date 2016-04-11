@@ -84,7 +84,8 @@ public class PoxCswSource extends CswSource {
 
             String response = Request.Post(getEndpoint().toString()).body(entity)
                     .addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_XML.getMimeType())
-                    .execute().returnContent().asString();
+                    .addHeader(HttpHeaders.ACCEPT_CHARSET, Charsets.UTF_8.name())
+                    .execute().returnContent().asString(Charsets.UTF_8);
             log.trace("Response: {}", response);
             JAXBElement<GetRecordsResponseType> jaxb_response = unmarshaller.unmarshal(
                     new StreamSource(new StringReader(response)),
