@@ -11,7 +11,7 @@
     <groupId>org.n52.youngs</groupId>
     <artifactId>main</artifactId>
     <packaging>jar</packaging>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
 
     <name>Youngs</name>
     <description>A mapping platform to load CSW records into Elasticsearch</description>
