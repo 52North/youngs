@@ -205,15 +205,24 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
             boolean isXml = mapNode.path("raw_xml").asBooleanValue(false);
 
             String expression = mapNode.path("xpath").asTextValue();
+
             XPath xPath = newXPath(nsContext);
             try {
                 XPathExpression compiledExpression = xPath.compile(expression);
+
+                XPathExpression condition = null;
+                if (mapNode.has("condition")) {
+                    String conditionString = mapNode.path("condition").asTextValue();
+                    condition = newXPath(nsContext).compile(conditionString);
+                }
+
                 MappingEntryImpl entry = new MappingEntryImpl(id,
                         compiledExpression,
                         indexProperties,
                         isIdentifier,
                         isLocation,
-                        isXml);
+                        isXml,
+                        condition);
                 log.trace("Starting new entry: {}", entry);
 
                 // geo types

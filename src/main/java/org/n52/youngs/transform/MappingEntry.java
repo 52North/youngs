@@ -80,4 +80,8 @@ public interface MappingEntry {
      */
     public boolean isAnalyzed();
 
+    XPathExpression getCondition();
+
+    boolean hasCondition();
+
 }

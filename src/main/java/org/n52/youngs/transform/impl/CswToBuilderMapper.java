@@ -16,31 +16,21 @@
  */
 package org.n52.youngs.transform.impl;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.MoreObjects;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.io.Resources;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -53,10 +43,10 @@ import org.n52.youngs.harvest.NodeSourceRecord;
 import org.n52.youngs.transform.Mapper;
 import org.n52.youngs.transform.MappingConfiguration;
 import org.n52.youngs.transform.MappingEntry;
+import org.n52.youngs.transform.impl.EntryMapper.EvalResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -68,17 +58,13 @@ public class CswToBuilderMapper implements Mapper {
 
     private final MappingConfiguration mapper;
 
-    private final TransformerFactory tFactory = TransformerFactory.newInstance();
-
-    private static final Map<String, String> DEFAULT_OUTPUT_PROPERTIES = ImmutableMap.of(
-            OutputKeys.OMIT_XML_DECLARATION, "no",
-            OutputKeys.INDENT, "no",
-            OutputKeys.ENCODING, Charsets.UTF_8.name());
-
     private Optional<Transformer> stripspaceTransformer = Optional.empty();
+    private Transformer defaultTransformer;
 
     public CswToBuilderMapper(MappingConfiguration mapper) {
         this.mapper = mapper;
+
+        TransformerFactory tFactory = TransformerFactory.newInstance();
 
         try (InputStream is = Resources.getResource("xslt/stripspace.xslt").openStream();) {
             Source xslt = new StreamSource(is);
@@ -86,6 +72,12 @@ public class CswToBuilderMapper implements Mapper {
             log.trace("Will apply stripspace XSLT.");
         } catch (TransformerConfigurationException | IOException e) {
             log.error("Problem loading strip-space XSLT file.", e);
+        }
+
+        try {
+            defaultTransformer = tFactory.newTransformer();
+        } catch (TransformerConfigurationException ex) {
+            log.error("Problem loading deault Transformer.", ex);
         }
     }
 
@@ -213,35 +205,7 @@ public class CswToBuilderMapper implements Mapper {
     }
 
     private void mapEntry(MappingEntry entry, final Node node, XContentBuilder builder) {
-        log.trace("Applying field mapping '{}' to node: {}", entry.getFieldName(), node);
-
-        Optional<EvalResult> result = Optional.empty();
-        // try nodeset first
-        try {
-            Object nodesetResult = entry.getXPath().evaluate(node, XPathConstants.NODESET);
-            result = Optional.ofNullable(handleEvaluationResult(nodesetResult, entry.getFieldName()));
-            if (result.isPresent()) {
-                log.trace("Found nodeset result: {}", result.get());
-            }
-        } catch (XPathExpressionException e) {
-            log.debug("Error selecting field {} as nodeset, could be XPath 2.0 expression... trying evaluation to string."
-                    + " Error was: {}", entry.getFieldName(), e.getMessage());
-            log.trace("Error selecting field {} as nodeset", entry.getFieldName(), e);
-        }
-
-        // try string eval if nodeset did not work
-        if (!result.isPresent()) {
-            try {
-                String stringResult = (String) entry.getXPath().evaluate(node, XPathConstants.STRING);
-                result = Optional.ofNullable(handleEvaluationResult(stringResult, entry.getFieldName()));
-                if (result.isPresent()) {
-                    log.trace("Found string result: {}", result.get());
-                }
-            } catch (XPathExpressionException e) {
-                log.warn("Error selecting field {} as string: {}", entry.getFieldName(), e.getMessage());
-                log.trace("Error selecting field {} as string", entry.getFieldName(), e);
-            }
-        }
+        Optional<EntryMapper.EvalResult> result = new EntryMapper().mapEntry(entry, node);
 
         if (result.isPresent()) {
             EvalResult er = result.get();
@@ -318,107 +282,23 @@ public class CswToBuilderMapper implements Mapper {
 
     private void mapRawEntry(MappingEntry entry, Node node, XContentBuilder builder) {
         try {
-            // handle full xml
-            Node nodesetResult = (Node) entry.getXPath().evaluate(node, XPathConstants.NODE);
-
-            Map<String, String> outputProperties = Maps.newHashMap();
-            outputProperties.putAll(DEFAULT_OUTPUT_PROPERTIES);
-            if (entry.hasOutputProperties()) {
-                outputProperties.putAll(entry.getOutputProperties());
-            }
-            String xmldoc = asString(nodesetResult, outputProperties);
-            log.trace("Storing full XML to field {} starting with {}", entry.getFieldName(),
-                    xmldoc.substring(0, Math.min(xmldoc.length(), 120)));
+            String xmldoc = new EntryMapper(stripspaceTransformer, defaultTransformer).mapRawEntry(entry, node);
             builder.field(entry.getFieldName(), xmldoc);
         } catch (IOException | XPathExpressionException e) {
             log.warn("Error adding field {}: {}", entry.getFieldName(), e);
         }
     }
 
-    private EvalResult handleEvaluationResult(final Object evalutationResult, final String name) {
-        if (evalutationResult instanceof String) {
-            String valueString = (String) evalutationResult;
-            if (!valueString.isEmpty()) {
-                log.trace("Found field {} = {}", name, valueString);
-                return new EvalResult(name, valueString);
-            } else {
-                log.debug("Evaluation returned empty string for entry {}", name);
-            }
-        } else if (evalutationResult instanceof NodeList) {
-            NodeList nodeList = (NodeList) evalutationResult;
-            Optional<Object> value = Optional.empty();
-
-            if (nodeList.getLength() < 1) {
-                log.debug("Evaluation returned no results for entry {}", name);
-            } else {
-                Set<String> contents = Sets.newHashSet();
-                for (int i = 0; i < nodeList.getLength(); i++) {
-                    Node n = nodeList.item(i);
-                    String textContent = n.getTextContent();
-                    if (textContent != null && !textContent.isEmpty()) {
-                        contents.add(textContent);
-                    }
-                }
-
-                log.trace("{} evaluation result(s): {} = {}", contents.size(),
-                        name, Arrays.toString(contents.toArray()));
-
-                if (contents.size() == 1) {
-                    value = Optional.of(contents.iterator().next());
-                    log.trace("Adding field {} = '{}'", name, value.get());
-                }
-                if (contents.size() > 1) {
-                    value = Optional.of(contents.toArray());
-                    log.trace("Adding array field ({} values) {} = {}", contents.size(), name,
-                            Arrays.toString(contents.toArray()));
-                }
-            }
-
-            if (value.isPresent()) {
-                return new EvalResult(name, value.get());
-            } else {
-                log.trace("No result found for field {}", name);
-            }
-        } else {
-            log.debug("Unsupported evalutation result: {}", evalutationResult);
-        }
-
-        return null;
-    }
-
-    private String asString(Node node, Map<String, String> outputProperties) {
-        log.debug("Converting node {} to string using properties {}", node, Arrays.toString(outputProperties.entrySet().toArray()));
-
-        StringWriter sw = new StringWriter();
-        try {
-            Transformer t = null;
-            if (outputProperties.get("indent").equals("no") && stripspaceTransformer.isPresent()) {
-                t = stripspaceTransformer.get();
-                log.trace("Will apply stripspace XSLT.");
-            } else {
-                t = tFactory.newTransformer();
-            }
-
-            for (Map.Entry<String, String> op : outputProperties.entrySet()) {
-                t.setOutputProperty(op.getKey(), op.getValue());
-            }
-
-            t.transform(new DOMSource(node), new StreamResult(sw));
-        } catch (TransformerException e) {
-            log.warn("Problem getting node {} as string", node, e);
-        }
-
-        return sw.toString();
-    }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("mapping", this.mapper)
-                .add("transformerFactory", this.tFactory)
+                .add("defaultTransformer", this.defaultTransformer)
                 .omitNullValues()
                 .toString();
     }
+
 
     private static class IdAndBuilder {
 
@@ -431,28 +311,6 @@ public class CswToBuilderMapper implements Mapper {
             this.id = id;
             this.builder = builder;
         }
-    }
-
-    private static class EvalResult {
-
-        protected final String name;
-
-        protected final Object value;
-
-        public EvalResult(String name, Object value) {
-            this.name = name;
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return MoreObjects.toStringHelper(this)
-                    .add("name", name)
-                    .add("value", value)
-                    .omitNullValues()
-                    .toString();
-        }
-
     }
 
 }

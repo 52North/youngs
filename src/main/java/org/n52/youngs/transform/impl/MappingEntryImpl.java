@@ -52,15 +52,22 @@ public class MappingEntryImpl implements MappingEntry {
     private Optional<String> split = Optional.empty();
 
     private final String fieldName;
+    private XPathExpression condition;
 
     public MappingEntryImpl(String fieldName, XPathExpression xPath, Map<String, Object> indexProperties,
-            boolean identifier, boolean location, boolean rawXml) {
+        boolean identifier, boolean location, boolean rawXml) {
+        this(fieldName, xPath, indexProperties, identifier, location, rawXml, null);
+    }
+
+    public MappingEntryImpl(String fieldName, XPathExpression xPath, Map<String, Object> indexProperties,
+            boolean identifier, boolean location, boolean rawXml, XPathExpression condition) {
         this.fieldName = fieldName;
         this.xPath = xPath;
         this.indexProperties.putAll(indexProperties);
         this.identifier = Optional.of(identifier);
         this.location = Optional.of(location);
         this.raw = Optional.of(rawXml);
+        this.condition = condition;
     }
 
     @Override
@@ -201,4 +208,16 @@ public class MappingEntryImpl implements MappingEntry {
         this.split = Optional.of(split);
         return this;
     }
+
+    @Override
+    public XPathExpression getCondition() {
+        return this.condition;
+    }
+
+    @Override
+    public boolean hasCondition() {
+        return this.condition != null;
+    }
+
+
 }
