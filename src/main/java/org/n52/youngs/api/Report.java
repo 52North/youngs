@@ -16,6 +16,7 @@
  */
 package org.n52.youngs.api;
 
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Map;
 
@@ -25,7 +26,14 @@ import java.util.Map;
  */
 public interface Report {
 
+    /**
+     * @deprecated use @see(#getNumberOfRecordsSuccesful()) instead
+     * @return the number of affected records
+     */
+    @Deprecated
     public int getNumberOfRecordsAdded();
+
+    public int getNumberOfRecordsSuccesful();
 
     public int getNumberOfRecordsFailed();
 
@@ -42,5 +50,7 @@ public interface Report {
     public Map<String, String> getFailedIds();
 
     public void addMessage(String message);
+
+    public Map<LocalTime, String> getMessages();
 
 }

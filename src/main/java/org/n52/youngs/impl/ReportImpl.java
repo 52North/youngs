@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.time.LocalTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import org.n52.youngs.api.Report;
 
@@ -38,6 +39,11 @@ public class ReportImpl implements Report {
 
     @Override
     public int getNumberOfRecordsAdded() {
+        return getNumberOfRecordsSuccesful();
+    }
+
+    @Override
+    public int getNumberOfRecordsSuccesful() {
         return added.size();
     }
 
@@ -73,6 +79,11 @@ public class ReportImpl implements Report {
     @Override
     public void addMessage(String message) {
         this.messages.put(LocalTime.now(), message);
+    }
+
+    @Override
+    public Map<LocalTime, String> getMessages() {
+        return Collections.unmodifiableMap(this.messages);
     }
 
     @Override
