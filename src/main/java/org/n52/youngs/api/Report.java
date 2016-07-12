@@ -19,6 +19,7 @@ package org.n52.youngs.api;
 import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Map;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -52,5 +53,7 @@ public interface Report {
     public void addMessage(String message);
 
     public Map<LocalTime, String> getMessages();
+
+    Map<DateTime, String> getMessagesDateTime();
 
 }

@@ -23,6 +23,7 @@ import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import org.joda.time.DateTime;
 import org.n52.youngs.api.Report;
 
 /**
@@ -35,7 +36,7 @@ public class ReportImpl implements Report {
 
     private final Map<String, String> failed = Maps.newHashMap();
 
-    private final Map<LocalTime, String> messages = Maps.newHashMap();
+    private final Map<DateTime, String> messages = Maps.newHashMap();
 
     @Override
     public int getNumberOfRecordsAdded() {
@@ -78,11 +79,24 @@ public class ReportImpl implements Report {
 
     @Override
     public void addMessage(String message) {
-        this.messages.put(LocalTime.now(), message);
+        this.messages.put(new DateTime(), message);
     }
 
     @Override
     public Map<LocalTime, String> getMessages() {
+        Map<LocalTime, String> result = Maps.newHashMap();
+
+        this.messages.keySet().forEach(dt -> {
+            result.put(LocalTime.of(dt.getHourOfDay(),
+                    dt.getMinuteOfHour(),
+                    dt.getSecondOfMinute(),
+                    dt.getMillisOfSecond()*1000), this.messages.get(dt));
+        });
+
+        return result;
+    }
+
+    public Map<DateTime, String> getMessagesDateTime() {
         return Collections.unmodifiableMap(this.messages);
     }
 
