@@ -15,7 +15,7 @@ The following features are modularized as Java packages, simply prepend ``org.n5
 
 ## The name
 
-[Young's modulus](https://en.wikipedia.org/wiki/Young's_modulus), also called modulus of elasticity, is a "standard" for (simplified) describing the elasticity of solid materials. OGC and ISO standards might be some people actually be described as solid with both positive and negative connotations. In this project we use the name **youngs** simply because it combines the two words "elastic" for the document search engine Elasticsearch with the notion of a common standard, in our case OGC and ISO standards for describing geospatial metadata.
+[Young's modulus](https://en.wikipedia.org/wiki/Young's_modulus), also called modulus of elasticity, is a "standard" for (simplified) describing the elasticity of solid materials. OGC and ISO standards might be described as solid with both positive and negative connotations. In this project we use the name **youngs** simply because it combines the two words "elastic" for the document search engine Elasticsearch with the notion of a common standard, in our case OGC and ISO standards for describing geospatial metadata.
 
 
 ## Build
@@ -70,7 +70,7 @@ index:
     type: testrecord
     settings: |
         index:
-            number_of_shards: 1 
+            number_of_shards: 1
             number_of_replicas: 1
 ```
 
@@ -100,7 +100,7 @@ mappings:
                     "type": "string",
                     "store": "yes",
                     "index": "analyzed",
-                    "boost": 2.0
+                    "boost": 2.0,
                     "index_name": "id"
                 }
             }
@@ -109,7 +109,7 @@ mappings:
 }
 ```
 
-The advantag of a YAML file is that it supports references, e.g. using default values as shown below.
+The advantage of a YAML file is that it supports references, e.g. using default values as shown below.
 
 ```yaml
 defaults:
@@ -129,7 +129,7 @@ mappings:
 
 A special mapping must be used for fields with geospatial data. A ``coordinates`` field with a single field ``points`` is needed. The points field contains an ordered list of latitude and longitude coordinates which form the geometry of the field. The type of the geometry must be given as value of ``coordinates_type``. Currently supported types and the required format for Elasticsearch are as follows:
 
-* [envelope](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-geo-shape-type.html#_envelope)
+* [envelope](https://www.elastic.co/guide/en/elasticsearch/reference/2.2/geo-shape.html#_envelope)
 
 The fields `lat` and `lon` must contain numbers to be correctly encoded, which removes trailing zeros.
 
@@ -216,7 +216,7 @@ typed_keywords": [
 ### General notes
 
 * If an XPath expression yields multiple results, the corresponding field will contain an array.
- 
+
 
 ### Schema creation and insertion
 
@@ -240,6 +240,70 @@ Youngs creates a second type `mt` to hold metadata for when and which mapping wa
 * `curl -XGET 'http://localhost:9200/<indexname>/_mapping/mt'` shows the mapping for the metadata schema
 
 
+### Basic Java example
+
+The following example demonstrates the usage of the youngs
+API.
+
+```java
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Paths;
+import org.n52.youngs.api.Report;
+import org.n52.youngs.control.Runner;
+import org.n52.youngs.control.impl.SingleThreadBulkRunner;
+import org.n52.youngs.harvest.DirectorySource;
+import org.n52.youngs.harvest.Source;
+import org.n52.youngs.impl.XPathHelper;
+import org.n52.youngs.load.impl.ElasticsearchRemoteHttpSink;
+import org.n52.youngs.load.impl.ElasticsearchSink;
+import org.n52.youngs.transform.Mapper;
+import org.n52.youngs.transform.MappingConfiguration;
+import org.n52.youngs.transform.impl.CswToBuilderMapper;
+import org.n52.youngs.transform.impl.YamlMappingConfiguration;
+
+public class YoungsExample {
+
+
+    public static void main(String[] args) throws IOException {
+        String host = "localhost";
+        int port = 9300;
+        String cluster = "elasticsearch";
+        String mappingFile = "/tmp/data-mappings/iso-default.yml";
+        String dataDirectory = "/tmp/data-directory";
+
+        MappingConfiguration mapping = new YamlMappingConfiguration(
+                new FileInputStream(new File(mappingFile)),
+                new XPathHelper());
+        Mapper mapper = new CswToBuilderMapper(mapping);
+
+        boolean transportMode = false;
+        ElasticsearchSink sink = new ElasticsearchRemoteHttpSink(
+                host, port, cluster,
+                mapping.getIndex(),
+                mapping.getType(),
+                transportMode ?
+                        ElasticsearchRemoteHttpSink.Mode.TRANSPORT :
+                        ElasticsearchRemoteHttpSink.Mode.NODE);
+
+        Source source = new DirectorySource(
+                Paths.get(dataDirectory));
+
+        Runner runner = new SingleThreadBulkRunner()
+                .setBulkSize(100)
+                .setRecordsLimit(10000)
+                .harvest(source)
+                .transform(mapper);
+
+        Report report = runner.load(sink);
+        //do something with the report
+    }
+
+}
+
+```
+
 ## Development
 
 See developer documentation file `DEV_README.MD`.
@@ -252,4 +316,5 @@ This project is published under The Apache Software License Version 2.0. For det
 
 ## Contact
 
-* [d.nuest@52north.org](@nuest)
+* [m.rieke@52north.org](@matthesrieke)
+* [daniel.nuest@uni-muenster.de](@nuest)
