@@ -139,6 +139,45 @@ public class MappingEntryTest {
         Assert.assertThat(arr.get(0), CoreMatchers.is("Europe"));
     }
 
+    @Test
+    public void testFullTextConcatenation() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        EntryMapper mapper = new EntryMapper();
+
+        Node node = readNode("/records/gmd/metadata_fulltext.xml");
+
+        XPathFactory xpathFactory = new XPathHelper().newXPathFactory();
+        XPath xPath = xpathFactory.newXPath();
+        Map<String, String> namespaceMap = new HashMap<>();
+
+        namespaceMap.put("gmi", "http://www.isotc211.org/2005/gmi");
+        namespaceMap.put("gmd", "http://www.isotc211.org/2005/gmd");
+        namespaceMap.put("gco", "http://www.isotc211.org/2005/gco");
+        namespaceMap.put("gml", "http://www.opengis.net/gml");
+        namespaceMap.put("gmi", "http://www.eumetsat.int/2008/gmi");
+        namespaceMap.put("apiso", "http://www.opengis.net/cat/csw/apiso/1.0");
+
+
+        NamespaceContextImpl nsContext = new NamespaceContextImpl(namespaceMap);
+        xPath.setNamespaceContext(nsContext);
+
+        MappingEntryImpl entry = new MappingEntryImpl("coverage",
+                xPath.compile("normalize-space(string-join(//text() | //@*[not(starts-with(local-name(), 'xmlns')) and not(starts-with(local-name(), 'schemaLocation'))], ' '))"),
+                Collections.singletonMap("type", "string"),
+                false,
+                false,
+                false,
+                null);
+
+        Optional<EntryMapper.EvalResult> result = mapper.mapEntry(entry, node);
+
+        Assert.assertThat(result.get(), CoreMatchers.notNullValue());
+        Assert.assertThat(result.get().value, CoreMatchers.instanceOf(String.class));
+        String arr = (String) result.get().value;
+        Assert.assertThat(arr, CoreMatchers.containsString("EO:EUM:CM:MULT:SARAH_V001 "));
+        Assert.assertThat(arr, CoreMatchers.containsString(" test-attribute "));
+        Assert.assertThat(arr, CoreMatchers.not(CoreMatchers.containsString("http://www.eumetsat.int/2008/gmi")));
+    }
+
     private Node readNode(String res) throws ParserConfigurationException, SAXException, IOException {
         DocumentBuilderFactory builder = DocumentBuilderFactory.newInstance();
         Document doc = builder.newDocumentBuilder().parse(getClass().getResourceAsStream(res));
