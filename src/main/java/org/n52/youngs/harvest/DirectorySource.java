@@ -19,10 +19,14 @@ package org.n52.youngs.harvest;
 import com.google.common.base.MoreObjects;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -38,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class DirectorySource implements Source {
@@ -134,7 +139,8 @@ public class DirectorySource implements Source {
         log.debug("Reading record from file {}", f);
 
         DocumentBuilder documentBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = documentBuilder.parse(f);
+        Charset cs = Charset.forName("utf-8");
+        Document doc = documentBuilder.parse(new InputSource(new InputStreamReader(new FileInputStream(f), cs)));
 
         Element elem = doc.getDocumentElement();
         elem.normalize();
