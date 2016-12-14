@@ -447,6 +447,47 @@
                                 </eum:MD_EUMFormat>
                             </eum:format>
                         </eum:MD_EUMDigitalTransfer>
+                        <eum:MD_EUMDigitalTransfer>
+                            <eum:availability>
+                                <eum:MD_EUMDigitalTransferOptions>
+                                    <gmd:onLine>
+                                        <gmd:CI_OnlineResource>
+                                            <gmd:linkage>
+                                                <gmd:URL>http://dx.doi.org/10.5676/EUM_SAF_CM/SARAH/V001</gmd:URL>
+                                            </gmd:linkage>
+                                            <gmd:protocol>
+                                                <gco:CharacterString>http</gco:CharacterString>
+                                            </gmd:protocol>
+                                            <gmd:name>
+                                                <gco:CharacterString>CM SAF Archive and FTP</gco:CharacterString>
+                                            </gmd:name>
+                                            <gmd:function>
+                                                <gmd:CI_OnLineFunctionCode codeList="CI_OnLineFunctionCode" codeListValue="order"/>
+                                            </gmd:function>
+                                        </gmd:CI_OnlineResource>
+                                    </gmd:onLine>
+                                    <eum:availability>
+                                        <gco:CharacterString>SAF Archive &amp; FTP</gco:CharacterString>
+                                    </eum:availability>
+                                </eum:MD_EUMDigitalTransferOptions>
+                            </eum:availability>
+                            <eum:format>
+                                <eum:MD_EUMFormat>
+                                    <gmd:name>
+                                        <gco:CharacterString>FTP</gco:CharacterString>
+                                    </gmd:name>
+                                    <gmd:version>
+                                        <gco:CharacterString>-</gco:CharacterString>
+                                    </gmd:version>
+                                    <eum:typicalFilename>
+                                        <gco:CharacterString>DNIdm200506150000002231000101MH.nc</gco:CharacterString>
+                                    </eum:typicalFilename>
+                                    <eum:averageFileSizeUnits>
+                                        <gco:CharacterString>MB</gco:CharacterString>
+                                    </eum:averageFileSizeUnits>
+                                </eum:MD_EUMFormat>
+                            </eum:format>
+                        </eum:MD_EUMDigitalTransfer>
                     </eum:digitalTransfers>
                 </eum:MD_EUMDistributor>
             </gmd:distributor>

@@ -19,6 +19,7 @@ package org.n52.youngs.transform.impl;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -51,6 +52,8 @@ public class MappingEntryImpl implements MappingEntry {
 
     private Optional<String> split = Optional.empty();
 
+    private final List<MappingEntry> children;
+
     private final String fieldName;
     private XPathExpression condition;
 
@@ -61,6 +64,11 @@ public class MappingEntryImpl implements MappingEntry {
 
     public MappingEntryImpl(String fieldName, XPathExpression xPath, Map<String, Object> indexProperties,
             boolean identifier, boolean location, boolean rawXml, XPathExpression condition) {
+        this(fieldName, xPath, indexProperties, identifier, location, rawXml, condition, Collections.emptyList());
+    }
+
+    public MappingEntryImpl(String fieldName, XPathExpression xPath, Map<String, Object> indexProperties,
+            boolean identifier, boolean location, boolean rawXml, XPathExpression condition, List<MappingEntry> children) {
         this.fieldName = fieldName;
         this.xPath = xPath;
         this.indexProperties.putAll(indexProperties);
@@ -68,6 +76,7 @@ public class MappingEntryImpl implements MappingEntry {
         this.location = Optional.of(location);
         this.raw = Optional.of(rawXml);
         this.condition = condition;
+        this.children = children;
     }
 
     @Override
@@ -219,5 +228,9 @@ public class MappingEntryImpl implements MappingEntry {
         return this.condition != null;
     }
 
+    @Override
+    public List<MappingEntry> getChildren() {
+        return children;
+    }
 
 }

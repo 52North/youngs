@@ -21,7 +21,6 @@ import com.google.common.io.Resources;
 import java.io.IOException;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +29,6 @@ import org.n52.youngs.impl.XPathHelper;
 import org.n52.youngs.load.impl.BuilderRecord;
 import org.n52.youngs.transform.impl.CswToBuilderMapper;
 import org.n52.youngs.transform.impl.YamlMappingConfiguration;
-import org.n52.youngs.util.JsonMatchers;
 
 /**
  *

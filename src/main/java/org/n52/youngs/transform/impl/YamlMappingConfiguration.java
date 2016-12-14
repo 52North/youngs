@@ -32,6 +32,7 @@ import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -216,13 +217,16 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
                     condition = newXPath(nsContext).compile(conditionString);
                 }
 
+                List<MappingEntry> children = createChildren(node, expression, nsContext);
+
                 MappingEntryImpl entry = new MappingEntryImpl(id,
                         compiledExpression,
                         indexProperties,
                         isIdentifier,
                         isLocation,
                         isXml,
-                        condition);
+                        condition,
+                        children);
                 log.trace("Starting new entry: {}", entry);
 
                 // geo types
@@ -455,6 +459,22 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
         }
 
         return s.omitNullValues().toString();
+    }
+
+    private List<MappingEntry> createChildren(YamlNode node, String xpath, NamespaceContext nsContext) {
+        if (node.hasNotNull("children")) {
+            final YamlMapNode childrenMap = node.path("children").asMap();
+            Map<YamlNode, YamlNode> children = childrenMap.entries().stream().collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+
+            List<MappingEntry> result = new ArrayList<>(children.size());
+            children.forEach((YamlNode k, YamlNode v) -> {
+                log.trace("Parsing children {} = {}, type: {}", k, v, v.getClass());
+                result.add(createEntry(k.asTextValue(), v, nsContext));
+            });
+
+            return result;
+        }
+        return Collections.emptyList();
     }
 
 }

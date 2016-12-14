@@ -23,7 +23,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -81,7 +83,14 @@ public class EntryMapper {
             }
 
             Object nodesetResult = entry.getXPath().evaluate(node, XPathConstants.NODESET);
-            result = Optional.ofNullable(handleEvaluationResult(nodesetResult, entry.getFieldName()));
+
+            if (entry.getChildren() != null && !entry.getChildren().isEmpty()) {
+                result = mapChildren(nodesetResult, entry);
+            }
+            else {
+                result = Optional.ofNullable(handleEvaluationResult(nodesetResult, entry.getFieldName()));
+            }
+
             if (result.isPresent()) {
                 log.trace("Found nodeset result: {}", result.get());
             }
@@ -115,6 +124,47 @@ public class EntryMapper {
             }
 
             result = Optional.of(er);
+        }
+
+        return result;
+    }
+
+    private Optional<EvalResult> mapChildren(Object nodesetResult, MappingEntry entry) {
+        Optional<EvalResult> result;
+
+        // special case: children --> nested object
+        List<Node> nodes;
+        if (nodesetResult instanceof NodeList) {
+            NodeList tmp = (NodeList) nodesetResult;
+            nodes = new ArrayList<>(tmp.getLength());
+            for (int i = 0; i < tmp.getLength(); i++) {
+                nodes.add(tmp.item(i));
+            }
+        }
+        else if (nodesetResult instanceof Node) {
+            nodes = Collections.singletonList((Node) nodesetResult);
+        }
+        else {
+            log.warn("nodesetResult type {} not supported", nodesetResult.getClass());
+            nodes = Collections.emptyList();
+        }
+
+        //for each parent node, parse the children
+        List<Map<String, Object>> value = nodes.stream()
+                .map(n -> entry.getChildren().stream()
+                    //use the common mapEntry method
+                    .map(me -> mapEntry(me, n).orElse(null))
+                    .filter(me -> me != null)
+                    //but map to a default Map<String, Object>
+                    .collect(Collectors.toMap(EvalResult::getName, EvalResult::getValue)))
+                .collect(Collectors.toList());
+
+        //set singleton not as array result
+        if (value.size() == 1) {
+            result = Optional.of(new EvalResult(entry.getFieldName(), value.get(0)));
+        }
+        else {
+            result = Optional.of(new EvalResult(entry.getFieldName(), value));
         }
 
         return result;
@@ -290,6 +340,14 @@ public class EntryMapper {
         public EvalResult(String name, Object value) {
             this.name = name;
             this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Object getValue() {
+            return value;
         }
 
         @Override

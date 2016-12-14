@@ -16,6 +16,7 @@
  */
 package org.n52.youngs.transform;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.xml.xpath.XPathExpression;
@@ -83,5 +84,9 @@ public interface MappingEntry {
     XPathExpression getCondition();
 
     boolean hasCondition();
+
+    default List<MappingEntry> getChildren() {
+        return Collections.emptyList();
+    };
 
 }
