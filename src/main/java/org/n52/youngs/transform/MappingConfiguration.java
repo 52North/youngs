@@ -17,6 +17,8 @@
 package org.n52.youngs.transform;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 import org.n52.youngs.api.XPathConstants;
 import org.w3c.dom.Document;
 
@@ -81,5 +83,13 @@ public interface MappingConfiguration {
     public boolean hasIndexCreationRequest();
 
     public String getIndexCreationRequest();
+
+    default boolean hasSuggest() {
+        return false;
+    }
+
+    default Map<String, Object> getSuggest() {
+        return Collections.emptyMap();
+    }
 
 }

@@ -50,6 +50,11 @@ public class SchemaGeneratorImpl implements SchemaGenerator {
             });
             fields.put(entry.getFieldName(), properties);
         });
+
+        if (mapping.hasSuggest()) {
+            schema.put("suggest", mapping.getSuggest());
+        }
+
         schema.put("properties", fields);
 
         log.info("Created {} schema with {} fields", mapping.isDynamicMappingEnabled() ? "dynamic" : "", fields.size());

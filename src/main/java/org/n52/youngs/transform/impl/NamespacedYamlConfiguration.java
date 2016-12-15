@@ -34,7 +34,7 @@ public abstract class NamespacedYamlConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(NamespacedYamlConfiguration.class);
 
-    protected NamespaceContext parseNamespaceContext(YamlNode configurationNodes) {
+    protected final NamespaceContext parseNamespaceContext(YamlNode configurationNodes) {
         if (configurationNodes.hasNotNull("namespaces")) {
             Map<String, String> nsMap = Maps.newHashMap();
             final YamlMapNode valueMap = configurationNodes.path("namespaces").asMap();

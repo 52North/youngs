@@ -18,6 +18,7 @@ package org.n52.youngs.test;
 
 import java.io.IOException;
 import java.util.Map;
+import org.hamcrest.CoreMatchers;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
@@ -58,6 +59,16 @@ public class SchemaGeneratorTest {
 
 //        assertThat("contains dynamic field false", generatedRequest,
 //                hasJsonPath("mappings.record.dynamic", is(false)));
+    }
+
+    @Test
+    public void testSuggestMapping() throws IOException {
+        YamlMappingConfiguration config = new YamlMappingConfiguration("mappings/testmapping-suggest.yml", new XPathHelper());
+
+        SchemaGenerator generator = new SchemaGeneratorImpl();
+        Map<String, Object> generatedRequest = generator.generate(config);
+
+        assertThat(generatedRequest.get("suggest"), CoreMatchers.notNullValue());
     }
 
 }

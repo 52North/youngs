@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -89,6 +90,7 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
     private String identifierField;
 
     private Optional<String> locationField = Optional.empty();
+    private Map<String, Object> suggest;
 
     public YamlMappingConfiguration(String fileName, XPathHelper xpathHelper) throws IOException {
         this(Resources.asByteSource(Resources.getResource(fileName)).openStream(), xpathHelper);
@@ -191,6 +193,25 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
             Collections.sort(entries, (me1, me2) -> {
                 return me1.getFieldName().compareTo(me2.getFieldName());
             });
+        }
+
+        if (configurationNodes.hasNotNull("suggest")) {
+            YamlMapNode suggestNode = configurationNodes.path("suggest").asMap();
+            this.suggest = Maps.newHashMap();
+            for (Entry<YamlNode, YamlNode> entry : suggestNode.entries()) {
+                Object val;
+                YamlNode tmp = entry.getValue();
+                if (tmp.isText()) {
+                    val = tmp.asTextValue();
+                }
+                else if (tmp.isBoolean()) {
+                    val = tmp.asBooleanValue();
+                }
+                else {
+                    continue;
+                }
+                this.suggest.put(entry.getKey().asTextValue(), val);
+            }
         }
     }
 
@@ -475,6 +496,16 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
             return result;
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public boolean hasSuggest() {
+        return this.suggest != null && !this.suggest.isEmpty();
+    }
+
+    @Override
+    public Map<String, Object> getSuggest() {
+        return this.suggest;
     }
 
 }

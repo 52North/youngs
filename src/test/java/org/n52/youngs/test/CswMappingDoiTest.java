@@ -59,12 +59,12 @@ public class CswMappingDoiTest {
         String mappedRecordString = mappedRecord.getBuilder().string();
 
         JsonNode parent = new ObjectMapper().readTree(mappedRecordString);
-        
+
         Assert.assertThat(parent.has("doi"), CoreMatchers.is(true));
         JsonNode json = parent.get("doi");
         Assert.assertThat(json.has("url"), CoreMatchers.is(true));
         Assert.assertThat(json.get("url").asText(), CoreMatchers.equalTo("http://dx.doi.org/10.5676/EUM_SAF_CM/SARAH/V001"));
-        
+
         Assert.assertThat(json.has("identifier"), CoreMatchers.is(true));
         Assert.assertThat(json.get("identifier").asText(), CoreMatchers.equalTo("10.5676/EUM_SAF_CM/SARAH/V001"));
     }
