@@ -20,12 +20,17 @@ import com.google.common.base.MoreObjects;
 import com.google.common.io.Resources;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -134,9 +139,23 @@ public class CswToBuilderMapper implements Mapper {
         }
 
         // handle non-geo entries
-        entries.stream().filter(e -> !e.hasCoordinates() && !e.isRawXml()).forEach(entry -> {
-            mapEntry(entry, node, builder);
-        });
+        List<EvalResult> mappedEntries = entries.stream().filter(e -> !e.hasCoordinates() && !e.isRawXml())
+                .map(entry -> mapEntry(entry, node, builder))
+                .filter(entry -> entry.isPresent())
+                .map(entry -> entry.get())
+                .collect(Collectors.toList());
+
+        mappedEntries.stream()
+                .forEach(er -> {
+                    try {
+                        Object value = er.value;
+                        builder.field(er.name);
+                        builder.value(value);
+                        log.debug("Added field: {} = {}", er.name, (value instanceof Object[]) ? Arrays.toString((Object[]) value) : value);
+                    } catch (IOException e) {
+                        log.warn("Error adding field {}: {}", er.name, e);
+                    }
+                });
 
         // handle geo types
         entries.stream().filter(e -> e.hasCoordinates() && !e.isRawXml()).forEach(entry -> {
@@ -147,6 +166,10 @@ public class CswToBuilderMapper implements Mapper {
         entries.stream().filter(e -> e.isRawXml()).forEach(entry -> {
             mapRawEntry(entry, node, builder);
         });
+
+        if (mapper.hasSuggest()) {
+            handleSuggest(builder, mapper.getSuggest(), mappedEntries);
+        }
 
         builder.endObject();
         builder.close();
@@ -203,20 +226,10 @@ public class CswToBuilderMapper implements Mapper {
         }
     }
 
-    private void mapEntry(MappingEntry entry, final Node node, XContentBuilder builder) {
+    private Optional<EvalResult> mapEntry(MappingEntry entry, final Node node, XContentBuilder builder) {
         Optional<EntryMapper.EvalResult> result = new EntryMapper().mapEntry(entry, node);
 
-        if (result.isPresent()) {
-            EvalResult er = result.get();
-
-            try {
-                Object value = er.value;
-                builder.field(er.name, value);
-                log.debug("Added field: {} = {}", er.name, (value instanceof Object[]) ? Arrays.toString((Object[]) value) : value);
-            } catch (IOException e) {
-                log.warn("Error adding field {}: {}", entry.getFieldName(), e);
-            }
-        }
+        return result;
     }
 
     private void mapRawEntry(MappingEntry entry, Node node, XContentBuilder builder) {
@@ -238,6 +251,76 @@ public class CswToBuilderMapper implements Mapper {
                 .toString();
     }
 
+    private void handleSuggest(XContentBuilder builder, Map<String, Object> suggestDef, List<EvalResult> mappingEntries) throws IOException {
+        Map<String, Object> suggest = (Map<String, Object>) suggestDef.get("mappingConfiguration");
+        List<String> inputs = new ArrayList<>();
+
+        Boolean singleWords = extractValue(suggest, "input_as_single_words", true);
+        String splitSep = extractValue(suggest, "split", " ");
+        Boolean fullOutput = extractValue(suggest, "full_output", true);
+        List<String> inputExlucdes = extractValue(suggest, "input_exlucdes", Collections.emptyList());
+        List<String> inputRemoves = extractValue(suggest, "input_remove", Collections.emptyList());
+        Integer weight = extractValue(suggest, "weight", 1);
+        List<String> entries = extractValue(suggest, "entries", Collections.emptyList());
+
+        List<Map<String, Object>> suggestEntries = entries.stream()
+                .map(fieldName -> {
+                    Optional<Object> fieldValue = mappingEntries.stream()
+                            .filter(me -> fieldName.equals(me.getName()))
+                            .map(me -> me.getValue())
+                            .findFirst();
+
+                    if (!fieldValue.isPresent() || !(fieldValue.get() instanceof String)) {
+                        return null;
+                    }
+
+                    String[] fieldArray = fieldValue.get().toString().split(splitSep);
+                    List<String> inputList = Arrays.asList(fieldArray).stream()
+                            .filter(s -> {
+                                return inputExlucdes.stream().noneMatch((ex) -> (s.equalsIgnoreCase(ex) || s.matches(ex)));
+                            })
+                            .map(s -> {
+                                for (String inputRemove : inputRemoves) {
+                                    s = s.replace(inputRemove, "");
+                                }
+                                return s.trim();
+                            })
+                            .collect(Collectors.toList());
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("inputs", inputList);
+                    map.put("weight", weight);
+                    map.put("output", fieldValue.get());
+                    return map;
+                })
+                .filter(e -> e != null)
+                .collect(Collectors.toList());
+
+        if (suggestEntries.isEmpty()) {
+            return;
+        }
+
+        if (suggestEntries.size() > 1) {
+            builder.startArray("suggest");
+        }
+        else {
+            builder.field("suggest");
+        }
+        for (Map<String, Object> suggestEntry : suggestEntries) {
+            builder.startObject();
+            builder.field("input", suggestEntry.get("inputs"));
+            builder.field("output", suggestEntry.get("output"));
+            builder.field("weight", suggestEntry.get("weight"));
+            builder.endObject();
+        }
+        if (suggestEntries.size() > 1) {
+            builder.endArray();
+        }
+    }
+
+    private <V> V extractValue(Map<String, Object> map, String key, V defaultValue) {
+        V value = (V) map.get(key);
+        return value == null ? defaultValue : value;
+    }
 
     private static class IdAndBuilder {
 

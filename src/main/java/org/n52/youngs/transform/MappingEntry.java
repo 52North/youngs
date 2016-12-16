@@ -89,4 +89,12 @@ public interface MappingEntry {
         return Collections.emptyList();
     };
 
+    default boolean hasSuggest() {
+        return false;
+    }
+
+    default Map<String, Object> getSuggest() {
+        return Collections.emptyMap();
+    }
+
 }

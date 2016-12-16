@@ -18,6 +18,7 @@ package org.n52.youngs.load.impl;
 
 import com.google.common.collect.Maps;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import org.n52.youngs.load.SchemaGenerator;
 import org.n52.youngs.transform.MappingConfiguration;
@@ -52,7 +53,11 @@ public class SchemaGeneratorImpl implements SchemaGenerator {
         });
 
         if (mapping.hasSuggest()) {
-            schema.put("suggest", mapping.getSuggest());
+            Map<String, Object> suggest = new HashMap<>(mapping.getSuggest());
+            if (suggest.containsKey("mappingConfiguration")) {
+                suggest.remove("mappingConfiguration");
+            }
+            fields.put("suggest", suggest);
         }
 
         schema.put("properties", fields);

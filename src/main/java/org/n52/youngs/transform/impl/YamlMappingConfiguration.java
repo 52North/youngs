@@ -43,6 +43,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -199,21 +200,65 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
             YamlMapNode suggestNode = configurationNodes.path("suggest").asMap();
             this.suggest = Maps.newHashMap();
             for (Entry<YamlNode, YamlNode> entry : suggestNode.entries()) {
-                Object val;
                 YamlNode tmp = entry.getValue();
-                if (tmp.isText()) {
-                    val = tmp.asTextValue();
+                Object val = extractObjectValue(tmp);
+                if (val != null) {
+                    this.suggest.put(entry.getKey().asTextValue(), val);
                 }
-                else if (tmp.isBoolean()) {
-                    val = tmp.asBooleanValue();
-                }
-                else {
-                    continue;
-                }
-                this.suggest.put(entry.getKey().asTextValue(), val);
             }
         }
     }
+
+    private Map<String, Object> createSuggestConfiguration(YamlNode node) {
+        if (node.hasNotNull("suggest")) {
+            final YamlMapNode suggestMap = node.path("suggest").asMap();
+            Map<YamlNode, YamlNode> suggestProps = suggestMap.entries().stream().collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+
+            Map<String, Object> result = new HashMap<>(suggestProps.size());
+            suggestProps.forEach((YamlNode k, YamlNode v) -> {
+                Object val = extractObjectValue(v);
+
+                if (val != null) {
+                    result.put(k.asTextValue(), val);
+                }
+            });
+
+            return result;
+        }
+
+        return Collections.emptyMap();
+    }
+
+    private Object extractObjectValue(YamlNode yn) {
+        Object val;
+        if (yn.isText()) {
+            val = yn.asTextValue();
+        }
+        else if (yn.isInt()) {
+            val = yn.intValue();
+        }
+        else if (yn.isBoolean()) {
+            val = yn.booleanValue();
+        }
+        else if (yn.isSequence()) {
+            val = yn.asSequence().stream()
+                    .map(y -> extractObjectValue(y))
+                    .collect(Collectors.toList());
+        }
+        else if (yn.isMap()) {
+            val = yn.asMap().entries().stream()
+                    .collect(Collectors.toMap(e -> {
+                        return extractObjectValue(e.getKey());
+                    }, e -> {
+                        return extractObjectValue(e.getValue());
+                    }));
+        }
+        else {
+            val = null;
+        }
+        return val;
+    }
+
 
     private MappingEntry createEntry(String id, YamlNode node, NamespaceContext nsContext) throws MappingError {
         log.trace("Parsing mapping '{}'", id);

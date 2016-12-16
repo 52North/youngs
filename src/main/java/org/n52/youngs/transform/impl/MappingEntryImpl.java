@@ -56,6 +56,7 @@ public class MappingEntryImpl implements MappingEntry {
 
     private final String fieldName;
     private XPathExpression condition;
+    private final Map<String, Object> suggest;
 
     public MappingEntryImpl(String fieldName, XPathExpression xPath, Map<String, Object> indexProperties,
         boolean identifier, boolean location, boolean rawXml) {
@@ -69,6 +70,12 @@ public class MappingEntryImpl implements MappingEntry {
 
     public MappingEntryImpl(String fieldName, XPathExpression xPath, Map<String, Object> indexProperties,
             boolean identifier, boolean location, boolean rawXml, XPathExpression condition, List<MappingEntry> children) {
+        this(fieldName, xPath, indexProperties, identifier, location, rawXml, condition, children, null);
+    }
+
+    public MappingEntryImpl(String fieldName, XPathExpression xPath, Map<String, Object> indexProperties,
+            boolean identifier, boolean location, boolean rawXml, XPathExpression condition, List<MappingEntry> children,
+            Map<String, Object> suggest) {
         this.fieldName = fieldName;
         this.xPath = xPath;
         this.indexProperties.putAll(indexProperties);
@@ -77,6 +84,7 @@ public class MappingEntryImpl implements MappingEntry {
         this.raw = Optional.of(rawXml);
         this.condition = condition;
         this.children = children;
+        this.suggest = suggest;
     }
 
     @Override
@@ -231,6 +239,16 @@ public class MappingEntryImpl implements MappingEntry {
     @Override
     public List<MappingEntry> getChildren() {
         return children;
+    }
+
+    @Override
+    public boolean hasSuggest() {
+        return suggest != null && !suggest.isEmpty();
+    }
+
+    @Override
+    public Map<String, Object> getSuggest() {
+        return this.suggest;
     }
 
 }

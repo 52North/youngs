@@ -68,7 +68,16 @@ public class SchemaGeneratorTest {
         SchemaGenerator generator = new SchemaGeneratorImpl();
         Map<String, Object> generatedRequest = generator.generate(config);
 
-        assertThat(generatedRequest.get("suggest"), CoreMatchers.notNullValue());
+        assertThat(generatedRequest.get("properties"), CoreMatchers.notNullValue());
+        Map<String, Object> props = (Map<String, Object>) generatedRequest.get("properties");
+        assertThat(props.get("suggest"), CoreMatchers.notNullValue());
+        Map<String, Object> suggest = (Map<String, Object>) props.get("suggest");
+
+        assertThat(suggest.containsKey("mappingConfiguration"), CoreMatchers.is(false));
+        assertThat(suggest.get("type"), CoreMatchers.equalTo("completion"));
+        assertThat(suggest.get("analyzer"), CoreMatchers.equalTo("simple"));
+        assertThat(suggest.get("search_analyzer"), CoreMatchers.equalTo("simple"));
+        assertThat(suggest.get("payloads"), CoreMatchers.equalTo(false));
     }
 
 }
