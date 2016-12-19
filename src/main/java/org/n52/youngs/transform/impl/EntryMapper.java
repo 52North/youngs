@@ -164,6 +164,9 @@ public class EntryMapper {
         if (value.size() == 1) {
             result = Optional.of(new EvalResult(entry.getFieldName(), value.get(0)));
         }
+        else if (value.isEmpty()) {
+            return Optional.empty();
+        }
         else {
             result = Optional.of(new EvalResult(entry.getFieldName(), value));
         }
