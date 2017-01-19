@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,8 @@
  */
 package org.n52.youngs.test;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Map;
 import org.hamcrest.CoreMatchers;
@@ -33,7 +35,7 @@ import org.n52.youngs.transform.impl.YamlMappingConfiguration;
  */
 public class SchemaGeneratorTest {
 
-    @Test
+//    @Test
     public void generateSchema() throws IOException {
         YamlMappingConfiguration config = new YamlMappingConfiguration("mappings/testmapping.yml", new XPathHelper());
 
@@ -47,7 +49,7 @@ public class SchemaGeneratorTest {
 //                hasJsonPath("mappings.record.dynamic", is(false)));
     }
 
-    @Test
+//    @Test
     public void generateSchemaDisabledAndDynamic() throws IOException {
         YamlMappingConfiguration config = new YamlMappingConfiguration("mappings/testmapping-creation-disabled-but-dynamic.yml", new XPathHelper());
 
@@ -61,7 +63,7 @@ public class SchemaGeneratorTest {
 //                hasJsonPath("mappings.record.dynamic", is(false)));
     }
 
-    @Test
+//    @Test
     public void testSuggestMapping() throws IOException {
         YamlMappingConfiguration config = new YamlMappingConfiguration("mappings/testmapping-suggest.yml", new XPathHelper());
 
@@ -80,4 +82,22 @@ public class SchemaGeneratorTest {
         assertThat(suggest.get("payloads"), CoreMatchers.equalTo(false));
     }
 
+    @Test
+    public void testNgramAnalyzerMapping() throws IOException {
+        YamlMappingConfiguration config = new YamlMappingConfiguration("mappings/testmapping-ngram.yml", new XPathHelper());
+
+        SchemaGenerator generator = new SchemaGeneratorImpl();
+        Map<String, Object> generatedRequest = generator.generate(config);
+        String jsonRequest = new ObjectMapper().writeValueAsString(generatedRequest);
+
+
+        assertThat(generatedRequest.get("properties"), CoreMatchers.notNullValue());
+        Map<String, Object> props = (Map<String, Object>) generatedRequest.get("properties");
+
+        assertThat(props.get("datasetTitle"), CoreMatchers.notNullValue());
+        Map<String, Object> dataset = (Map<String, Object>) props.get("datasetTitle");
+
+        assertThat(dataset.get("analyzer"), CoreMatchers.equalTo("suggest_autocomplete"));
+        assertThat(dataset.get("search_analyzer"), CoreMatchers.equalTo("standard"));
+    }
 }
