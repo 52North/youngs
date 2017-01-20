@@ -1,0 +1,53 @@
+---
+# http://navigator.eumetsat.int/soapServices/CSWStartup?service=CSW&request=GetCapabilities
+name: "GMI Record Mapping"
+version: 1
+xpathversion: 2.0
+applicability_xpath: "boolean(//*[local-name()='MI_Metadata']) and boolean(namespace-uri(//*[local-name()='MI_Metadata']) = 'http://www.isotc211.org/2005/gmi')"
+namespaces:
+    gmi: http://www.isotc211.org/2005/gmi
+    gmd: http://www.isotc211.org/2005/gmd
+    gco: http://www.isotc211.org/2005/gco
+    gml: http://www.opengis.net/gml
+    eum: http://www.eumetsat.int/2008/gmi
+    apiso: http://www.opengis.net/cat/csw/apiso/1.0
+index:
+    create: true
+    name: csw
+    type: record
+    settings: |
+        analysis:
+            filter:
+                autocomplete_filter:
+                    type: edge_ngram
+                    min_gram: 1
+                    max_gram: 20
+            analyzer:
+                suggest_autocomplete:
+                    type: custom
+                    tokenizer: standard
+                    filter:
+                        - lowercase
+                        - autocomplete_filter
+mappings:
+    ######################
+    # metadata information
+    id:
+        xpath: "gmd:fileIdentifier/*/text()"
+        alias: [ "apiso:Identifier", "apiso:ResourceIdentifier", fileIdentifier, Identifier, identifier, resourceIdentifier ]
+        identifier: true
+        properties:
+            store: yes
+            type: string
+            #boost: 20.0
+            include_in_all: false
+            index: not_analyzed
+    datasetTitle:
+        xpath: "/*/gmd:identificationInfo/*/gmd:citation/*/gmd:title/*/text()"
+        alias: [ "apiso:Title", title ]
+        properties:
+            store: yes
+            type: string
+            include_in_all: true
+            analyzer: suggest_autocomplete
+            search_analyzer: standard
