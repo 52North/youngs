@@ -209,7 +209,7 @@ public class EntryMapper {
         for (Map.Entry<String, String> replacement : replacements.entrySet()) {
             out = out.replace(replacement.getKey(), replacement.getValue());
         }
-        return out;
+        return out.trim();
     }
 
     private EvalResult handleSplit(MappingEntry entry, EvalResult er) {
