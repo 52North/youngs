@@ -11,7 +11,7 @@
     <groupId>org.n52.youngs</groupId>
     <artifactId>main</artifactId>
     <packaging>jar</packaging>
-    <version>1.3.0</version>
+    <version>1.4.0-SNAPSHOT</version>
 
     <name>Youngs</name>
     <description>A mapping platform to load CSW records into Elasticsearch</description>
@@ -54,7 +54,7 @@
         <url>https://github.com/52North/youngs</url>
         <connection>scm:git:https://github.com/52North/youngs.git</connection>
         <developerConnection>scm:git:https://github.com/52North/youngs.git</developerConnection>
-        <tag>v1.3.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
