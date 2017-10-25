@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import javax.xml.namespace.NamespaceContext;
@@ -405,6 +406,46 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
                     value = Optional.of(v.asDoubleValue());
                 } else if (v instanceof YamlIntegralNode) {
                     value = Optional.of(v.asLongValue());
+                }
+                else {
+                    // multi fields (e.g. for sorting _and_ analyzing)
+                    if (k.isText() && k.asTextValue().equals("fields")) {
+                        Map<String, Object> subFields = new HashMap<>();
+                        YamlNode fieldsNode = v;
+                        if (v.isMap()) {
+                            YamlMapNode fieldsNodeMap = v.asMap();
+
+                            // walk through each entry in the fields
+                            fieldsNodeMap.entries().stream()
+                                .forEach((Entry<YamlNode, YamlNode> fieldNode) -> {
+                                    String subFieldName = fieldNode.getKey().asTextValue();
+                                    if (fieldNode.getValue().isMap()) {
+                                        YamlMapNode subFieldValues = fieldNode.getValue().asMap();
+                                        // add the string values of the subField
+                                        Map<String, String> subFieldProperties = new HashMap<>();
+                                        subFieldValues.entries().stream()
+                                                .filter((Entry<YamlNode, YamlNode> fieldNodeProperties) -> {
+                                                    String propertyKey = fieldNodeProperties.getKey().asTextValue();
+                                                    if ("type".equals(propertyKey) || "index".equals(propertyKey)) {
+                                                        YamlNode propertyValue = fieldNodeProperties.getValue();
+                                                        if (propertyValue.isText()) {
+                                                            return true;
+                                                        }
+                                                    }
+
+                                                    return false;
+                                                })
+                                                .forEach((Entry<YamlNode, YamlNode> fieldNodeProperties) -> {
+                                                    String propertyKey = fieldNodeProperties.getKey().asTextValue();
+                                                    String propertyValue = fieldNodeProperties.getValue().asTextValue();
+                                                    subFieldProperties.put(propertyKey, propertyValue);
+                                                });
+                                        subFields.put(subFieldName, subFieldProperties);
+                                    }
+                                });
+                            value = Optional.of(subFields);
+                        }
+                    }
                 }
 
                 if (value.isPresent()) {
