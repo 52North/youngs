@@ -45,11 +45,7 @@ public class SchemaGeneratorImpl implements SchemaGenerator {
 
         Map<String, Object> fields = Maps.newHashMap();
         mapping.getEntries().forEach((MappingEntry entry) -> {
-            Map<String, Object> properties = Maps.newHashMap();
-            entry.getIndexProperties().entrySet().stream().forEach((entryProps) -> {
-                properties.put(entryProps.getKey(), entryProps.getValue());
-            });
-            fields.put(entry.getFieldName(), properties);
+            fields.put(entry.getFieldName(), createElasticEntry(entry));
         });
 
         if (mapping.hasSuggest()) {
@@ -65,6 +61,28 @@ public class SchemaGeneratorImpl implements SchemaGenerator {
         log.info("Created {} schema with {} fields", mapping.isDynamicMappingEnabled() ? "dynamic" : "", fields.size());
         log.debug("Created schema with {} first level elements: {}", schema.size(), Arrays.deepToString(schema.entrySet().toArray()));
         return schema;
+    }
+
+    private Map<String, Object> createElasticEntry(MappingEntry entry) {
+        Map<String, Object> properties = Maps.newHashMap();
+
+        entry.getIndexProperties().entrySet().stream().forEach((entryProps) -> {
+            properties.put(entryProps.getKey(), entryProps.getValue());
+        });
+        if (isNested(entry)) {
+            Map<String, Object> childrenMap = new HashMap<>();
+            entry.getChildren().stream()
+                    .forEach(c -> childrenMap.put(c.getFieldName(), createElasticEntry(c)));
+            properties.put("properties", childrenMap);
+        }
+
+        return properties;
+    }
+
+    private boolean isNested(MappingEntry entry) {
+        return entry.getIndexProperties().entrySet().stream()
+                .filter(e -> e.getKey().equals("type") && e.getValue().equals("nested"))
+                .count() > 0;
     }
 
 }
