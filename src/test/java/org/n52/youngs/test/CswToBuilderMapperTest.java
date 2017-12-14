@@ -24,6 +24,7 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import org.junit.Assert;
 import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
@@ -133,6 +134,18 @@ public class CswToBuilderMapperTest {
                 containsString("full_text"));
         assertThat("Mapped record contains fields that are not covered by mapping", mappedRecordString,
                 allOf(containsString("Physiography"), containsString("molestie lorem")));
+    }
+
+    @Test
+    public void invalidDocumentNotMapped() throws Exception {
+        YamlMappingConfiguration c = new YamlMappingConfiguration(
+                Resources.asByteSource(Resources.getResource("mappings/eum-default.yml")).openStream(),
+                new XPathHelper());
+        CswToBuilderMapper m = new CswToBuilderMapper(c);
+
+        SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/not-valid.xml");
+        BuilderRecord mappedRecord = m.map(record);
+        Assert.assertNull(mappedRecord);
     }
 
     @Test

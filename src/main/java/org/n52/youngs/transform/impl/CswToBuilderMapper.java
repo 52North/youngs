@@ -103,6 +103,10 @@ public class CswToBuilderMapper implements Mapper {
                 NodeSourceRecord object = (NodeSourceRecord) sourceRecord;
                 IdAndBuilder mappedRecord = mapNodeToBuilder(object.getRecord());
 
+                if (mappedRecord == null) {
+                    return null;
+                }
+
                 record = new BuilderRecord(mappedRecord.id, mappedRecord.builder);
                 return record;
             } catch (IOException e) {
@@ -131,8 +135,14 @@ public class CswToBuilderMapper implements Mapper {
             Optional<MappingEntry> idEntry = entries.stream().filter(MappingEntry::isIdentifier).findFirst();
             if (idEntry.isPresent()) {
                 id = idEntry.get().getXPath().evaluate(node);
-                log.trace("Found id for node: {}", id);
+                id = (id == null || id.trim().isEmpty()) ? null : id.trim();
             }
+            if (id == null) {
+                log.warn("No ID present, skipping");
+                return null;
+            }
+
+            log.trace("Found id for node: {}", id);
         } catch (XPathExpressionException e) {
             log.warn("Error selecting id field from node", e);
         }
