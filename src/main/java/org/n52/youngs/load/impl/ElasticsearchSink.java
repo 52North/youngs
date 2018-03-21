@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2018 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -42,6 +43,7 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.joda.time.DateTimeZone;
 import org.n52.iceland.statistics.api.mappings.MetadataDataMapping;
 import org.n52.iceland.statistics.api.parameters.AbstractEsParameter;
@@ -79,7 +81,7 @@ public abstract class ElasticsearchSink implements Sink {
 
     public abstract Client getClient();
 
-    protected String getCluster() {
+    protected final String getCluster() {
         return cluster;
     }
 
@@ -102,10 +104,10 @@ public abstract class ElasticsearchSink implements Sink {
             try {
                 log.trace("Sending record to sink...");
                 IndexResponse response = request.execute().actionGet();
-                log.trace("Created [{}] with id {} @ {}/{}, version {}", response.isCreated(),
+                log.trace("Created [{}] with id {} @ {}/{}, version {}", response.getResult() == DocWriteResponse.Result.CREATED,
                         response.getId(), response.getIndex(), response.getType(), response.getVersion());
 
-                return response.isCreated() || (!response.isCreated() && (response.getVersion() > 1));
+                return response.getResult() == DocWriteResponse.Result.CREATED || (response.getResult() != DocWriteResponse.Result.CREATED && (response.getVersion() > 1));
             } catch (ElasticsearchException e) {
                 log.error("Could not store record {}", builderRecord.getId(), e);
                 return false;
@@ -160,7 +162,7 @@ public abstract class ElasticsearchSink implements Sink {
                 .addMapping(MetadataDataMapping.METADATA_TYPE_NAME, getMetadataSchema())
                 .addMapping(mapping.getType(), schema);
         if (mapping.hasIndexCreationRequest()) {
-            request.setSettings(mapping.getIndexCreationRequest());
+            request.setSettings(mapping.getIndexCreationRequest(), XContentType.YAML);
         }
 
         CreateIndexResponse response = request.get();
@@ -168,9 +170,9 @@ public abstract class ElasticsearchSink implements Sink {
 
         Map<String, Object> mdRecord = createMetadataRecord(mapping.getVersion(), mapping.getName());
         IndexResponse mdResponse = getClient().prepareIndex(indexId, MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID).setSource(mdRecord).get();
-        log.debug("Saved mapping metadata '{}': {}", mdResponse.isCreated(), Arrays.toString(mdRecord.entrySet().toArray()));
+        log.debug("Saved mapping metadata '{}': {}", mdResponse.getResult() == DocWriteResponse.Result.CREATED, Arrays.toString(mdRecord.entrySet().toArray()));
 
-        return (mdResponse.isCreated() && response.isAcknowledged());
+        return (mdResponse.getResult() == DocWriteResponse.Result.CREATED && response.isAcknowledged());
     }
 
     protected boolean updateMapping(String indexId, MappingConfiguration mapping) throws SinkError {
@@ -201,7 +203,7 @@ public abstract class ElasticsearchSink implements Sink {
         UpdateResponse mdUpdate = getClient().prepareUpdate(indexId, MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID)
                 .setDoc(updatedMetadata).get();
         log.info("Update metadata record created: {} | id = {} @ {}/{}",
-                mdUpdate.isCreated(), mdUpdate.getId(), mdUpdate.getIndex(), mdUpdate.getType());
+                mdUpdate.getResult() == DocWriteResponse.Result.CREATED, mdUpdate.getId(), mdUpdate.getIndex(), mdUpdate.getType());
 
         return (mdUpdate.getId().equals(MetadataDataMapping.METADATA_ROW_ID)
                 && updateMappingResponse.isAcknowledged());
@@ -209,7 +211,7 @@ public abstract class ElasticsearchSink implements Sink {
 
     private double getCurrentVersion(String indexId) {
         GetResponse resp = getClient().prepareGet(indexId, MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID)
-                .setOperationThreaded(false).get();
+                .get();
         if (resp.isExists()) {
             Object versionString = resp.getSourceAsMap().get(MetadataDataMapping.METADATA_VERSION_FIELD.getName());
             if (versionString == null) {
@@ -224,7 +226,7 @@ public abstract class ElasticsearchSink implements Sink {
 
     private Map<String, Object> createUpdatedMetadata(String indexId) throws SinkError {
         GetResponse resp = getClient().prepareGet(indexId, MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID)
-                .setOperationThreaded(false).get();
+                .get();
         Object retrievedValues = resp.getSourceAsMap().get(MetadataDataMapping.METADATA_UUIDS_FIELD.getName());
         List<String> values;
 
@@ -276,9 +278,9 @@ public abstract class ElasticsearchSink implements Sink {
             Map<String, Object> childrenMap = new HashMap<>(value.getAllChildren().size());
             subproperties.put("properties", childrenMap);
 
-            for (AbstractEsParameter child : object.getAllChildren()) {
+            object.getAllChildren().forEach((child) -> {
                 resolveParameterField(child, childrenMap);
-            }
+            });
 
             map.put(object.getName(), subproperties);
 

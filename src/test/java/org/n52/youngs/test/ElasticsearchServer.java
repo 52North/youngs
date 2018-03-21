@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2018 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,11 +16,11 @@
  */
 package org.n52.youngs.test;
 
+import java.io.IOException;
 import java.util.Optional;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
 import org.junit.rules.ExternalResource;
 
 /**
@@ -61,10 +61,10 @@ public class ElasticsearchServer extends ExternalResource {
                 .orElse(startElasticsearch.toString()));
         if (startEs) {
             String fileName = "elasticsearch-it.yml";
-            Settings settings = Settings.settingsBuilder().loadFromStream(fileName, getClass().getResourceAsStream(fileName)).build();
+            Settings settings = Settings.builder().loadFromStream(fileName, getClass().getResourceAsStream(fileName), false).build();
             cluster = settings.get("cluster.name");
 
-            embeddedNode = NodeBuilder.nodeBuilder().settings(settings).build();
+            embeddedNode = new Node(settings);
             embeddedNode.start();
             client = embeddedNode.client();
             System.out.println(String.format("### Elasticsearch server '%s' started ###", cluster));
@@ -74,7 +74,11 @@ public class ElasticsearchServer extends ExternalResource {
     @Override
     protected void after() {
         if (Optional.ofNullable(embeddedNode).isPresent()) {
-            embeddedNode.close();
+            try {
+                embeddedNode.close();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
             System.out.println("### Elasticsearch server closed ###");
         }
         if(Optional.ofNullable(client).isPresent()) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2018 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,9 +22,9 @@ import java.net.UnknownHostException;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.n52.youngs.exception.SinkError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,25 +58,21 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
         this.host = host;
         this.port = port;
 
-        Settings.Builder settings = Settings.settingsBuilder()
+        Settings.Builder settings = Settings.builder()
                 .put("cluster.name", getCluster());
 
         try {
             switch (mode) {
                 case TRANSPORT:
-                    TransportClient tClient = TransportClient.builder().settings(settings).build();
+                    TransportClient tClient = new PreBuiltTransportClient(settings.build());
                     tClient.addTransportAddress(
-                            new InetSocketTransportAddress(InetAddress.getByName(this.host), this.port));
+                            new TransportAddress(InetAddress.getByName(this.host), this.port));
                     this.client = tClient;
                     break;
                 case NODE:
                     settings.put("http.enabled", false);
-                    settings.put("path.home", Files.createTempDir());
-                    Node node = NodeBuilder.nodeBuilder()
-                            .settings(settings)
-                            .data(false)
-                            .client(true)
-                            .node();
+                    settings.put("path.home", Files.createTempDir().toPath());
+                    Node node = new Node(settings.build());
                     this.client = node.client();
                     break;
                 default:
