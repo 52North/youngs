@@ -16,6 +16,8 @@
  */
 package org.n52.youngs.test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.n52.youngs.impl.SourceRecordHelper;
 import com.google.common.io.Resources;
 import java.io.IOException;
@@ -44,6 +46,8 @@ public class CswToBuilderMapperTest {
     private YamlMappingConfiguration cswConfiguration;
 
     private CswToBuilderMapper cswMapper;
+
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Before
     public void load() throws IOException {
@@ -81,8 +85,11 @@ public class CswToBuilderMapperTest {
         BuilderRecord mappedRecord = cswMapper.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 
+        mapper.disable(SerializationFeature.INDENT_OUTPUT);
+        mappedRecordString = mapper.readTree(mappedRecordString).toString();
+
         assertThat("Mapped record contains all subjects", mappedRecordString,
-                containsString("[ \"Otherography\", \"Physiography\", \"Morography\" ]"));
+                containsString("[\"Otherography\",\"Physiography\",\"Morography\"]"));
     }
 
     @Test
@@ -159,9 +166,12 @@ public class CswToBuilderMapperTest {
         BuilderRecord mappedRecord = m.map(record.iterator().next());
         String mappedRecordString = mappedRecord.getBuilder().string();
 
+        mapper.disable(SerializationFeature.INDENT_OUTPUT);
+        mappedRecordString = mapper.readTree(mappedRecordString).toString();
+
         assertThat("Mapped record contains envelope", mappedRecordString,
                 allOf(containsString("location"), containsString("envelope"),
-                        containsString("[ [ -11.1, 14.0 ], [ 12.22, -13.0 ] ]")));
+                        containsString("[[-11.1,14.0],[12.22,-13.0]]")));
     }
 
     @Test

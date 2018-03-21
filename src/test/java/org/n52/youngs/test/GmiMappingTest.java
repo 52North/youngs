@@ -16,6 +16,8 @@
  */
 package org.n52.youngs.test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.n52.youngs.impl.SourceRecordHelper;
 import com.google.common.io.Resources;
 import static org.hamcrest.CoreMatchers.allOf;
@@ -34,6 +36,7 @@ import org.n52.youngs.transform.impl.YamlMappingConfiguration;
  */
 public class GmiMappingTest {
 
+
     @Test
     public void splitting() throws Exception {
         YamlMappingConfiguration configuration = new YamlMappingConfiguration(
@@ -45,8 +48,12 @@ public class GmiMappingTest {
         BuilderRecord mappedRecord = mapper.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 
+        ObjectMapper mapperJson = new ObjectMapper();
+        mapperJson.disable(SerializationFeature.INDENT_OUTPUT);
+        mappedRecordString = mapperJson.readTree(mappedRecordString).toString();
+
         assertThat("Mapped record contains extend timestamps", mappedRecordString,
-                allOf(containsString("\"splitter\" : [ \"theme:Atmospheric conditions\","),
+                allOf(containsString("\"splitter\":[\"theme:Atmospheric conditions\","),
                         containsString("\"socialBenefitArea:Weather"),
                         //                        containsString("\"socialBenefitArea:Climate\""), // FIXME come up with magic XPath or nested splitting
                         containsString("\"theme:Atmosphere\""),

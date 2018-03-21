@@ -16,6 +16,8 @@
  */
 package org.n52.youngs.test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.n52.youngs.impl.SourceRecordHelper;
 import com.google.common.io.Resources;
 import java.io.IOException;
@@ -42,6 +44,8 @@ public class CswMappingTest {
 
     private CswToBuilderMapper cswMapper;
 
+    private final ObjectMapper mapper = new ObjectMapper();
+
     @Before
     public void load() throws IOException {
         cswConfiguration = new YamlMappingConfiguration(
@@ -56,12 +60,15 @@ public class CswMappingTest {
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 
+        mapper.disable(SerializationFeature.INDENT_OUTPUT);
+        mappedRecordString = mapper.readTree(mappedRecordString).toString();
+
         // https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-geo-shape-type.html#_envelope
         // lat lon as array > GeoJSON conform: [lon, lat]
         assertThat("Mapped record contains envelope location", mappedRecordString,
                 allOf(containsString("location"), containsString("envelope")));
         assertThat("Mapped record contains correct coordinate string", mappedRecordString,
-                containsString("[ [ 68.41, 13.754 ], [ 60.042, 17.92 ] ]"));
+                containsString("[[68.41,13.754],[60.042,17.92]]"));
     }
 
     @Test
@@ -98,9 +105,12 @@ public class CswMappingTest {
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
         String mappedRecordString = mappedRecord.getBuilder().string();
 
+        mapper.disable(SerializationFeature.INDENT_OUTPUT);
+        mappedRecordString = mapper.readTree(mappedRecordString).toString();
+
         assertThat("Mapped record contains field", mappedRecordString,
                 allOf(containsString("replacer")));
         assertThat("Mapped record contains replaced coordinates as string", mappedRecordString,
-                containsString(" [ \"60_042 13_754\", \"68_410 17_920\" ]"));
+                containsString("[\"60_042 13_754\",\"68_410 17_920\"]"));
     }
 }
