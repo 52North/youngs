@@ -49,7 +49,7 @@ mappings:
         properties:
             type: text
             store: *STOREDEFAULT
-            index: analyzed
+            index: true
             #index_name: "id"
             boost: 2.0
     title:
@@ -65,7 +65,7 @@ mappings:
         isoqueryable: true
         isoqueryableName: language
         properties:
-            index: "not_analyzed"
+            index: false
             null_value: "N/A"
     date:
         xpath: "//date"
@@ -82,7 +82,7 @@ mappings:
         properties:
             type: text
             store: *STOREDEFAULT
-            index: "no"
+            index: false
     loc:
         xpath: "."
         location: true

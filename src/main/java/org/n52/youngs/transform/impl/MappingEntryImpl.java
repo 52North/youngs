@@ -172,11 +172,14 @@ public class MappingEntryImpl implements MappingEntry {
 
     @Override
     public boolean isAnalyzed() {
-        // https://www.elastic.co/guide/en/elasticsearch/reference/1.7/mapping.html
         boolean analyzed = true;
         if (indexProperties.containsKey(INDEX_MAPPING_ATTRIBUTE)) {
-            analyzed = !(indexProperties.get(INDEX_MAPPING_ATTRIBUTE).equals("not_analyzed")
+            analyzed = !(indexProperties.get(INDEX_MAPPING_ATTRIBUTE).equals(false)
                     || indexProperties.get(INDEX_MAPPING_ATTRIBUTE).equals("no"));
+        }
+        else if (indexProperties.containsKey(IndexProperties.TYPE)) {
+            // by default, keywords are not analyzed in ES 6.x
+            analyzed = !(indexProperties.get(IndexProperties.TYPE).equals("keyword"));
         }
 
         return analyzed;

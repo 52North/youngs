@@ -240,7 +240,7 @@ public class YamlConfigurationTest {
         assertThat("id entry index properties size", props.size(), is(equalTo(4)));
         assertThat("id entry property type", props.get("type"), is(equalTo("text")));
         assertThat("id entry property type", props.get("store"), is(equalTo(true)));
-        assertThat("id entry property type", props.get("index"), is(equalTo("analyzed")));
+        assertThat("id entry property type", props.get("index"), is(equalTo(true)));
         assertThat("id entry property type", props.get("boost"), is(equalTo(2d)));
     }
 
