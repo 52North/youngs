@@ -38,7 +38,7 @@ mappings:
         identifier: true
         properties:
             store: yes
-            type: string
+            type: text
             #boost: 20.0
             include_in_all: false
             index: not_analyzed
@@ -47,7 +47,7 @@ mappings:
         alias: [ "apiso:Title", title ]
         properties:
             store: yes
-            type: string
+            type: text
             include_in_all: true
             analyzer: suggest_autocomplete
             search_analyzer: standard

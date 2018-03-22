@@ -33,7 +33,7 @@ mappings:
         alias: [ "apiso:Abstract" ]
         properties:
             store: yes
-            type: string
+            type: text
             #boost: 4.0
             include_in_all: true
             analyzer: suggest_autocomplete
@@ -44,7 +44,7 @@ mappings:
         alias: [ "apiso:AccessConstraints", AccessConstraints ]
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
     alternateTitle:
@@ -52,7 +52,7 @@ mappings:
         alias: [ "apiso:AlternateTitle" ]
         properties:
             store: yes
-            type: string
+            type: text
             #boost: 5.0
             include_in_all: false
     aggregationInfo:
@@ -62,21 +62,21 @@ mappings:
                 xpath: "gmd:aggregateDataSetIdentifier/gmd:MD_Identifier/gmd:code/*/text()"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             typeCode:
                 xpath: "gmd:associationType/*/@codeListValue"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             typeCodeList:
                 xpath: "gmd:associationType/*/@codeList"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
         properties:
@@ -86,7 +86,7 @@ mappings:
         alias: [ "Aggregate" ]
         properties:
             store: yes
-            type: string
+            type: text
             #index: not_analyzed
             include_in_all: false
     # distribution information
@@ -95,14 +95,14 @@ mappings:
         alias: [ "Availability" ]
         properties:
             store: yes
-            type: string
+            type: text
     # distribution information
     availableFormats:
         xpath: "/*/gmd:distributionInfo/*/gmd:distributor/*/eum:digitalTransfers/*/eum:format/*/gmd:name/gco:CharacterString"
         alias: [ "AvailableFormats", "apiso:Format" ]
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
     # distribution information
@@ -111,7 +111,7 @@ mappings:
         alias: [ "AvailableFormatsVersion" ]
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
 # deprecated: nested object within formats
@@ -123,7 +123,7 @@ mappings:
 #        alias: [ avgFileSize ]
 #        properties:
 #            store: yes
-#            type: string
+#            type: text
 #            index: not_analyzed
 #            include_in_all: false
     category:
@@ -139,7 +139,7 @@ mappings:
         alias: [ "ConditionApplyingToAccessAndUse" ]
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
     coverage:
@@ -148,7 +148,7 @@ mappings:
         split: ","
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
     creation_date:
@@ -178,14 +178,14 @@ mappings:
         alias: [ "apiso:Title", title ]
         properties:
             store: yes
-            type: string
+            type: text
             #boost: 5.0
             include_in_all: true
             analyzer: suggest_autocomplete
             search_analyzer: standard
             fields:
                 raw:
-                    type: string
+                    type: text
                     index: not_analyzed
     # part of INSPIRE LimitationsOnPublicAccess
     data_policy:
@@ -193,7 +193,7 @@ mappings:
         alias: [ "apiso:HasSecurityConstraints", hassecurityconstraints, "DataPolicy", "Classification" ]
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
     dateStamp:
@@ -227,42 +227,42 @@ mappings:
                         xpath: "gmd:linkage/gmd:URL"
                         properties:
                             store: yes
-                            type: string
+                            type: text
                             index: not_analyzed
                             include_in_all: false
                     label:
                         xpath: "gmd:name/gco:CharacterString"
                         properties:
                             store: yes
-                            type: string
+                            type: text
                             index: not_analyzed
                             include_in_all: false
                     function:
                         xpath: "gmd:function/*/@codeListValue"
                         properties:
                             store: yes
-                            type: string
+                            type: text
                             index: not_analyzed
                             include_in_all: false
                     protocol:
                         xpath: "gmd:protocol/gco:CharacterString"
                         properties:
                             store: yes
-                            type: string
+                            type: text
                             index: not_analyzed
                             include_in_all: false
                     availability:
                         xpath: "../../eum:availability/gco:CharacterString"
                         properties:
                             store: yes
-                            type: string
+                            type: text
                             index: not_analyzed
                             include_in_all: false
                     channels:
                         xpath: "../../eum:eumetcastChannels/gco:CharacterString"
                         properties:
                             store: yes
-                            type: string
+                            type: text
                             index: not_analyzed
                             include_in_all: false
             format:
@@ -274,21 +274,21 @@ mappings:
                         xpath: "gmd:name/gco:CharacterString"
                         properties:
                             store: yes
-                            type: string
+                            type: text
                             index: not_analyzed
                             include_in_all: false
                     version:
                         xpath: "gmd:version/gco:CharacterString"
                         properties:
                             store: yes
-                            type: string
+                            type: text
                             index: not_analyzed
                             include_in_all: false
                     averageFileSizeUnits:
                         xpath: "eum:averageFileSizeUnits/gco:CharacterString"
                         properties:
                             store: yes
-                            type: string
+                            type: text
                             index: not_analyzed
                             include_in_all: false
                     averageFileSize:
@@ -302,28 +302,28 @@ mappings:
                         xpath: "eum:frequency/gco:CharacterString"
                         properties:
                             store: yes
-                            type: string
+                            type: text
                             index: not_analyzed
                             include_in_all: false
                     fileFormatDescription:
                         xpath: "eum:fileFormatDescription/gco:CharacterString"
                         properties:
                             store: yes
-                            type: string
+                            type: text
                             index: not_analyzed
                             include_in_all: false
                     typicalFilename:
                         xpath: "eum:typicalFilename/gco:CharacterString"
                         properties:
                             store: yes
-                            type: string
+                            type: text
                             index: not_analyzed
                             include_in_all: false
                     bulletin:
                         xpath: "eum:bulletin/gco:CharacterString"
                         properties:
                             store: yes
-                            type: string
+                            type: text
                             index: not_analyzed
                             include_in_all: false
     distribution:
@@ -335,7 +335,7 @@ mappings:
               with: ""
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
     distributorContact:
@@ -345,49 +345,49 @@ mappings:
                 xpath: "gmd:individualName/gco:CharacterString/text()"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             organisationName:
                 xpath: "gmd:organisationName/gco:CharacterString/text()"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             email:
                 xpath: "gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gco:CharacterString/text()"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             url:
                 xpath: "gmd:contactInfo/*/gmd:onlineResource/*/gmd:linkage/gmd:URL"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             phone:
                 xpath: "gmd:contactInfo/*/gmd:phone/*/gmd:voice/gco:CharacterString"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             facsimile:
                 xpath: "gmd:contactInfo/*/gmd:phone/*/gmd:facsimile/gco:CharacterString"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             responsiblePartyRole:
                 xpath: "gmd:role/*/@codeListValue"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
         properties:
@@ -399,7 +399,7 @@ mappings:
                 xpath: "gmd:URL/text()"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             identifier:
@@ -415,7 +415,7 @@ mappings:
                       with: ""
                 properties: 
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
         properties:
@@ -425,7 +425,7 @@ mappings:
 #        xpath: "/*/gmd:identificationInfo/*/gmd:citation/*/gmd:citedResponsibleParty/*/gmd:contactInfo/*/gmd:onlineResource/*/gmd:linkage[gmd:URL[text()[contains(.,'doi') or contains(.,'DOI')]]]/gmd:URL/text()"
 #        properties:
 #            store: yes
-#            type: string
+#            type: text
 #            index: not_analyzed
 #            include_in_all: false
 # not used in any component
@@ -436,7 +436,7 @@ mappings:
 #              with: ""
 #        properties:
 #            store: yes
-#            type: string
+#            type: text
 #            index: not_analyzed
 #            include_in_all: false
    # EUMETSAT metadata for INSPIRE/CIM Bridge
@@ -451,7 +451,7 @@ mappings:
         alias: [ EUMETCASTChannels ]
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
     file_format_description:
@@ -459,7 +459,7 @@ mappings:
         alias: [ FileFormatDescription ]
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
     frequency:
@@ -467,7 +467,7 @@ mappings:
         alias: [ "Frequency" ]
         properties:
             store: yes
-            type: string
+            type: text
             #index: not_analyzed
             include_in_all: false
     # fulltext of all elements, joined with ' '
@@ -479,7 +479,7 @@ mappings:
             # http://stackoverflow.com/questions/30113753/elastic-search-wildcard-search-with-spaces
             #index: "not_analyzed"
             index: "analyzed"
-            type: string
+            type: text
             include_in_all: true
 # not used in any component
 #    hierarchyLevel:
@@ -501,7 +501,7 @@ mappings:
         identifier: true
         properties:
             store: yes
-            type: string
+            type: text
             #boost: 20.0
             include_in_all: false
             index: not_analyzed
@@ -509,7 +509,7 @@ mappings:
         xpath: "/*/gmd:identificationInfo/*/gmd:citation/*/gmd:identifier/*/gmd:code/*/text()"
         properties:
             store: yes
-            type: string
+            type: text
             #boost: 10.0
             index: "analyzed"
             include_in_all: false
@@ -517,14 +517,14 @@ mappings:
         xpath: "/*/gmi:acquisitionInformation/*/gmi:platform/*/gmi:instrument/*/gmi:citation/*/gmd:identifier/*/gmd:code/*/text()"
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
     instrument_type:
         xpath: "/*/gmi:acquisitionInformation/*/gmi:platform/*/gmi:instrument/*/eum:type/*/@codeListValue"
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
     # EUMETSAT metadata for INSPIRE/CIM Bridge
@@ -557,42 +557,42 @@ mappings:
                 xpath: "gmd:keyword/*/text()"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             thesaurus:
                 xpath: "gmd:thesaurusName/*/gmd:title/*/text()"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             thesaurusDate:
                 xpath: "gmd:thesaurusName/*/gmd:date/*/gmd:date/*/text()"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             thesaurusDateType:
                 xpath: "gmd:thesaurusName/*/gmd:date/*/gmd:dateType/*/@codeListValue"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             type:
                 xpath: "gmd:type/*/@codeListValue"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             typeList:
                 xpath: "gmd:type/*/@codeList"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
     language:
@@ -641,7 +641,7 @@ mappings:
 #        xpath: "/*/gmd:identificationInfo/*/gmd:title/*/text()"
 #        properties:
 #            store: yes
-#            type: string
+#            type: text
 #            #boost: 5.0
 #            include_in_all: false
     onlineResource:
@@ -650,17 +650,17 @@ mappings:
         children:
             url:
                 xpath: "gmd:linkage/gmd:URL"
-                type: string
+                type: text
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             label:
                 xpath: "gmd:name/gco:CharacterString"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
         properties:
@@ -669,7 +669,7 @@ mappings:
         xpath: "/*/gmi:acquisitionInformation/*/gmi:platform/eum:MI_EUMPlatform/eum:orbitType/*/@codeListValue"
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
 # these overwrite other aliases, commenting out
@@ -693,7 +693,7 @@ mappings:
         alias: [ "OtherConstraints", "apiso:OtherConstraints" ]
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
     parent:
@@ -725,7 +725,7 @@ mappings:
         alias: [ "Lineage" ]
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
     resourceType:
@@ -746,49 +746,49 @@ mappings:
                 xpath: "gmd:individualName/gco:CharacterString/text()"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             organisationName:
                 xpath: "gmd:organisationName/gco:CharacterString/text()"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             email:
                 xpath: "gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gco:CharacterString/text()"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             url:
                 xpath: "gmd:contactInfo/*/gmd:onlineResource/*/gmd:linkage/gmd:URL"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             phone:
                 xpath: "gmd:contactInfo/*/gmd:phone/*/gmd:voice/gco:CharacterString"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             facsimile:
                 xpath: "gmd:contactInfo/*/gmd:phone/*/gmd:facsimile/gco:CharacterString"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             responsiblePartyRole:
                 xpath: "gmd:role/*/@codeListValue"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
         properties:
@@ -837,7 +837,7 @@ mappings:
 #              with: ""
 #        properties:
 #            store: yes
-#            type: string
+#            type: text
 #            include_in_all: false
     # acquisition information
     satellite:
@@ -845,7 +845,7 @@ mappings:
         #alias: [ "Satellite" ]
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
     # acquisition information
@@ -854,7 +854,7 @@ mappings:
         alias: [ "satellite description" ]
         properties:
             store: yes
-            type: string
+            type: text
             include_in_all: false
     social_benefit_area:
         #xpath: "//gmd:hierarchyLevelName/*[contains(text(), 'SBA.')]/text()"
@@ -865,7 +865,7 @@ mappings:
         #      with: ""
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
     # INSPIRE additional queryable, part ofcomposition of union specification
@@ -874,7 +874,7 @@ mappings:
         alias: [ "SpecificationTitle" ]
         properties:
             store: yes
-            type: string
+            type: text
             include_in_all: false
     # INSPIRE additional queryable, part ofcomposition of union specification
     specification_date:
@@ -891,7 +891,7 @@ mappings:
         alias: [ "SpecificationDateType" ]
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
     tempextent_begin:
@@ -917,14 +917,14 @@ mappings:
               with: " "
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
     thumbnails:
         xpath: "/*/gmd:identificationInfo/*/gmd:graphicOverview/*/gmd:fileName/gco:CharacterString/text()"
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
     topicCategory:
@@ -950,7 +950,7 @@ mappings:
 #        alias: [ typicalfilename ]
 #        properties:
 #            store: yes
-#            type: string
+#            type: text
 #            index: not_analyzed
 #            include_in_all: false
     use_constraint:
@@ -958,14 +958,14 @@ mappings:
         alias: [ "apiso:UseConstraints", UseConstraints ]
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
     version:
         xpath: "/*/gmd:identificationInfo/*/gmd:resourceFormat/*/gmd:version/gco:CharacterString[../../gmd:name/gco:CharacterString='Resource Version']"
         properties:
             store: yes
-            type: string
+            type: text
             index: not_analyzed
             include_in_all: false
     # full XML
@@ -982,7 +982,7 @@ mappings:
               value: UTF-8
         properties:
             store: yes
-            type: string
+            type: text
             index: "no"
             # include_in_all: false > included via index: no
     # youngs metadata
@@ -995,5 +995,5 @@ mappings:
     youngs_used_mapping:
         xpath: "string('GMD Record Mapping version 1')"
         properties:
-            type: string
+            type: text
             include_in_all: false

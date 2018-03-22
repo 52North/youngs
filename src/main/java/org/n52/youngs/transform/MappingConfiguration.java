@@ -48,7 +48,7 @@ public interface MappingConfiguration {
 
     public static final boolean DEFAULT_DYNAMIC_MAPPING = false;
 
-    public static final String DEFAULT_INDEXPROPERTY_TYPE = "string";
+    public static final String DEFAULT_INDEXPROPERTY_TYPE = "text";
 
     /**
      *

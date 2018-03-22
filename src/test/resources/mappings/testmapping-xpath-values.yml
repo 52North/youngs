@@ -20,7 +20,7 @@ mappings:
     full_text:
         xpath: "normalize-space(string-join(//text() | //@*[not(starts-with(local-name(), 'xmlns')) and not(starts-with(local-name(), 'schemaLocation'))], ' '))"
         properties:
-            type: string
+            type: text
     raw_xml:
         xpath: "/"
         raw_xml: TRUE
@@ -34,5 +34,5 @@ mappings:
             - name: encoding
               value: UTF-8
         properties:
-            type: string
+            type: text
         

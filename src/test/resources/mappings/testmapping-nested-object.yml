@@ -40,7 +40,7 @@ mappings:
         isoqueryable: false
         identifier: TRUE
         properties:
-            type: string
+            type: text
             store: *STOREDEFAULT
             index: analyzed
             #index_name: "id"
@@ -50,19 +50,19 @@ mappings:
         children:
             name:
                 xpath: "gmd:name/gco:CharacterString"
-                type: string
+                type: text
 #                split: ","
             version:
                 xpath: "gmd:version/gco:CharacterString"
-                type: string
+                type: text
 #                split: ","
             typicalFilename:
                 xpath: "eum:typicalFilename/gco:CharacterString"
-                type: string
+                type: text
 #                split: ","
             averageFileSizeUnits:
                 xpath: "eum:averageFileSizeUnits/gco:CharacterString"
-                type: string
+                type: text
 #                split: ","
             averageFileSizeUnits:
                 xpath: "eum:averageFileSize/gco:Real"
@@ -70,11 +70,11 @@ mappings:
 #                split: ","
             frequency:
                 xpath: "eum:frequency/gco:CharacterString"
-                type: string
+                type: text
 #                split: ","
             fileFormatDescription:
                 xpath: "eum:fileFormatDescription/gco:CharacterString"
-                type: string
+                type: text
 #                split: ","
         properties:
             type: object

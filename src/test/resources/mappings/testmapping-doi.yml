@@ -47,7 +47,7 @@ mappings:
         isoqueryable: false
         identifier: TRUE
         properties:
-            type: string
+            type: text
             store: *STOREDEFAULT
             index: analyzed
             #index_name: "id"
@@ -60,7 +60,7 @@ mappings:
                 condition: "gmd:URL[text()[contains(.,'doi') or contains(.,'DOI')]]"
                 properties:
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
             identifier:
@@ -71,7 +71,7 @@ mappings:
                       with: ""
                 properties: 
                     store: yes
-                    type: string
+                    type: text
                     index: not_analyzed
                     include_in_all: false
         properties:

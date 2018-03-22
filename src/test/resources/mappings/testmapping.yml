@@ -47,7 +47,7 @@ mappings:
         isoqueryable: false
         identifier: TRUE
         properties:
-            type: string
+            type: text
             store: *STOREDEFAULT
             index: analyzed
             #index_name: "id"
@@ -80,7 +80,7 @@ mappings:
         xpath: "/"
         raw_xml: TRUE
         properties:
-            type: string
+            type: text
             store: *STOREDEFAULT
             index: "no"
     loc:

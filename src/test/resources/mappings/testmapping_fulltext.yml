@@ -40,7 +40,7 @@ mappings:
         isoqueryable: false
         identifier: TRUE
         properties:
-            type: string
+            type: text
             store: *STOREDEFAULT
             index: analyzed
             #index_name: "id"
@@ -53,5 +53,5 @@ mappings:
             # http://stackoverflow.com/questions/30113753/elastic-search-wildcard-search-with-spaces
             #index: "not_analyzed"
             index: "analyzed"
-            type: string
+            type: text
             include_in_all: true

@@ -26,7 +26,7 @@ mappings:
         isoqueryable: false
         identifier: true
         properties:
-            type: string
+            type: text
             store: *STORE
             index: analyzed
             #index_name: "id"
@@ -36,7 +36,7 @@ mappings:
         isoqueryable: false
         properties:
             store: *STORE
-            type: string
+            type: text
             index_name: title
             boost: 10
             copy_to: autocomplete_field

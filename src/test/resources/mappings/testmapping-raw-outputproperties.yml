@@ -19,5 +19,5 @@ mappings:
             - name: indent
               value: "no"
         properties:
-            type: string
+            type: text
         

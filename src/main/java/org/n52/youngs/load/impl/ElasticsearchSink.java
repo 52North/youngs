@@ -17,6 +17,7 @@
 package org.n52.youngs.load.impl;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -47,6 +48,7 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.joda.time.DateTimeZone;
 import org.n52.iceland.statistics.api.mappings.MetadataDataMapping;
 import org.n52.iceland.statistics.api.parameters.AbstractEsParameter;
+import org.n52.iceland.statistics.api.parameters.ElasticsearchTypeRegistry;
 import org.n52.iceland.statistics.api.parameters.ObjectEsParameter;
 import org.n52.iceland.statistics.api.parameters.SingleEsParameter;
 import org.n52.youngs.exception.SinkError;
@@ -147,6 +149,7 @@ public abstract class ElasticsearchSink implements Sink {
                 return createMapping(mapping, indexId);
             }
         } catch (RuntimeException e) {
+            log.warn(e.getMessage(), e);
             throw new SinkError(e, "Problem preparing sink: %s", e.getMessage());
         }
     }
@@ -159,7 +162,6 @@ public abstract class ElasticsearchSink implements Sink {
 
         // create metadata mapping and schema mapping
         CreateIndexRequestBuilder request = indices.prepareCreate(indexId)
-                .addMapping(MetadataDataMapping.METADATA_TYPE_NAME, getMetadataSchema())
                 .addMapping(mapping.getType(), schema);
         if (mapping.hasIndexCreationRequest()) {
             request.setSettings(mapping.getIndexCreationRequest(), XContentType.YAML);
@@ -168,11 +170,22 @@ public abstract class ElasticsearchSink implements Sink {
         CreateIndexResponse response = request.get();
         log.debug("Created indices: {}, acknowledged: {}", response, response.isAcknowledged());
 
+        // elasticsearch 6.x removed support for multiple types in one index, we need a separate one
+        // create metadata mapping and schema mapping
+        CreateIndexRequestBuilder requestMeta = indices.prepareCreate(deriveMetadataIndexName(indexId))
+                .addMapping(MetadataDataMapping.METADATA_TYPE_NAME, getMetadataSchema());
+        if (mapping.hasIndexCreationRequest()) {
+            requestMeta.setSettings(mapping.getIndexCreationRequest(), XContentType.YAML);
+        }
+
+        CreateIndexResponse responseMeta = requestMeta.get();
+        log.debug("Created indices: {}, acknowledged: {}", responseMeta, responseMeta.isAcknowledged());
+
         Map<String, Object> mdRecord = createMetadataRecord(mapping.getVersion(), mapping.getName());
-        IndexResponse mdResponse = getClient().prepareIndex(indexId, MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID).setSource(mdRecord).get();
+        IndexResponse mdResponse = getClient().prepareIndex(deriveMetadataIndexName(indexId), MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID).setSource(mdRecord).get();
         log.debug("Saved mapping metadata '{}': {}", mdResponse.getResult() == DocWriteResponse.Result.CREATED, Arrays.toString(mdRecord.entrySet().toArray()));
 
-        return (mdResponse.getResult() == DocWriteResponse.Result.CREATED && response.isAcknowledged());
+        return response.isAcknowledged();
     }
 
     protected boolean updateMapping(String indexId, MappingConfiguration mapping) throws SinkError {
@@ -182,7 +195,7 @@ public abstract class ElasticsearchSink implements Sink {
             throw new SinkError("Database inconsistency. Metadata version not found in type %s", MetadataDataMapping.METADATA_TYPE_NAME);
         }
         if (version != mapping.getVersion()) {
-            throw new SinkError("Database schema version inconsistency. Version numbers don't match. Database version number %d != mapping version number %d",
+            throw new SinkError("Database schema version inconsistency. Version numbers don't match. Database version number %s != mapping version number %s",
                     version, mapping.getVersion());
         }
 
@@ -199,8 +212,8 @@ public abstract class ElasticsearchSink implements Sink {
             log.error("Problem updating mapping for type {}", mapping.getType());
         }
 
-        Map<String, Object> updatedMetadata = createUpdatedMetadata(indexId);
-        UpdateResponse mdUpdate = getClient().prepareUpdate(indexId, MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID)
+        Map<String, Object> updatedMetadata = createUpdatedMetadata(deriveMetadataIndexName(indexId));
+        UpdateResponse mdUpdate = getClient().prepareUpdate(deriveMetadataIndexName(indexId), MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID)
                 .setDoc(updatedMetadata).get();
         log.info("Update metadata record created: {} | id = {} @ {}/{}",
                 mdUpdate.getResult() == DocWriteResponse.Result.CREATED, mdUpdate.getId(), mdUpdate.getIndex(), mdUpdate.getType());
@@ -210,13 +223,13 @@ public abstract class ElasticsearchSink implements Sink {
     }
 
     private double getCurrentVersion(String indexId) {
-        GetResponse resp = getClient().prepareGet(indexId, MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID)
+        GetResponse resp = getClient().prepareGet(deriveMetadataIndexName(indexId), MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID)
                 .get();
         if (resp.isExists()) {
             Object versionString = resp.getSourceAsMap().get(MetadataDataMapping.METADATA_VERSION_FIELD.getName());
             if (versionString == null) {
                 throw new ElasticsearchException(String.format("Database inconsistency. Version can't be found in row %s/%s/%s",
-                        indexId, MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID));
+                        deriveMetadataIndexName(indexId), MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID));
             }
             return Double.valueOf(versionString.toString());
         } else {
@@ -268,7 +281,12 @@ public abstract class ElasticsearchSink implements Sink {
     private void resolveParameterField(AbstractEsParameter value, Map<String, Object> map) {
         if (value instanceof SingleEsParameter) {
             SingleEsParameter single = (SingleEsParameter) value;
-            map.put(single.getName(), single.getTypeAsMap());
+            if (single.getType() == ElasticsearchTypeRegistry.stringField) {
+                map.put(single.getName(), new ElasticsearchTypeRegistry.ElasticsearchType(ImmutableMap.<String, Object> of("type", "text", "index", "false")).getType());
+            }
+            else {
+                map.put(single.getName(), single.getTypeAsMap());
+            }
         } else if (value instanceof ObjectEsParameter) {
             ObjectEsParameter object = (ObjectEsParameter) value;
 
@@ -339,6 +357,10 @@ public abstract class ElasticsearchSink implements Sink {
                 .add("type", type)
                 .add("client", getClient())
                 .toString();
+    }
+
+    private String deriveMetadataIndexName(String indexId) {
+        return indexId + "-meta";
     }
 
 }

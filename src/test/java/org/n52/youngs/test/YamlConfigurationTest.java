@@ -137,10 +137,10 @@ public class YamlConfigurationTest {
         Collection<MappingEntry> entries = config.getEntries();
         Iterator<MappingEntry> iter = entries.iterator();
         assertThat("date entry field type", iter.next().getIndexPropery("type"), is(equalTo("date")));
-        assertThat("id entry field type", iter.next().getIndexPropery("type"), is(equalTo("string")));
-        assertThat("language entry field type", iter.next().getIndexPropery("type"), is(equalTo("string")));
-        assertThat("title entry field type", iter.next().getIndexPropery("type"), is(equalTo("string")));
-        assertThat("xtitle entry field type", iter.next().getIndexPropery("type"), is(equalTo("string")));
+        assertThat("id entry field type", iter.next().getIndexPropery("type"), is(equalTo("text")));
+        assertThat("language entry field type", iter.next().getIndexPropery("type"), is(equalTo("text")));
+        assertThat("title entry field type", iter.next().getIndexPropery("type"), is(equalTo("text")));
+        assertThat("xtitle entry field type", iter.next().getIndexPropery("type"), is(equalTo("text")));
     }
 
     @Test
@@ -238,7 +238,7 @@ public class YamlConfigurationTest {
         MappingEntry second = iter.next();
         Map<String, Object> props = second.getIndexProperties();
         assertThat("id entry index properties size", props.size(), is(equalTo(4)));
-        assertThat("id entry property type", props.get("type"), is(equalTo("string")));
+        assertThat("id entry property type", props.get("type"), is(equalTo("text")));
         assertThat("id entry property type", props.get("store"), is(equalTo(true)));
         assertThat("id entry property type", props.get("index"), is(equalTo("analyzed")));
         assertThat("id entry property type", props.get("boost"), is(equalTo(2d)));

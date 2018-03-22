@@ -16,7 +16,7 @@ mappings:
         identifier: true
         properties:
             store: yes
-            type: string
+            type: text
             boost: 10.0
     language:
         xpath: "//gmd:language/gmd:LanguageCode/@codeListValue"
