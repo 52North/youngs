@@ -14,27 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.n52.youngs.control;
+package org.n52.youngs.postprocess;
 
-import org.n52.youngs.api.Report;
-import org.n52.youngs.harvest.Source;
-import org.n52.youngs.load.Sink;
-import org.n52.youngs.postprocess.PostProcessor;
-import org.n52.youngs.transform.Mapper;
+import org.n52.youngs.load.SinkRecord;
 
 /**
- * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
+ *
+ * @author <a href="mailto:m.rieke@52north.org">Matthes Rieke</a>
  */
-public interface Runner {
+public interface PostProcessor {
 
-    public Runner harvest(Source source);
-
-    public Runner transform(Mapper mapper);
-
-    public Runner postTransformProcess(PostProcessor postProcessor);
-
-    public Report load(Sink sink);
-
-    public double getCompletedPercentage();
+    SinkRecord process(SinkRecord record);
 
 }

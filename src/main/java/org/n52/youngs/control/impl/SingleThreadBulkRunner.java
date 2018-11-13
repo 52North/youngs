@@ -34,6 +34,7 @@ import org.n52.youngs.harvest.SourceRecord;
 import org.n52.youngs.impl.ReportImpl;
 import org.n52.youngs.load.Sink;
 import org.n52.youngs.load.SinkRecord;
+import org.n52.youngs.postprocess.PostProcessor;
 import org.n52.youngs.transform.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +69,7 @@ public class SingleThreadBulkRunner implements Runner {
     private final boolean testRun = false;
 
     private long startPosition = 1;
+    private PostProcessor postProcessor;
 
     public SingleThreadBulkRunner() {
         //
@@ -99,6 +101,13 @@ public class SingleThreadBulkRunner implements Runner {
     public SingleThreadBulkRunner transform(final Mapper mapper) {
         this.mapper = mapper;
         log.debug("Saved mapper, waiting for load() to be called...", source);
+        return this;
+    }
+
+    @Override
+    public Runner postTransformProcess(PostProcessor postProcessor) {
+        this.postProcessor = postProcessor;
+        log.debug("Saved postProcessor, waiting for load() to be called...", source);
         return this;
     }
 
@@ -159,7 +168,11 @@ public class SingleThreadBulkRunner implements Runner {
                 List<SinkRecord> mappedRecords = records.stream()
                         .map(record -> {
                             try {
-                                return mapper.map(record);
+                                SinkRecord r = mapper.map(record);
+                                if (this.postProcessor != null) {
+                                    return this.postProcessor.process(r);
+                                }
+                                return r;
                             } catch (MappingError e) {
                                 report.addFailedRecord(record.toString(), "Problem during mapping: " + e.getMessage());
                                 return null;
@@ -181,6 +194,7 @@ public class SingleThreadBulkRunner implements Runner {
                                 report.addFailedRecord(record.getId(), "see sink log");
                             }
                         } catch (SinkError e) {
+                            log.warn("Problem during mapping: ", e);
                             report.addFailedRecord(record.toString(), "Problem during mapping: " + e.getMessage());
                         }
                     });
