@@ -47,6 +47,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.n52.youngs.harvest.DirectorySource;
 import org.n52.youngs.harvest.NodeSourceRecord;
+import org.n52.youngs.harvest.SourceException;
 import org.n52.youngs.harvest.SourceRecord;
 import org.n52.youngs.impl.ReportImpl;
 import org.n52.youngs.impl.XPathHelper;
@@ -103,7 +104,7 @@ public class DirectorySourceTestDisabled {
     }
 
     @Test
-    public void testCswRecordsDirectory() throws IOException {
+    public void testCswRecordsDirectory() throws IOException, SourceException {
         DirectorySource source = new DirectorySource(baseDirectory.resolve("csw"));
         Collection<SourceRecord> records = source.getRecords(new ReportImpl());
         assertThat("correct number of records returned", records.size(), is(equalTo(12)));
@@ -121,7 +122,7 @@ public class DirectorySourceTestDisabled {
     }
 
     @Test
-    public void testPagination() {
+    public void testPagination() throws SourceException {
         DirectorySource source = new DirectorySource(baseDirectory.resolve("csw"));
         Collection<SourceRecord> records = source.getRecords(2, 9, new ReportImpl());
         assertThat("correct number of records", records.size(), is(9));
@@ -140,7 +141,7 @@ public class DirectorySourceTestDisabled {
     }
 
     @Test
-    public void testPaginationUpperBound() {
+    public void testPaginationUpperBound() throws SourceException {
         DirectorySource source = new DirectorySource(baseDirectory.resolve("csw"));
         Collection<SourceRecord> records = source.getRecords(12, 100, new ReportImpl());
         assertThat("correct number of records", records.size(), is(1));
@@ -186,7 +187,7 @@ public class DirectorySourceTestDisabled {
     }
 
     @Test
-    public void testCswRecordsDirectoryWithMapping() throws IOException {
+    public void testCswRecordsDirectoryWithMapping() throws IOException, SourceException {
         DirectorySource source = new DirectorySource(baseDirectory.resolve("csw"));
 
         Collection<SourceRecord> records = source.getRecords(1, 7, new ReportImpl());

@@ -30,6 +30,7 @@ import org.n52.youngs.control.Runner;
 import org.n52.youngs.exception.MappingError;
 import org.n52.youngs.exception.SinkError;
 import org.n52.youngs.harvest.Source;
+import org.n52.youngs.harvest.SourceException;
 import org.n52.youngs.harvest.SourceRecord;
 import org.n52.youngs.impl.ReportImpl;
 import org.n52.youngs.load.Sink;
@@ -203,7 +204,7 @@ public class SingleThreadBulkRunner implements Runner {
                     log.info("TESTRUN, created documents are:\n{}", Arrays.toString(mappedRecords.toArray()));
                 }
 
-            } catch (RuntimeException e) {
+            } catch (SourceException | RuntimeException e) {
                 if (sourceTimer.isRunning()) {
                     sourceTimer.stop();
                 }

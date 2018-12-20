@@ -41,8 +41,8 @@ public interface Source {
     */
     public long getRecordCount();
 
-    public Collection<SourceRecord> getRecords(Report report);
+    public Collection<SourceRecord> getRecords(Report report) throws SourceException;
 
-    public Collection<SourceRecord> getRecords(long startPosition, long maxRecords, Report report);
+    public Collection<SourceRecord> getRecords(long startPosition, long maxRecords, Report report) throws SourceException;
 
 }

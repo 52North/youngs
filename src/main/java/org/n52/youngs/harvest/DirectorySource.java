@@ -27,6 +27,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -92,12 +93,12 @@ public class DirectorySource implements Source {
     }
 
     @Override
-    public Collection<SourceRecord> getRecords(Report report) {
+    public Collection<SourceRecord> getRecords(Report report) throws SourceException {
         return readRecordsFromDirectory();
     }
 
     @Override
-    public Collection<SourceRecord> getRecords(long startPosition, long maxRecords, Report report) {
+    public Collection<SourceRecord> getRecords(long startPosition, long maxRecords, Report report) throws SourceException {
         List<SourceRecord> sorted = readRecordsFromDirectory();
         int calculatedBegin = (int) (startPosition - 1);
         int calculatedEnd = (int) Math.min(sorted.size(), (calculatedBegin + maxRecords));
@@ -111,10 +112,12 @@ public class DirectorySource implements Source {
         return this.directory.toFile().listFiles(filter);
     }
 
-    private List<SourceRecord> readRecordsFromDirectory() {
+    private List<SourceRecord> readRecordsFromDirectory() throws SourceException {
         if (this.records.isPresent()) {
             return this.records.get();
         }
+
+        List<SourceException> exceptions = new ArrayList<>();
 
         List<SourceRecord> recs = Arrays.stream(getFiles())
                 .map(file -> {
@@ -125,11 +128,16 @@ public class DirectorySource implements Source {
                     } catch (SAXException | IOException | ParserConfigurationException e) {
                         log.warn("Could not parse file {}: {} (turn on debug for full trace)", file, e.getMessage());
                         log.debug("Error reading file {}", file, e);
+                        exceptions.add(new SourceException("Issue with file '" + file.getName() + "': " + e.getMessage(), e));
                         return null;
                     }
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+
+        if (!exceptions.isEmpty()) {
+            throw exceptions.get(0);
+        }
 
         this.records = Optional.of(recs);
         return this.records.get();
