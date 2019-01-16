@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2019 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,6 @@ package org.n52.youngs.impl;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -36,7 +35,7 @@ public class ReportImpl implements Report {
 
     private final Map<String, String> failed = Maps.newHashMap();
 
-    private final Map<DateTime, String> messages = Maps.newHashMap();
+    private final Collection<MessageWithDate> messages = Lists.newArrayList();
 
     @Override
     public int getNumberOfRecordsAdded() {
@@ -79,25 +78,12 @@ public class ReportImpl implements Report {
 
     @Override
     public void addMessage(String message) {
-        this.messages.put(new DateTime(), message);
+        this.messages.add(new MessageWithDate(new DateTime(), message));
     }
 
     @Override
-    public Map<LocalTime, String> getMessages() {
-        Map<LocalTime, String> result = Maps.newHashMap();
-
-        this.messages.keySet().forEach(dt -> {
-            result.put(LocalTime.of(dt.getHourOfDay(),
-                    dt.getMinuteOfHour(),
-                    dt.getSecondOfMinute(),
-                    dt.getMillisOfSecond()*1000), this.messages.get(dt));
-        });
-
-        return result;
-    }
-
-    public Map<DateTime, String> getMessagesDateTime() {
-        return Collections.unmodifiableMap(this.messages);
+    public Collection<MessageWithDate> getMessages() {
+        return Collections.unmodifiableCollection(this.messages);
     }
 
     @Override
@@ -109,7 +95,7 @@ public class ReportImpl implements Report {
         sb.append(" Failed: ").append(getNumberOfRecordsFailed()).append("\n").append("\n");
         sb.append(" Added IDs: ").append(Joiner.on(", ").join(added)).append("\n");
         sb.append(" Faild IDs: ").append(Joiner.on(", ").withKeyValueSeparator(": ").join(failed)).append("\n");
-        sb.append(" Messages: ").append(Joiner.on("; ").withKeyValueSeparator(": ").join(messages)).append("\n");
+        sb.append(" Messages: ").append(Joiner.on("; ").join(messages)).append("\n");
 
         return sb.toString();
     }

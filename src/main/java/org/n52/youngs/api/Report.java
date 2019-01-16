@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2019 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,10 +16,9 @@
  */
 package org.n52.youngs.api;
 
-import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Map;
-import org.joda.time.DateTime;
+import org.n52.youngs.impl.MessageWithDate;
 
 /**
  *
@@ -52,8 +51,6 @@ public interface Report {
 
     public void addMessage(String message);
 
-    public Map<LocalTime, String> getMessages();
-
-    Map<DateTime, String> getMessagesDateTime();
+    public Collection<MessageWithDate> getMessages();
 
 }
