@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.n52.youngs.impl;
+package org.n52.youngs.api;
 
 import org.joda.time.DateTime;
 
@@ -27,10 +27,16 @@ public class MessageWithDate implements Comparable<MessageWithDate> {
 
     private final DateTime date;
     private final String message;
+    private final Report.Level level;
 
     public MessageWithDate(DateTime date, String message) {
+        this(date, message, Report.Level.INFO);
+    }
+
+    public MessageWithDate(DateTime date, String message, Report.Level level) {
         this.date = date;
         this.message = message;
+        this.level = level;
     }
 
     @Override
@@ -46,9 +52,13 @@ public class MessageWithDate implements Comparable<MessageWithDate> {
         return message;
     }
 
+    public Report.Level getLevel() {
+        return level;
+    }
+
     @Override
     public String toString() {
-        return "MessageWithDate{" + "date=" + date + ", message=" + message + '}';
+        return "MessageWithDate{" + "date=" + date + ", message=" + message + ", level=" + level + '}';
     }
 
 }

@@ -18,13 +18,18 @@ package org.n52.youngs.api;
 
 import java.util.Collection;
 import java.util.Map;
-import org.n52.youngs.impl.MessageWithDate;
 
 /**
  *
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
 public interface Report {
+
+    public enum Level {
+        INFO,
+        WARN,
+        ERROR
+    }
 
     /**
      * @deprecated use @see(#getNumberOfRecordsSuccesful()) instead
@@ -49,7 +54,11 @@ public interface Report {
      */
     public Map<String, String> getFailedIds();
 
-    public void addMessage(String message);
+    default void addMessage(String message) {
+        addMessage(message, Level.INFO);
+    };
+
+    public void addMessage(String message, Level level);
 
     public Collection<MessageWithDate> getMessages();
 

@@ -16,6 +16,7 @@
  */
 package org.n52.youngs.impl;
 
+import org.n52.youngs.api.MessageWithDate;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -79,6 +80,11 @@ public class ReportImpl implements Report {
     @Override
     public void addMessage(String message) {
         this.messages.add(new MessageWithDate(new DateTime(), message));
+    }
+
+    @Override
+    public void addMessage(String message, Level level) {
+        this.messages.add(new MessageWithDate(new DateTime(), message, level));
     }
 
     @Override

@@ -16,25 +16,28 @@
  */
 package org.n52.youngs.control;
 
+import java.util.List;
 import org.n52.youngs.api.Report;
 import org.n52.youngs.harvest.Source;
 import org.n52.youngs.load.Sink;
 import org.n52.youngs.postprocess.PostProcessor;
 import org.n52.youngs.transform.Mapper;
+import org.n52.youngs.validation.XmlSchemaValidator;
 
 /**
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
 public interface Runner {
 
-    public Runner harvest(Source source);
+    Runner harvest(Source source);
 
-    public Runner transform(Mapper mapper);
+    Runner transform(Mapper mapper);
 
-    public Runner postTransformProcess(PostProcessor postProcessor);
+    Runner postTransformProcess(PostProcessor postProcessor);
 
-    public Report load(Sink sink);
+    Runner withValidators(List<XmlSchemaValidator> vals);
 
-    public double getCompletedPercentage();
+    Report load(Sink sink);
 
+    double getCompletedPercentage();
 }

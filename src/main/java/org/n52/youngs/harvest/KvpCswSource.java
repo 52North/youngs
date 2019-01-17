@@ -40,6 +40,7 @@ import net.opengis.csw.v_2_0_2.AbstractRecordType;
 import net.opengis.csw.v_2_0_2.GetRecordsResponseType;
 import org.apache.http.client.fluent.Request;
 import org.n52.youngs.api.Report;
+import org.n52.youngs.api.Report.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -110,7 +111,7 @@ public class KvpCswSource extends CswSource {
             }
         } catch (IOException | JAXBException | ParserConfigurationException e) {
             log.error("Could not retrieve records using url {}", recordsRequest, e);
-            report.addMessage(String.format("Error retrieving record from endpoint %s: %s", this, e));
+            report.addMessage(String.format("Error retrieving record from endpoint %s: %s", this, e), Level.ERROR);
         }
 
         return records;

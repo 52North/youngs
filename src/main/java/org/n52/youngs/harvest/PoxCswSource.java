@@ -54,6 +54,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.n52.youngs.api.Report;
+import org.n52.youngs.api.Report.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -117,7 +118,7 @@ public class PoxCswSource extends CswSource {
             }
         } catch (IOException | JAXBException | ParserConfigurationException e) {
             log.error("Could not retrieve records from endpoint {}", getEndpoint(), e);
-            report.addMessage(String.format("Error retrieving record from endpoint %s: %s", this, e));
+            report.addMessage(String.format("Error retrieving record from endpoint %s: %s", this, e), Level.ERROR);
         }
 
         log.debug("Decoded {} records", records.size());

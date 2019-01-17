@@ -18,17 +18,21 @@ package org.n52.youngs.control.impl;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Stopwatch;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.n52.youngs.api.Report;
+import org.n52.youngs.api.Report.Level;
 import org.n52.youngs.control.Runner;
 import org.n52.youngs.exception.MappingError;
 import org.n52.youngs.exception.SinkError;
+import org.n52.youngs.harvest.NodeSourceRecord;
 import org.n52.youngs.harvest.Source;
 import org.n52.youngs.harvest.SourceException;
 import org.n52.youngs.harvest.SourceRecord;
@@ -37,8 +41,11 @@ import org.n52.youngs.load.Sink;
 import org.n52.youngs.load.SinkRecord;
 import org.n52.youngs.postprocess.PostProcessor;
 import org.n52.youngs.transform.Mapper;
+import org.n52.youngs.validation.XmlSchemaValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 /**
  * A harvesting runner that downloads a fixed number of records at a time from
@@ -71,6 +78,8 @@ public class SingleThreadBulkRunner implements Runner {
 
     private long startPosition = 1;
     private PostProcessor postProcessor;
+    private boolean validateXml;
+    private List<XmlSchemaValidator> validators;
 
     public SingleThreadBulkRunner() {
         //
@@ -113,6 +122,13 @@ public class SingleThreadBulkRunner implements Runner {
     }
 
     @Override
+    public Runner withValidators(List<XmlSchemaValidator> vals) {
+        this.validators = vals;
+        this.validateXml = true;
+        return this;
+    }
+
+    @Override
     public Report load(final Sink sink) {
         this.sink = sink;
         Objects.nonNull(source);
@@ -127,12 +143,12 @@ public class SingleThreadBulkRunner implements Runner {
             if (!prepareSink) {
                 String msg = "The sink could not be prepared. Stopping load, please check the logs.";
                 log.error(msg);
-                report.addMessage(msg);
+                report.addMessage(msg, Level.ERROR);
                 return report;
             }
         } catch (SinkError e) {
             log.error("Problem preparing sink", e);
-            report.addMessage(String.format("Problem preparing sink: %s", e.getMessage()));
+            report.addMessage(String.format("Problem preparing sink: %s", e.getMessage()), Level.ERROR);
             return report;
         }
 
@@ -163,6 +179,15 @@ public class SingleThreadBulkRunner implements Runner {
                 sourceTimer.start();
                 Collection<SourceRecord> records = source.getRecords(pageStart, size, report);
                 sourceTimer.stop();
+
+                if (this.validateXml) {
+                    for (SourceRecord record : records) {
+                        List<String> messages = validate(record);
+                        if (!messages.isEmpty()) {
+                            messages.forEach(m -> report.addMessage(m, Level.INFO));
+                        }
+                    }
+                }
 
                 log.debug("Mapping {} retrieved records.", records.size());
                 mappingTimer.start();
@@ -204,7 +229,17 @@ public class SingleThreadBulkRunner implements Runner {
                     log.info("TESTRUN, created documents are:\n{}", Arrays.toString(mappedRecords.toArray()));
                 }
 
-            } catch (SourceException | RuntimeException e) {
+            } catch (SourceException e) {
+                String msg = String.format("Issue while processing records %s to %s: %s",
+                        pageStart, size, e.getMessage());
+                log.info(msg, e);
+                report.addMessage(msg, Level.ERROR);
+            } catch (RuntimeException e) {
+                String msg = String.format("Unexpected error while processing records %s to %s: %s",
+                        pageStart, size, e.getMessage());
+                log.error(msg, e);
+                report.addMessage(msg, Level.ERROR);
+            } finally {
                 if (sourceTimer.isRunning()) {
                     sourceTimer.stop();
                 }
@@ -214,17 +249,14 @@ public class SingleThreadBulkRunner implements Runner {
                 if (sinkTimer.isRunning()) {
                     sinkTimer.stop();
                 }
-
-                String msg = String.format("Problem processing records %s to %s: %s", pageStart, pageStart + size, e.getMessage());
-                log.error(msg, e);
-                report.addMessage(msg);
             }
 
             pageStart += bulkSize;
 
             currentBulkTimer.stop();
             bulkTimeAvg = ((bulkTimeAvg * runNumber) + currentBulkTimer.elapsed(TimeUnit.SECONDS)) / (runNumber + 1);
-            updateAndLog(runNumber, (runNumber + 1) * bulkSize, currentBulkTimer.elapsed(TimeUnit.SECONDS), bulkTimeAvg);
+            updateAndLog(runNumber, (runNumber + 1) * bulkSize,
+                    currentBulkTimer.elapsed(TimeUnit.SECONDS), bulkTimeAvg);
             currentBulkTimer.reset();
 
             runNumber++;
@@ -263,6 +295,40 @@ public class SingleThreadBulkRunner implements Runner {
                 String.format("%1$,.2f", getCompletedPercentage()),
                 bulkSeconds,
                 String.format("%1$,.2f", bulkAverageSeconds));
+    }
+
+    private List<String> validate(SourceRecord sourceRecord) throws SourceException {
+        if (sourceRecord instanceof NodeSourceRecord) {
+            NodeSourceRecord nsr = (NodeSourceRecord) sourceRecord;
+
+            try {
+                XmlSchemaValidator val = resolveValidator(nsr.getRecord());
+                if (val != null) {
+                    return val.validate(nsr.getRecord());
+                } else {
+                    return Collections.singletonList("No schema validator available for namespace: " +
+                            nsr.getRecord().getNamespaceURI());
+                }
+            } catch (SAXException | IOException ex) {
+                throw new SourceException(ex.getMessage(), ex);
+            }
+        } else {
+            log.warn("The SourceRecord class {} is not supported", sourceRecord.getClass().getName());
+        }
+
+        return Collections.emptyList();
+    }
+
+    private XmlSchemaValidator resolveValidator(Node record) {
+        if (this.validators != null && !this.validators.isEmpty()) {
+            for (XmlSchemaValidator validator : validators) {
+                if (validator.matchesNamespace(record.getNamespaceURI())) {
+                    return validator;
+                }
+            }
+        }
+
+        return null;
     }
 
 }
