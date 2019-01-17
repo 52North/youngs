@@ -92,7 +92,7 @@ public class XmlSchemaValidator {
         LocalErrorHandler eh = new LocalErrorHandler();
         this.validator.setErrorHandler(eh);
         validator.validate(new DOMSource(xmlFile));
-        
+
         // if we have not errors or fatals, return the warnings (not breaking but informative)
         if (eh.errors.isEmpty() && eh.fatalErrors.isEmpty()) {
             return eh.warnings.stream()
