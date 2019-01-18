@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="http://eden.ign.fr/xsd/metafor/20050620/gmi" elementFormDefault="qualified" version="0.1" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://eden.ign.fr/xsd/metafor/20050620/gmi">
+	<!-- ================================= Annotation ================================ -->
+	<xs:annotation>
+		<xs:documentation>This file was generated from ISO TC/211 UML class diagrams == 06-19-2005 10:29:30 ====== Name: Lineage - Position: 2</xs:documentation>
+	</xs:annotation>
+	<!-- ================================== Imports ================================== -->
+	<xs:import namespace="http://www.isotc211.org/2005/gmd" schemaLocation="../gmd/dataQuality.xsd"/>
+	<xs:import namespace="http://www.isotc211.org/2005/gco" schemaLocation="../gco/gco.xsd"/>
+	<!-- ########################################################################### -->
+	<!-- ########################################################################### -->
+	<!-- ================================== Classes ================================= -->
+	<xs:complexType name="LE_Algorithm_Type">
+		<xs:annotation>
+			<xs:documentation>Description: Details of the methodology by which geographic information was derived from the instrument readings - FGDC: Algorithm_Information - shortName: Algorithm</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="gco:AbstractObject_Type">
+				<xs:sequence>
+					<xs:element name="citation" type="gmd:CI_Citation_PropertyType"/>
+					<xs:element name="description" type="gco:CharacterString_PropertyType"/>
+				</xs:sequence>
+				<xs:attribute ref="gco:isoType"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!-- ........................................................................ -->
+	<xs:element name="LE_Algorithm" type="gmi:LE_Algorithm_Type"/>
+	<!-- ........................................................................ -->
+	<xs:complexType name="LE_Algorithm_PropertyType">
+		<xs:sequence>
+			<xs:element ref="gmi:LE_Algorithm" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attributeGroup ref="gco:ObjectReference"/>
+		<xs:attribute ref="gco:nilReason"/>
+	</xs:complexType>
+	<!-- =========================================================================== -->
+	<xs:complexType name="LE_Processing_Type">
+		<xs:annotation>
+			<xs:documentation>Description: Comprehensive information about the procedure(s), the process(es) and algorithm(s) applied in the process step.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="gco:AbstractObject_Type">
+				<xs:sequence>
+					<xs:element name="identifier" type="gmd:MD_Identifier_PropertyType"/>
+					<xs:element name="softwareReference" type="gmd:CI_Citation_PropertyType" minOccurs="0"/>
+					<xs:element name="procedureDescription" type="gco:CharacterString_PropertyType" minOccurs="0"/>
+					<xs:element name="documentation" type="gmd:CI_Citation_PropertyType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="runTimeParameters" type="gco:CharacterString_PropertyType" minOccurs="0"/>
+					<xs:element name="algorithm" type="gmi:LE_Algorithm_PropertyType" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute ref="gco:isoType"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!-- ........................................................................ -->
+	<xs:element name="LE_Processing" type="gmi:LE_Processing_Type"/>
+	<!-- ........................................................................ -->
+	<xs:complexType name="LE_Processing_PropertyType">
+		<xs:sequence>
+			<xs:element ref="gmi:LE_Processing" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attributeGroup ref="gco:ObjectReference"/>
+		<xs:attribute ref="gco:nilReason"/>
+	</xs:complexType>
+	<!-- =========================================================================== -->
+	<xs:complexType name="LE_Source_Type">
+		<xs:annotation>
+			<xs:documentation>Description: information on source of data sets for processing step - FGDC:  - shortName: SrcDataset</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="gmd:LI_Source_Type">
+				<xs:sequence>
+					<xs:element name="processedLevel" type="gmd:MD_Identifier_PropertyType" minOccurs="0"/>
+					<xs:element name="resolution" type="gmi:LE_NominalResolution_PropertyType" minOccurs="0"/>
+				</xs:sequence>
+				<xs:attribute ref="gco:isoType"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!-- ........................................................................ -->
+	<xs:element name="LE_Source" type="gmi:LE_Source_Type" substitutionGroup="gmd:LI_Source"/>
+	<!-- ........................................................................ -->
+	<xs:complexType name="LE_Source_PropertyType">
+		<xs:sequence>
+			<xs:element ref="gmi:LE_Source" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attributeGroup ref="gco:ObjectReference"/>
+		<xs:attribute ref="gco:nilReason"/>
+	</xs:complexType>
+	<!-- =========================================================================== -->
+	<xs:complexType name="LE_ProcessStep_Type">
+		<xs:annotation>
+			<xs:documentation>Description: Information about an event or transformation in the life of the dataset including details of the algorithm and software used for processing - FGDC:  - shortName: DetailProcStep</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="gmd:LI_ProcessStep_Type">
+				<xs:sequence>
+					<xs:element name="processingInformation" type="gmi:LE_Processing_PropertyType" minOccurs="0"/>
+					<xs:element name="output" type="gmi:LE_Source_PropertyType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="report" type="gmi:LE_ProcessStepReport_PropertyType" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute ref="gco:isoType"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!-- ........................................................................ -->
+	<xs:element name="LE_ProcessStep" type="gmi:LE_ProcessStep_Type" substitutionGroup="gmd:LI_ProcessStep"/>
+	<!-- ........................................................................ -->
+	<xs:complexType name="LE_ProcessStep_PropertyType">
+		<xs:sequence>
+			<xs:element ref="gmi:LE_ProcessStep" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attributeGroup ref="gco:ObjectReference"/>
+		<xs:attribute ref="gco:nilReason"/>
+	</xs:complexType>
+	<!-- =========================================================================== -->
+	<xs:complexType name="LE_ProcessStepReport_Type">
+		<xs:annotation>
+			<xs:documentation>Report of what occured during the process step.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="gco:AbstractObject_Type">
+				<xs:sequence>
+					<xs:element name="name" type="gco:CharacterString_PropertyType"/>
+					<xs:element name="description" type="gco:CharacterString_PropertyType" minOccurs="0"/>
+					<xs:element name="fileType" type="gco:CharacterString_PropertyType" minOccurs="0"/>
+				</xs:sequence>
+				<xs:attribute ref="gco:isoType"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!-- ........................................................................ -->
+	<xs:element name="LE_ProcessStepReport" type="gmi:LE_ProcessStepReport_Type"/>
+	<!-- ........................................................................ -->
+	<xs:complexType name="LE_ProcessStepReport_PropertyType">
+		<xs:sequence>
+			<xs:element ref="gmi:LE_ProcessStepReport" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attributeGroup ref="gco:ObjectReference"/>
+		<xs:attribute ref="gco:nilReason"/>
+	</xs:complexType>
+	<!-- =========================================================================== -->
+	<xs:complexType name="LE_NominalResolution_Type">
+		<xs:annotation>
+			<xs:documentation>Distance between adjacent pixels.</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="scanningResolution" type="gco:Distance_PropertyType"/>
+			<xs:element name="groundResolution" type="gco:Distance_PropertyType"/>
+		</xs:choice>
+		<xs:attribute ref="gco:isoType"/>
+	</xs:complexType>
+	<!-- ........................................................................ -->
+	<xs:element name="LE_NominalResolution" type="gmi:LE_NominalResolution_Type"/>
+	<!-- ........................................................................ -->
+	<xs:complexType name="LE_NominalResolution_PropertyType">
+		<xs:sequence>
+			<xs:element ref="gmi:LE_NominalResolution" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute ref="gco:nilReason"/>
+	</xs:complexType>
+	<!-- =========================================================================== -->
+</xs:schema>

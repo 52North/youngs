@@ -181,11 +181,13 @@ public class SingleThreadBulkRunner implements Runner {
                 sourceTimer.stop();
 
                 if (this.validateXml) {
+                    int index = 0;
                     for (SourceRecord record : records) {
                         List<String> messages = validate(record);
                         if (!messages.isEmpty()) {
                             messages.forEach(m -> report.addMessage(m, Level.INFO));
                         }
+                        log.debug("File #{} is schema valid", index++);
                     }
                 }
 

@@ -20,11 +20,14 @@ import com.google.common.collect.Lists;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.xml.XMLConstants;
+import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
@@ -49,23 +52,43 @@ public class XmlSchemaValidator {
     private final String namespace;
     private Validator validator;
 
-    public XmlSchemaValidator(URL schemaResource, String namespace) throws SAXException {
-        Objects.nonNull(schemaResource);
+    /**
+     * Creates a new instance of a validator for the given namespace with the
+     * schema resource.
+     *
+     * If there are schema imports, this validator instance might have issues, depending
+     * on the underlying implementation. Some cannot resolve imports when URLs
+     * are used to create the schema source.
+     *
+     * @param namespace the target namespace
+     * @param schemaResources the resources
+     * @throws SAXException when the schema cannot be processed
+     */
+    public XmlSchemaValidator(String namespace, URL... schemaResources) throws SAXException {
+        Objects.nonNull(schemaResources);
         Objects.nonNull(namespace);
         this.namespace = namespace;
         SchemaFactory schemaFactory = SchemaFactory
                 .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        this.schema = schemaFactory.newSchema(schemaResource);
+        this.schema = schemaFactory.newSchema(convertToSources(schemaResources));
         this.initValidator();
     }
 
-    public XmlSchemaValidator(File schemaFile, String namespace) throws SAXException {
-        Objects.nonNull(schemaFile);
+    /**
+     * Creates a new instance of a validator for the given namespace with the
+     * schema resource.
+     *
+     * @param namespace the target namespace
+     * @param schemaFiles the resources as files
+     * @throws SAXException when the schema cannot be processed
+     */
+    public XmlSchemaValidator(String namespace, File... schemaFiles) throws SAXException {
+        Objects.nonNull(schemaFiles);
         Objects.nonNull(namespace);
         this.namespace = namespace;
         SchemaFactory schemaFactory = SchemaFactory
                 .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        this.schema = schemaFactory.newSchema(schemaFile);
+        this.schema = schemaFactory.newSchema(convertToSources(schemaFiles));
         this.initValidator();
     }
 
@@ -78,7 +101,7 @@ public class XmlSchemaValidator {
             this.validator.setFeature(validationFeature, true);
             this.validator.setFeature(schemaFeature, true);
         } catch (SAXNotRecognizedException | SAXNotSupportedException ex) {
-            LOG.warn("Could not enabled specific validation feature: "+ ex.getMessage());
+            LOG.warn("Could not enabled specific validation feature: " + ex.getMessage());
             LOG.debug(ex.getMessage(), ex);
         }
 
@@ -109,6 +132,34 @@ public class XmlSchemaValidator {
         // otherwise throw the fatal error
         SAXParseException e = eh.fatalErrors.get(0);
         throw new SAXException(e.getMessage(), e);
+    }
+
+    private Source[] convertToSources(URL[] schemaResources) throws SAXException {
+        List<IOException> exceptions = Lists.newArrayList();
+        StreamSource[] result = Arrays.asList(schemaResources).stream()
+                .map(sr -> {
+                    try {
+                        return new StreamSource(sr.openStream());
+                    } catch (IOException ex) {
+                        exceptions.add(ex);
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList())
+                .toArray(new StreamSource[0]);
+        if (!exceptions.isEmpty()) {
+            throw new SAXException(exceptions.get(0));
+        }
+        return result;
+    }
+
+    private Source[] convertToSources(File[] schemaResources) throws SAXException {
+        Source[] result = Arrays.asList(schemaResources).stream()
+                .map(sr -> new StreamSource(sr))
+                .collect(Collectors.toList())
+                .toArray(new StreamSource[0]);
+        return result;
     }
 
     private class LocalErrorHandler implements ErrorHandler {

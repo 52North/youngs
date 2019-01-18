@@ -17,7 +17,9 @@
 
 package org.n52.youngs.validation;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Collection;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
@@ -38,8 +40,8 @@ public class XmlSchemaValidatorTest {
 
     @Test
     public void testValidXmlFile() throws SAXException, SourceException, IOException {
-        XmlSchemaValidator val = new XmlSchemaValidator(getClass().getResource("/schemas/dummy-schema.xsd"),
-                "https://dummy.schema");
+        XmlSchemaValidator val = new XmlSchemaValidator("https://dummy.schema",
+                getClass().getResource("/schemas/dummy-schema.xsd"));
         Source source = new InMemoryStreamSource(getClass().getResourceAsStream("/schemas/dummy-doc1.xml"));
         Collection<SourceRecord> records = source.getRecords(new ReportImpl());
         NodeSourceRecord record1 = (NodeSourceRecord) records.iterator().next();
@@ -50,8 +52,8 @@ public class XmlSchemaValidatorTest {
 
     @Test
     public void testInvalidXmlFile() throws SourceException, IOException, SAXException {
-        XmlSchemaValidator val = new XmlSchemaValidator(getClass().getResource("/schemas/dummy-schema.xsd"),
-                "https://dummy.schema");
+        XmlSchemaValidator val = new XmlSchemaValidator("https://dummy.schema",
+                getClass().getResource("/schemas/dummy-schema.xsd"));
         Source source = new InMemoryStreamSource(getClass().getResourceAsStream("/schemas/dummy-doc2_invalid.xml"));
         Collection<SourceRecord> records = source.getRecords(new ReportImpl());
         NodeSourceRecord record1 = (NodeSourceRecord) records.iterator().next();
@@ -64,6 +66,20 @@ public class XmlSchemaValidatorTest {
         } catch (SAXException ex) {
             Assert.assertThat(ex.getMessage(), CoreMatchers.containsString(" is not a valid value for "));
         }
+    }
+
+
+    @Test
+    public void testMultiSchemaXmlFile() throws SAXException, SourceException, IOException {
+        XmlSchemaValidator val = new XmlSchemaValidator("http://www.isotc211.org/2005/gmi",
+                Paths.get(getClass().getResource("/schemas/gmi/gmi.xsd").getFile()).toFile()
+        );
+        Source source = new InMemoryStreamSource(getClass().getResourceAsStream("/schemas/complex_doc.xml"));
+        Collection<SourceRecord> records = source.getRecords(new ReportImpl());
+        NodeSourceRecord record1 = (NodeSourceRecord) records.iterator().next();
+
+        Assert.assertTrue(val.matchesNamespace(record1.getRecord().getNamespaceURI()));
+        Assert.assertTrue(val.validate(record1.getRecord()).isEmpty());
     }
 
 }
