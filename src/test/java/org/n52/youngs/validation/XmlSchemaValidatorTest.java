@@ -19,8 +19,11 @@ package org.n52.youngs.validation;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
@@ -71,9 +74,14 @@ public class XmlSchemaValidatorTest {
 
     @Test
     public void testMultiSchemaXmlFile() throws SAXException, SourceException, IOException {
-        XmlSchemaValidator val = new XmlSchemaValidator("http://www.isotc211.org/2005/gmi",
-                Paths.get(getClass().getResource("/schemas/gmi/gmi.xsd").getFile()).toFile()
-        );
+        XmlSchemaValidator val;
+        try {
+            val = new XmlSchemaValidator("http://www.isotc211.org/2005/gmi",
+                    Paths.get(getClass().getResource("/schemas/gmi/gmi.xsd").toURI()).toFile()
+            );
+        } catch (URISyntaxException ex) {
+            throw new IOException(ex);
+        }
         Source source = new InMemoryStreamSource(getClass().getResourceAsStream("/schemas/complex_doc.xml"));
         Collection<SourceRecord> records = source.getRecords(new ReportImpl());
         NodeSourceRecord record1 = (NodeSourceRecord) records.iterator().next();
