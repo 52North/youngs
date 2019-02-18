@@ -325,7 +325,7 @@ public class SingleThreadBulkRunner implements Runner {
                 }
             } catch (SAXException | IOException ex) {
                 String recordId = tryRecordIdExtraction((NodeSourceRecord) sourceRecord);
-                throw new SourceException("Validation failed for record with ID: " + recordId, ex);
+                throw new SourceException("Validation failed for record '" + recordId + "': " + ex.getMessage(), ex);
             }
         } else {
             log.warn("The SourceRecord class {} is not supported", sourceRecord.getClass().getName());
@@ -353,7 +353,7 @@ public class SingleThreadBulkRunner implements Runner {
             String result = idMapping.getXPath().evaluate(nodeSourceRecord.getRecord());
             return String.format("[identifier] %s", result);
         } catch (XPathExpressionException ex) {
-            log.debug("Could not extract ");
+            log.debug("Could not extract identifier field: " + ex.getMessage(), ex);
         }
 
         return String.format("[protocolIdentifier] %s", nodeSourceRecord.getProtocolIdentifier());
