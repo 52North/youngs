@@ -64,7 +64,7 @@ public abstract class InputStreamSource implements Source {
             elem.normalize();
             LOG.trace("Read document: {}", elem);
 
-            NodeSourceRecord record = new NodeSourceRecord(elem);
+            NodeSourceRecord record = new NodeSourceRecord(elem, resolveProtocolIdentifier());
             return Collections.singletonList(record);
         } catch (SAXException | IOException | ParserConfigurationException ex) {
             LOG.warn("Could not read file:" + ex.getMessage(), ex);
@@ -74,6 +74,8 @@ public abstract class InputStreamSource implements Source {
     }
 
     protected abstract InputStream resolveSourceInputStream() throws IOException;
+
+    protected abstract String resolveProtocolIdentifier();
 
     protected Charset sourceCharset() {
         Charset cs = Charset.forName("utf-8");

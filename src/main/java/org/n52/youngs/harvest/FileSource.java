@@ -59,4 +59,11 @@ public class FileSource extends InputStreamSource {
         return Files.newInputStream(this.file);
     }
 
+    @Override
+    protected String resolveProtocolIdentifier() {
+        return this.file.getFileName().toString();
+    }
+
+
+
 }

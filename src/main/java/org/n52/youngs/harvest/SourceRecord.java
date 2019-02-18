@@ -23,5 +23,10 @@ import org.n52.youngs.api.Record;
  * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
  */
 public interface SourceRecord extends Record {
+
+    default String getProtocolIdentifier() {
+        return toString();
+    };
+
     //
 }

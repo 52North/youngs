@@ -24,13 +24,20 @@ import org.w3c.dom.Node;
 public class NodeSourceRecord implements SourceRecord {
 
     private final Node record;
+    private final String protocolIdentifier;
 
-    public NodeSourceRecord(Node record) {
+    public NodeSourceRecord(Node record, String protocolIdentifier) {
         this.record = record;
+        this.protocolIdentifier = protocolIdentifier;
     }
 
     public Node getRecord() {
         return this.record;
+    }
+
+    @Override
+    public String getProtocolIdentifier() {
+        return protocolIdentifier;
     }
 
 }

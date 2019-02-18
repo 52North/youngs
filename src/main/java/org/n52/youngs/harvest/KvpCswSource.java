@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -90,10 +91,11 @@ public class KvpCswSource extends CswSource {
             List<Object> nodes = jaxb_response.getValue().getSearchResults().getAny();
             if (!nodes.isEmpty()) {
                 log.trace("Found {} \"any\" nodes.", nodes.size());
+                AtomicInteger streamIndex = new AtomicInteger(0);
                 nodes.stream()
                         .filter(n -> n instanceof Node)
                         .map(n -> (Node) n)
-                        .map(n -> new NodeSourceRecord(n))
+                        .map(n -> new NodeSourceRecord(n, "csw-record-" + streamIndex.getAndIncrement()))
                         .forEach(records::add);
             }
 
@@ -101,12 +103,13 @@ public class KvpCswSource extends CswSource {
             if (!jaxb_records.isEmpty()) {
                 log.trace("Found {} \"AbstractRecordType\" records.", jaxb_records.size());
                 DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                AtomicInteger streamIndex = new AtomicInteger(0);
                 jaxb_records.stream()
                         .map(type -> {
                             return getNode(type, context, db);
                         })
                         .filter(Objects::nonNull)
-                        .map(n -> new NodeSourceRecord(n))
+                        .map(n -> new NodeSourceRecord(n, "csw-record-" + streamIndex.getAndIncrement()))
                         .forEach(records::add);
             }
         } catch (IOException | JAXBException | ParserConfigurationException e) {

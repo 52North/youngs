@@ -57,12 +57,12 @@ public class XmlElementSource implements Source {
 
     @Override
     public Collection<SourceRecord> getRecords(Report report) {
-        return Collections.singleton(new NodeSourceRecord(this.element));
+        return Collections.singleton(new NodeSourceRecord(this.element, "internal-xml"));
     }
 
     @Override
     public Collection<SourceRecord> getRecords(long startPosition, long maxRecords, Report report) {
-        return Collections.singleton(new NodeSourceRecord(this.element));
+        return Collections.singleton(new NodeSourceRecord(this.element, "internal-xml"));
     }
 
 }

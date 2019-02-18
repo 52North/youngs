@@ -153,7 +153,7 @@ public class DirectorySource implements Source {
         elem.normalize();
         log.trace("Read document: {}", elem);
 
-        NodeSourceRecord record = new NodeSourceRecord(elem);
+        NodeSourceRecord record = new NodeSourceRecord(elem, f.getName());
         return record;
     }
 

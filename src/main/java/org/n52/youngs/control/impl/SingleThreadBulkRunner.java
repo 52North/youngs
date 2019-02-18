@@ -18,6 +18,7 @@ package org.n52.youngs.control.impl;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,6 +28,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import javax.xml.xpath.XPathExpressionException;
 import org.n52.youngs.api.Report;
 import org.n52.youngs.api.Report.Level;
 import org.n52.youngs.control.Runner;
@@ -41,6 +43,7 @@ import org.n52.youngs.load.Sink;
 import org.n52.youngs.load.SinkRecord;
 import org.n52.youngs.postprocess.PostProcessor;
 import org.n52.youngs.transform.Mapper;
+import org.n52.youngs.transform.MappingEntry;
 import org.n52.youngs.validation.XmlSchemaValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -180,20 +183,29 @@ public class SingleThreadBulkRunner implements Runner {
                 Collection<SourceRecord> records = source.getRecords(pageStart, size, report);
                 sourceTimer.stop();
 
+                Collection<SourceRecord> validRecords = Lists.newArrayList();
                 if (this.validateXml) {
                     int index = 0;
                     for (SourceRecord record : records) {
-                        List<String> messages = validate(record);
-                        if (!messages.isEmpty()) {
-                            messages.forEach(m -> report.addMessage(m, Level.INFO));
+                        try {
+                            List<String> messages = validate(record);
+                            if (!messages.isEmpty()) {
+                                messages.forEach(m -> report.addMessage(m, Level.INFO));
+                            }
+                            log.debug("File #{} is schema valid", index++);
+                            validRecords.add(record);
+                        } catch (SourceException e) {
+                            String msg = String.format("Issue while processing record %s: %s",
+                                    index, e.getMessage());
+                            log.info(msg, e);
+                            report.addMessage(msg, Level.ERROR);
                         }
-                        log.debug("File #{} is schema valid", index++);
                     }
                 }
 
-                log.debug("Mapping {} retrieved records.", records.size());
+                log.debug("Mapping {} retrieved valid records.", validRecords.size());
                 mappingTimer.start();
-                List<SinkRecord> mappedRecords = records.stream()
+                List<SinkRecord> mappedRecords = validRecords.stream()
                         .map(record -> {
                             try {
                                 SinkRecord r = mapper.map(record);
@@ -312,7 +324,8 @@ public class SingleThreadBulkRunner implements Runner {
                             nsr.getRecord().getNamespaceURI());
                 }
             } catch (SAXException | IOException ex) {
-                throw new SourceException(ex.getMessage(), ex);
+                String recordId = tryRecordIdExtraction((NodeSourceRecord) sourceRecord);
+                throw new SourceException("Validation failed for record with ID: " + recordId, ex);
             }
         } else {
             log.warn("The SourceRecord class {} is not supported", sourceRecord.getClass().getName());
@@ -331,6 +344,19 @@ public class SingleThreadBulkRunner implements Runner {
         }
 
         return null;
+    }
+
+    private String tryRecordIdExtraction(NodeSourceRecord nodeSourceRecord) {
+        String idField = this.mapper.getMapper().getIdentifierField();
+        MappingEntry idMapping = this.mapper.getMapper().getEntry(idField);
+        try {
+            String result = idMapping.getXPath().evaluate(nodeSourceRecord.getRecord());
+            return String.format("[identifier] %s", result);
+        } catch (XPathExpressionException ex) {
+            log.debug("Could not extract ");
+        }
+
+        return String.format("[protocolIdentifier] %s", nodeSourceRecord.getProtocolIdentifier());
     }
 
 }

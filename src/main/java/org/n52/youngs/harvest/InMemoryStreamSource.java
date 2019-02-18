@@ -52,4 +52,9 @@ public class InMemoryStreamSource extends InputStreamSource {
         return null;
     }
 
+    @Override
+    protected String resolveProtocolIdentifier() {
+        return "internal-stream";
+    }
+
 }

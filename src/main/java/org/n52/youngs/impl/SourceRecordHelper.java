@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -54,20 +55,22 @@ public class SourceRecordHelper {
 
         List<Object> nodes = jaxb_response.getValue().getSearchResults().getAny();
         if (!nodes.isEmpty()) {
+            AtomicInteger streamIndex = new AtomicInteger(0);
             nodes.stream()
                     .filter(n -> n instanceof Node)
                     .map(n -> (Node) n)
-                    .map(n -> new NodeSourceRecord(n))
+                    .map(n -> new NodeSourceRecord(n, "csw-record-" + streamIndex.getAndIncrement()))
                     .forEach(records::add);
         }
         List<JAXBElement<? extends AbstractRecordType>> jaxb_records = jaxb_response.getValue().getSearchResults().getAbstractRecord();
         if (!jaxb_records.isEmpty()) {
+            AtomicInteger streamIndex = new AtomicInteger(0);
             jaxb_records.stream()
                     .map(type -> {
                         return getNode(type, context);
                     })
                     .filter(Objects::nonNull)
-                    .map(n -> new NodeSourceRecord(n))
+                    .map(n -> new NodeSourceRecord(n, "csw-record-" + streamIndex.getAndIncrement()))
                     .forEach(records::add);
         }
 
@@ -94,7 +97,7 @@ public class SourceRecordHelper {
             Document doc = documentBuilder.parse(is);
             Element elem = doc.getDocumentElement();
             elem.normalize();
-            NodeSourceRecord record = new NodeSourceRecord(elem);
+            NodeSourceRecord record = new NodeSourceRecord(elem, filename);
             return record;
         }
     }
