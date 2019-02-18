@@ -183,8 +183,9 @@ public class SingleThreadBulkRunner implements Runner {
                 Collection<SourceRecord> records = source.getRecords(pageStart, size, report);
                 sourceTimer.stop();
 
-                Collection<SourceRecord> validRecords = Lists.newArrayList();
+                Collection<SourceRecord> validRecords;
                 if (this.validateXml) {
+                    validRecords = Lists.newArrayList();
                     int index = 0;
                     for (SourceRecord record : records) {
                         try {
@@ -201,6 +202,8 @@ public class SingleThreadBulkRunner implements Runner {
                             report.addMessage(msg, Level.ERROR);
                         }
                     }
+                } else {
+                    validRecords = records;
                 }
 
                 log.debug("Mapping {} retrieved valid records.", validRecords.size());
