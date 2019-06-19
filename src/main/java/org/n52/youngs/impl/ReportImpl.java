@@ -37,6 +37,7 @@ public class ReportImpl implements Report {
     private final Map<String, String> failed = Maps.newHashMap();
 
     private final Collection<MessageWithDate> messages = Lists.newArrayList();
+    private int identifiedRecordCount;
 
     @Override
     public int getNumberOfRecordsAdded() {
@@ -87,6 +88,10 @@ public class ReportImpl implements Report {
         this.messages.add(new MessageWithDate(new DateTime(), message, level));
     }
 
+    public void addMessageWithDate(MessageWithDate msg) {
+        this.messages.add(msg);
+    }
+
     @Override
     public Collection<MessageWithDate> getMessages() {
         return Collections.unmodifiableCollection(this.messages);
@@ -104,6 +109,15 @@ public class ReportImpl implements Report {
         sb.append(" Messages: ").append(Joiner.on("; ").join(messages)).append("\n");
 
         return sb.toString();
+    }
+
+    @Override
+    public int getIdentifiedRecordCount() {
+        return this.identifiedRecordCount;
+    }
+
+    public void setIdentifiedRecordCount(int identifiedRecordCount) {
+        this.identifiedRecordCount = identifiedRecordCount;
     }
 
 

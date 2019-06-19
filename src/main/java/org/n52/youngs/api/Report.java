@@ -62,4 +62,10 @@ public interface Report {
 
     public Collection<MessageWithDate> getMessages();
 
+    /**
+     * return the total count of records identified for the source (e.g. files)
+     * @return the total number
+     */
+    public int getIdentifiedRecordCount();
+
 }

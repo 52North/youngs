@@ -154,6 +154,12 @@ public class CswToBuilderMapper implements Mapper {
                 .map(entry -> entry.get())
                 .collect(Collectors.toList());
 
+        // apply a filter for entries (e.g. used by sub-classes)
+        if (!assessFilter(mappedEntries)) {
+            log.debug("record will be skipped as it did not pass the filter");
+            return null;
+        }
+
         mappedEntries.stream()
                 .forEach(er -> {
                     try {
@@ -329,6 +335,16 @@ public class CswToBuilderMapper implements Mapper {
     private <V> V extractValue(Map<String, Object> map, String key, V defaultValue) {
         V value = (V) map.get(key);
         return value == null ? defaultValue : value;
+    }
+
+    /**
+     * this method can be used by sub-classes to apply a filter on entries.
+     *
+     * @param mappedEntries input entries
+     * @return if the record passed the filter and should be considered for ingestion
+     */
+    public boolean assessFilter(List<EvalResult> mappedEntries) {
+        return true;
     }
 
     private static class IdAndBuilder {
