@@ -78,7 +78,7 @@
         <config.logger.fileappender.filepath>logs</config.logger.fileappender.filepath>
         <config.logger.fileappender.filename>${project.build.finalName}</config.logger.fileappender.filename>
         <version.java>1.8</version.java>
-        <version.log4j>2.8.2</version.log4j>
+        <version.log4j>2.13.3</version.log4j>
         <elasticsearch.version>6.2.2</elasticsearch.version>
     </properties>
 
