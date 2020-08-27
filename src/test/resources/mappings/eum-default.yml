@@ -27,6 +27,11 @@ index:
                     filter:
                         - lowercase
                         - autocomplete_filter
+            normalizer:
+                keyword_lowercase:
+                    type: custom
+                    filter:
+                        - lowercase
 mappings:
     abstract:
         xpath: "/*/gmd:identificationInfo/*/gmd:abstract/*/text()"
@@ -180,13 +185,13 @@ mappings:
             store: yes
             type: text
             #boost: 5.0
-            include_in_all: true
             analyzer: suggest_autocomplete
             search_analyzer: standard
             fields:
                 raw:
-                    type: text
-                    index: not_analyzed
+                    type: keyword
+                    index: false
+                    normalizer: keyword_lowercase
     # part of INSPIRE LimitationsOnPublicAccess
     data_policy:
         xpath: "/*/gmd:identificationInfo/*/gmd:resourceConstraints/*/gmd:classification/*/@codeListValue"
@@ -413,7 +418,7 @@ mappings:
                       with: ""
                     - replace: "https://doi.org/"
                       with: ""
-                properties: 
+                properties:
                     store: yes
                     type: text
                     index: not_analyzed
