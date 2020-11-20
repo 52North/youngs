@@ -1,0 +1,27 @@
+name: "JSON Record Mapping"
+version: 1
+mappings:
+    keywords:
+        expression: "/keywordsAsObjects/keyword"
+        properties:
+            type: node
+    keywords_types:
+        expression: "/keywordsAsObjects/type"
+        properties:
+            type: node
+    youngs_created_on:
+        expression: "current-dateTime()"
+        properties:
+            type: date
+    youngs_used_mapping:
+        expression: "JSON Record Mapping version 1"
+        properties:
+            type: string    
+    responsiblePartyRole:
+        expression: "/responsibleParty/responsiblePartyRole"
+        properties:
+            type: node
+    responsible_org:
+        expression: "/responsibleParty/organisationName"
+        properties:
+            type: node
