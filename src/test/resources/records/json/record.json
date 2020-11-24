@@ -2,12 +2,6 @@
 	"abstract": "The main objective of the Infrared Atmospheric Sounding Interferometer (IASI) is to provide high resolution atmospheric emission spectra to derive temperature and humidity profiles with high spectral and vertical resolution and accuracy. Additionally, it is used for the determination of trace gases such as ozone, as well as land and sea surface temperature, emissivity and cloud properties. This combined product (IASI Atmospheric Temperature Water Vapour and Surface Skin Temperature; IASI Cloud Parameters; IASI Ozone and IASI Trace Gases contains temperature Profiles, Humidity Profiles, Surface Temperature, Surface Emissivity, Fractional Cloud Cover, Cloud Top Temperature, Cloud Top Pressure, Cloud Phase, Total Column Ozone, Columnar ozone amounts in thick layers, Total column N2O, CO, CH4, CO2 - all combined in one product.",
 	"access_constraint": "copyright",
 	"alternateTitle": "IASSND02",
-	"availability": "EUMETSAT Data Centre",
-	"availableFormats": [
-		"Native",
-		"BUFR",
-		"netCDF"
-	],
 	"availableFormatsVersion": "-",
 	"conditions": [
 		"geossDataCore",
@@ -81,7 +75,6 @@
 			}
 		]
 	},
-	"distribution": "EUMETSAT Data Centre",
 	"distributorContact": {
 		"organisationName": "EUMETSAT",
 		"facsimile": "+49(0)6151-807 3790",
@@ -187,11 +180,6 @@
 	"topicCategory": "climatologyMeteorologyAtmosphere",
 	"typed_keywords": [
 		"theme:AtmosphereHumidityTemperature"
-	],
-	"typical_filename": [
-		"IASI_SND_02_M02_20100119102659Z_20100119120859Z_N_O_20100119121421Z.nat",
-		"W_XX-EUMETSAT-Darmstadt,HYPERSPECT+SOUNDING,METOPA+IASI_C_EUMP_20160309055653_48709_eps_o_l2.nc",
-		"M02-IASI-IASSND02-NA-6.4-20180917093252.000000000Z-20180917111436-1294552.bfr"
 	],
 	"use_constraint": "copyright",
 	"userGroups": [

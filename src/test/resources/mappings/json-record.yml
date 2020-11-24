@@ -25,3 +25,20 @@ mappings:
         expression: "/responsibleParty/organisationName"
         properties:
             type: node
+    typical_filename:
+        expression: "/digitalTransfers//typicalFilename"
+        properties:
+            type: list
+    availableFormats:
+        expression: "/digitalTransfers//name"
+        properties:
+            type: list
+    availability:
+        expression: "/digitalTransfers/availability/availability"
+        properties:
+            type: node
+    distribution:
+        expression: "/digitalTransfers/availability/availability"
+        properties:
+            type: node
+        

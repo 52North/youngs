@@ -1,11 +1,25 @@
+/*
+ * Copyright 2015-2020 52°North Initiative for Geospatial Open Source
+ * Software GmbH
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.n52.youngs.test;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -44,37 +58,68 @@ public class JsonMappingTest {
     private static final String FIELDNAME_TYPE = "type";
 
     private static final String FIELDNAME_KEYWORDS_TYPES = "keywords_types";
-    
+
     private static final String FIELDNAME_YOUNGS_CREATED_ON = "youngs_created_on";
-    
+
     private static final String FIELDNAME_RESPONSIBLE_PARTY_ROLE = "responsiblePartyRole";
-    
+
     private static final String FIELDNAME_RESPONSIBLE_ORG = "responsible_org";
 
     private static final long EXPECTED_TIME_DIFFERENCE_IN_SECONDS = 5;
 
     private static final String FIELDNAME_RESPONSIBLE_PARTY = "responsibleParty";
 
-    private static final String FIELDNAME_ORGANIZAiION_NAME = "organisationName";
-   
+    private static final String FIELDNAME_ORGANIZATION_NAME = "organisationName";
+    
+    private static final String FIELDNAME_NAME = "name";
+    
+    private static final String FIELDNAME_TYPICAL_FILENAME = "typical_filename";
+    
+    private static final String FIELDNAME_TYPICALFILENAME = "typicalFilename";
+    
+    private static final String FIELDNAME_DIGITAL_TRANSFERS = "digitalTransfers";
+
+    private static final String FIELDNAME_FORMAT = "format";
+    
+    private static final String ASSERTION_TEXT = "%s does not match. Got %s, expected %s.";
+
+    private static final String FIELDNAME_AVAILABLE_FORMATS = "availableFormats";
+
+    private static final String FIELDNAME_AVAILABILITY = "availability";
+
+    private static final String FIELDNAME_DISTRIBUTION = "distribution";
+
     private List<String> expectedKeywords = new ArrayList<String>();
 
     private String expectedKeywordsTypes = "";
 
     private String expectedIdentifier;
-    
+
     private String expectedResponsiblePartyRole;
-    
+
     private String expectedResponsibleOrg;
-    
+
     private Map<String, String> expectedMappingStringMap;
+    
+    private Map<String, String> expectedValuesStringMap;
 
     private ObjectMapper objectMapper;
+
+    private int expectedTypicalFileNameArraySize;
+    
+    private List<String> expectedTypicalFilenameList;
+    
+    private int expectedAvailableFormatsArraySize;
+    
+    private List<String> expectedAvailableFormatsList;
 
     @Before
     public void setUp() {
         objectMapper = new ObjectMapper();
         expectedMappingStringMap = new HashMap<String, String>();
+        expectedValuesStringMap = new HashMap<String, String>();
+        expectedTypicalFilenameList = new ArrayList<String>();
+        expectedAvailableFormatsList = new ArrayList<String>();
     }
 
     @Test
@@ -105,12 +150,52 @@ public class JsonMappingTest {
         checkKeywords(mappedRecordJsonNode);
         checkCreatedOn(mappedRecordJsonNode);
         checkExpectedElements(mappedRecordJsonNode);
-        checkResponsiblePartyElements(mappedRecordJsonNode);
+        checkValues(mappedRecordJsonNode);
+        checkTypicalFilenames(mappedRecordJsonNode);
+        checkAvailableFormats(mappedRecordJsonNode);
+        checkAvailabilityAndDistribution(mappedRecordJsonNode);
+    }
+
+    private void checkAvailabilityAndDistribution(JsonNode mappedRecordJsonNode) {
+        TextNode responsiblePartyRoleNode = (TextNode) mappedRecordJsonNode.path(FIELDNAME_RESPONSIBLE_PARTY_ROLE);
+        String responsiblePartyRoleString = responsiblePartyRoleNode.asText();
+        assertTrue(String.format(ASSERTION_TEXT , FIELDNAME_RESPONSIBLE_PARTY_ROLE, responsiblePartyRoleString, expectedResponsiblePartyRole), expectedResponsiblePartyRole.equals(responsiblePartyRoleString));
+        TextNode responsibleOrgNode = (TextNode) mappedRecordJsonNode.path(FIELDNAME_RESPONSIBLE_ORG);
+        String responsibleOrgString = responsibleOrgNode.asText();
+        assertTrue(String.format(ASSERTION_TEXT, FIELDNAME_RESPONSIBLE_ORG, responsibleOrgString, expectedResponsibleOrg), expectedResponsibleOrg.equals(responsibleOrgString));        
+    }
+
+    private void checkTypicalFilenames(JsonNode mappedRecordJsonNode) {
+        JsonNode typicalFileNameNode = mappedRecordJsonNode.findPath(FIELDNAME_TYPICAL_FILENAME);        
+        assertTrue(String.format("Node not instanceof ArrayNode. Is instance of %s.", typicalFileNameNode.getClass().getCanonicalName()), typicalFileNameNode instanceof ArrayNode);        
+        ArrayNode typicalFileNameArrayNode = (ArrayNode)typicalFileNameNode;        
+        assertTrue(String.format("ArrayNode length not as expected. Is %d, expected %d.", typicalFileNameArrayNode.size(), expectedTypicalFileNameArraySize), typicalFileNameArrayNode.size() == expectedTypicalFileNameArraySize);
+        ArrayList<String> typicalFilenameList = new ArrayList<String>();
+        for (JsonNode typicalFileNameTextNode : typicalFileNameArrayNode) {
+            typicalFilenameList.add(typicalFileNameTextNode.asText());
+        }
+        for (String expectedTypicalFilename : expectedTypicalFilenameList) {
+            assertTrue(String.format("Expected typical file name not mapped: %s", expectedTypicalFilename), typicalFilenameList.contains(expectedTypicalFilename));
+        }
+    }
+    
+    private void checkAvailableFormats(JsonNode mappedRecordJsonNode) {
+        JsonNode availableFormat = mappedRecordJsonNode.findPath(FIELDNAME_AVAILABLE_FORMATS);        
+        assertTrue(String.format("Node not instanceof ArrayNode. Is instance of %s.", availableFormat.getClass().getCanonicalName()), availableFormat instanceof ArrayNode);        
+        ArrayNode availableFormatArrayNode = (ArrayNode)availableFormat;        
+        assertTrue(String.format("ArrayNode length not as expected. Is %d, expected %d.", availableFormatArrayNode.size(), expectedAvailableFormatsArraySize), availableFormatArrayNode.size() == expectedAvailableFormatsArraySize);
+        ArrayList<String> AvailableFormatList = new ArrayList<String>();
+        for (JsonNode AvailableFormatTextNode : availableFormatArrayNode) {
+            AvailableFormatList.add(AvailableFormatTextNode.asText());
+        }
+        for (String expectedAvailableFormat : expectedAvailableFormatsList) {
+            assertTrue(String.format("Expected typical file name not mapped: %s", expectedAvailableFormat), AvailableFormatList.contains(expectedAvailableFormat));
+        }
     }
 
     private void extractExpectedValues(LightweightYamlMappingConfiguration mapper) {
-        Collection<LightweightMappingEntry> entries = mapper.getLightweightEntries();        
-        for (LightweightMappingEntry lightweightMappingEntry : entries) {            
+        Collection<LightweightMappingEntry> entries = mapper.getLightweightEntries();
+        for (LightweightMappingEntry lightweightMappingEntry : entries) {
             switch (lightweightMappingEntry.getType()) {
             case STRING:
                 String expression = lightweightMappingEntry.getExpression();
@@ -118,25 +203,26 @@ public class JsonMappingTest {
                 break;
             default:
                 break;
-            }            
+            }
         }
     }
 
-    private void checkResponsiblePartyElements(JsonNode mappedRecordJsonNode) {        
-      TextNode responsiblePartyRoleNode = (TextNode) mappedRecordJsonNode.path(FIELDNAME_RESPONSIBLE_PARTY_ROLE);
-      String responsiblePartyRoleString = responsiblePartyRoleNode.asText();
-      assertTrue(String.format("%s does not match. Got %s, expected %s.", FIELDNAME_RESPONSIBLE_PARTY_ROLE, responsiblePartyRoleString, expectedResponsiblePartyRole), expectedResponsiblePartyRole.equals(responsiblePartyRoleString));
-      TextNode responsibleOrgNode = (TextNode) mappedRecordJsonNode.path(FIELDNAME_RESPONSIBLE_ORG);
-      String responsibleOrgString = responsibleOrgNode.asText();
-      assertTrue(String.format("%s does not match. Got %s, expected %s.", FIELDNAME_RESPONSIBLE_ORG, responsibleOrgString, expectedResponsibleOrg), expectedResponsibleOrg.equals(responsibleOrgString));
+    private void checkValues(JsonNode mappedRecordJsonNode) {
+        
+        for (String expectedValueKey : expectedValuesStringMap.keySet()) {
+            String expectedValue = expectedValuesStringMap.get(expectedValueKey);
+            TextNode responsiblePartyRoleNode = (TextNode) mappedRecordJsonNode.path(expectedValueKey);
+            String responsiblePartyRoleString = responsiblePartyRoleNode.asText();
+            assertTrue(String.format(ASSERTION_TEXT , expectedValueKey, responsiblePartyRoleString, expectedValue), expectedValue.equals(responsiblePartyRoleString));
+        }
     }
-    
-    private void checkExpectedElements(JsonNode mappedRecordJsonNode) {        
+
+    private void checkExpectedElements(JsonNode mappedRecordJsonNode) {
         for (String expectedNodeFieldName : expectedMappingStringMap.keySet()) {
             TextNode youngsUsedMappingNode = (TextNode) mappedRecordJsonNode.path(expectedNodeFieldName);
             String youngsUsedMappingString = youngsUsedMappingNode.asText();
             String expectedYoungsUsedMappingString = expectedMappingStringMap.get(expectedNodeFieldName);
-            assertTrue(String.format("%sdoes not match. Got %s, expected %s.", expectedNodeFieldName, youngsUsedMappingString, expectedYoungsUsedMappingString), expectedYoungsUsedMappingString.equals(youngsUsedMappingString));     
+            assertTrue(String.format(ASSERTION_TEXT, expectedNodeFieldName, youngsUsedMappingString, expectedYoungsUsedMappingString), expectedYoungsUsedMappingString.equals(youngsUsedMappingString));
         }
     }
 
@@ -145,9 +231,9 @@ public class JsonMappingTest {
         String youngsCreatedOnString = youngsCreatedOnNode.asText();
         try {
             LocalDateTime now = LocalDateTime.now();
-            LocalDateTime youngsCreatedOnocalDateTime = LocalDateTime.parse(youngsCreatedOnString, DateTimeFormatter.ISO_OFFSET_DATE_TIME);            
-            long diff = ChronoUnit.SECONDS.between(now, youngsCreatedOnocalDateTime);            
-            assertTrue("Youngs created on date time that is older than five seconds from current time. Value is: " + youngsCreatedOnocalDateTime, diff < EXPECTED_TIME_DIFFERENCE_IN_SECONDS);                        
+            LocalDateTime youngsCreatedOnocalDateTime = LocalDateTime.parse(youngsCreatedOnString, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+            long diff = ChronoUnit.SECONDS.between(now, youngsCreatedOnocalDateTime);
+            assertTrue("Youngs created on date time that is older than five seconds from current time. Value is: " + youngsCreatedOnocalDateTime, diff < EXPECTED_TIME_DIFFERENCE_IN_SECONDS);
         } catch (DateTimeParseException e) {
             fail(String.format("Could not parse text to date. Got text: %s.", youngsCreatedOnString));
         }
@@ -159,10 +245,40 @@ public class JsonMappingTest {
         JsonNode keywordNode = keywordsAsObjectsNode.path(FIELDNAME_KEYWORD);
         ArrayNode keywordArrayNode = getArrayNode(keywordNode);
         keywordArrayNode.iterator().forEachRemaining(keyword -> expectedKeywords.add(keyword.asText()));
-        expectedKeywordsTypes = keywordsAsObjectsNode.path(FIELDNAME_TYPE).asText();        
+        expectedKeywordsTypes = keywordsAsObjectsNode.path(FIELDNAME_TYPE).asText();
         JsonNode responsiblePartyNode = metadataNode.path(FIELDNAME_RESPONSIBLE_PARTY);
         expectedResponsiblePartyRole = responsiblePartyNode.path(FIELDNAME_RESPONSIBLE_PARTY_ROLE).asText();
-        expectedResponsibleOrg = responsiblePartyNode.path(FIELDNAME_ORGANIZAiION_NAME).asText();        
+        expectedValuesStringMap.put(FIELDNAME_RESPONSIBLE_PARTY_ROLE, expectedResponsiblePartyRole);
+        expectedResponsibleOrg = responsiblePartyNode.path(FIELDNAME_ORGANIZATION_NAME).asText();
+        expectedValuesStringMap.put(FIELDNAME_RESPONSIBLE_ORG, expectedResponsibleOrg);
+        JsonNode digitalTransfersNode = metadataNode.path(FIELDNAME_DIGITAL_TRANSFERS);
+        JsonNode availabilityNode = digitalTransfersNode.path(FIELDNAME_AVAILABILITY);
+        String availabiltyString = "";
+        if(availabilityNode instanceof ArrayNode) {
+            availabiltyString = ((ArrayNode)availabilityNode).get(0).path(FIELDNAME_AVAILABILITY).asText();
+        }
+        expectedValuesStringMap.put(FIELDNAME_DISTRIBUTION, availabiltyString);
+        expectedValuesStringMap.put(FIELDNAME_AVAILABILITY, availabiltyString);
+        extractExpectedTypicalFilenames(metadataNode);
+        extractAvailableFormats(metadataNode);
+    }
+
+    private void extractExpectedTypicalFilenames(JsonNode metadataNode) {        
+        JsonNode digitalTransfersNode = metadataNode.path(FIELDNAME_DIGITAL_TRANSFERS);        
+        ArrayNode formatsNode = (ArrayNode)digitalTransfersNode.path(FIELDNAME_FORMAT);        
+        for (JsonNode jsonNode : formatsNode) {
+            expectedTypicalFilenameList.add(jsonNode.path(FIELDNAME_TYPICALFILENAME).asText());            
+        }
+        expectedTypicalFileNameArraySize = expectedTypicalFilenameList.size();
+    }
+    
+    private void extractAvailableFormats(JsonNode metadataNode) {        
+        JsonNode digitalTransfersNode = metadataNode.path(FIELDNAME_DIGITAL_TRANSFERS);        
+        ArrayNode formatsNode = (ArrayNode)digitalTransfersNode.path(FIELDNAME_FORMAT);        
+        for (JsonNode jsonNode : formatsNode) {
+            expectedAvailableFormatsList.add(jsonNode.path(FIELDNAME_NAME).asText());            
+        }
+        expectedAvailableFormatsArraySize = expectedAvailableFormatsList.size();
     }
 
     private ArrayNode getArrayNode(JsonNode keywordNode) {

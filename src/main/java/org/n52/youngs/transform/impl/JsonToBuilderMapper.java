@@ -18,7 +18,9 @@ package org.n52.youngs.transform.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 import org.elasticsearch.common.xcontent.NamedXContentRegistry;
@@ -39,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -107,38 +110,29 @@ public class JsonToBuilderMapper implements Mapper {
             String[] pathArray = expression.substring(1, expression.length()).split("/");
             JsonNode currentNode = sourceNode.path(pathArray[0]);
             for (int i = 1; i < pathArray.length; i++) {
-                currentNode = currentNode.get(pathArray[i]);
+                if(currentNode instanceof ArrayNode) {
+                    currentNode = ((ArrayNode)currentNode).get(0);//TODO check if applicable
+                    currentNode = currentNode.get(pathArray[i]);
+                } else {
+                    currentNode = currentNode.get(pathArray[i]);
+                }
             }
             result = currentNode;
             return result;
         case STRING:
             result = new TextNode(expression);
             return result;
+        case LIST:
+            String[] pathArrayForList = expression.substring(1, expression.length()).split("//");
+            if(pathArrayForList.length == 2) {
+                List<JsonNode> valuesList = sourceNode.path(pathArrayForList[0]).findValues(pathArrayForList[1]);
+                ArrayNode valuesArrayNode = new ArrayNode(JsonNodeFactory.instance, valuesList);
+                result = valuesArrayNode;
+            }
+            return result;
         default:
             log.warn("Entry could not be resolved." + mappingEntry.toString());
             return result;
         }
     }
-
-    private String extractString(String expression) {
-        expression = expression.replace("string", "");
-        expression = expression.replace("'", "");
-        return expression;
-    }
-
-    private void mapKeywords(JsonNode metadataNode) {
-
-        JsonNode keywordsAsObjectsNode = metadataNode.path(JsonConstants.FIELDNAME_KEYWORDS_AS_OBJECTS);
-
-        JsonNode keywordNode = keywordsAsObjectsNode.path(JsonConstants.FIELDNAME_KEYWORD);
-
-        ArrayNode keywordArrayNode = (ArrayNode) keywordNode;
-
-        ObjectNode metadataNodeObjectNode = (ObjectNode) metadataNode;
-
-        metadataNodeObjectNode.set(JsonConstants.FIELDNAME_KEYWORDS, keywordArrayNode);
-
-        metadataNodeObjectNode.set(JsonConstants.FIELDNAME_KEYWORDS_TYPES, keywordsAsObjectsNode.path(JsonConstants.FIELDNAME_TYPE));
-    }
-
 }
