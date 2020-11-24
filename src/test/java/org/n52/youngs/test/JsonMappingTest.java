@@ -90,15 +90,7 @@ public class JsonMappingTest {
     private static final String FIELDNAME_DISTRIBUTION = "distribution";
 
     private List<String> expectedKeywords = new ArrayList<String>();
-
-    private String expectedKeywordsTypes = "";
-
-    private String expectedIdentifier;
-
-    private String expectedResponsiblePartyRole;
-
-    private String expectedResponsibleOrg;
-
+    
     private Map<String, String> expectedMappingStringMap;
 
     private Map<String, String> expectedValuesStringMap;
@@ -146,23 +138,12 @@ public class JsonMappingTest {
             fail(e.getMessage());
             return;
         }
-        checkId(mappedRecordJsonNode);
         checkKeywords(mappedRecordJsonNode);
         checkCreatedOn(mappedRecordJsonNode);
         checkExpectedElements(mappedRecordJsonNode);
         checkValues(mappedRecordJsonNode);
         checkTypicalFilenames(mappedRecordJsonNode);
         checkAvailableFormats(mappedRecordJsonNode);
-        checkAvailabilityAndDistribution(mappedRecordJsonNode);
-    }
-
-    private void checkAvailabilityAndDistribution(JsonNode mappedRecordJsonNode) {
-        TextNode responsiblePartyRoleNode = (TextNode) mappedRecordJsonNode.path(FIELDNAME_RESPONSIBLE_PARTY_ROLE);
-        String responsiblePartyRoleString = responsiblePartyRoleNode.asText();
-        assertTrue(String.format(ASSERTION_TEXT , FIELDNAME_RESPONSIBLE_PARTY_ROLE, responsiblePartyRoleString, expectedResponsiblePartyRole), expectedResponsiblePartyRole.equals(responsiblePartyRoleString));
-        TextNode responsibleOrgNode = (TextNode) mappedRecordJsonNode.path(FIELDNAME_RESPONSIBLE_ORG);
-        String responsibleOrgString = responsibleOrgNode.asText();
-        assertTrue(String.format(ASSERTION_TEXT, FIELDNAME_RESPONSIBLE_ORG, responsibleOrgString, expectedResponsibleOrg), expectedResponsibleOrg.equals(responsibleOrgString));
     }
 
     private void checkTypicalFilenames(JsonNode mappedRecordJsonNode) {
@@ -239,25 +220,23 @@ public class JsonMappingTest {
     }
 
     private void extractExpectedValues(JsonNode metadataNode) throws IllegalArgumentException {
-        expectedIdentifier = metadataNode.path(FIELDNAME_ID).asText();
+        expectedValuesStringMap.put(FIELDNAME_ID, metadataNode.path(FIELDNAME_ID).asText());
         JsonNode keywordsAsObjectsNode = metadataNode.path(FIELDNAME_KEYWORDS_AS_OBJECTS);
         JsonNode keywordNode = keywordsAsObjectsNode.path(FIELDNAME_KEYWORD);
         ArrayNode keywordArrayNode = getArrayNode(keywordNode);
         keywordArrayNode.iterator().forEachRemaining(keyword -> expectedKeywords.add(keyword.asText()));
-        expectedKeywordsTypes = keywordsAsObjectsNode.path(FIELDNAME_TYPE).asText();
+        expectedValuesStringMap.put(FIELDNAME_KEYWORDS_TYPES, keywordsAsObjectsNode.path(FIELDNAME_TYPE).asText());
         JsonNode responsiblePartyNode = metadataNode.path(FIELDNAME_RESPONSIBLE_PARTY);
-        expectedResponsiblePartyRole = responsiblePartyNode.path(FIELDNAME_RESPONSIBLE_PARTY_ROLE).asText();
-        expectedValuesStringMap.put(FIELDNAME_RESPONSIBLE_PARTY_ROLE, expectedResponsiblePartyRole);
-        expectedResponsibleOrg = responsiblePartyNode.path(FIELDNAME_ORGANIZATION_NAME).asText();
-        expectedValuesStringMap.put(FIELDNAME_RESPONSIBLE_ORG, expectedResponsibleOrg);
+        expectedValuesStringMap.put(FIELDNAME_RESPONSIBLE_PARTY_ROLE, responsiblePartyNode.path(FIELDNAME_RESPONSIBLE_PARTY_ROLE).asText());
+        expectedValuesStringMap.put(FIELDNAME_RESPONSIBLE_ORG, responsiblePartyNode.path(FIELDNAME_ORGANIZATION_NAME).asText());
         JsonNode digitalTransfersNode = metadataNode.path(FIELDNAME_DIGITAL_TRANSFERS);
         JsonNode availabilityNode = digitalTransfersNode.path(FIELDNAME_AVAILABILITY);
-        String availabiltyString = "";
+        String expectedAvailabiltyString = "";
         if(availabilityNode instanceof ArrayNode) {
-            availabiltyString = ((ArrayNode)availabilityNode).get(0).path(FIELDNAME_AVAILABILITY).asText();
+            expectedAvailabiltyString = ((ArrayNode)availabilityNode).get(0).path(FIELDNAME_AVAILABILITY).asText();
         }
-        expectedValuesStringMap.put(FIELDNAME_DISTRIBUTION, availabiltyString);
-        expectedValuesStringMap.put(FIELDNAME_AVAILABILITY, availabiltyString);
+        expectedValuesStringMap.put(FIELDNAME_DISTRIBUTION, expectedAvailabiltyString);
+        expectedValuesStringMap.put(FIELDNAME_AVAILABILITY, expectedAvailabiltyString);
         extractExpectedTypicalFilenames(metadataNode);
         extractAvailableFormats(metadataNode);
     }
@@ -297,12 +276,5 @@ public class JsonMappingTest {
                 fail(String.format("Mapped keywords do not contain %s.", keyWordText));
             }
         }
-        String keyword_types = tree.findPath(FIELDNAME_KEYWORDS_TYPES).asText();
-        assertTrue(String.format("Keyword types not equal. Got %s, expected %s.", keyword_types, expectedKeywordsTypes), expectedKeywordsTypes.equals(keyword_types));
-    }
-
-    private void checkId(JsonNode tree) {
-        String _id = tree.findPath(FIELDNAME_ID).asText();
-        assertTrue(String.format("IDs do not match. Got %S, should be %S", _id, expectedIdentifier), _id.equals(expectedIdentifier));
     }
 }
