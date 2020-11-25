@@ -19,6 +19,7 @@ package org.n52.youngs.transform.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -117,7 +118,7 @@ public class LightweightYamlMappingConfiguration implements MappingConfiguration
 
     @Override
     public Collection<MappingEntry> getEntries() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override

@@ -1,5 +1,28 @@
 name: "JSON Record Mapping"
 version: 1
+index:
+    create: true
+    name: csw
+    type: record
+    settings: |
+        analysis:
+            filter:
+                autocomplete_filter:
+                    type: edge_ngram
+                    min_gram: 1
+                    max_gram: 20
+            analyzer:
+                suggest_autocomplete:
+                    type: custom
+                    tokenizer: standard
+                    filter:
+                        - lowercase
+                        - autocomplete_filter
+            normalizer:
+                keyword_lowercase:
+                    type: custom
+                    filter:
+                        - lowercase
 mappings:
     keywords:
         expression: "/keywordsAsObjects/keyword"
