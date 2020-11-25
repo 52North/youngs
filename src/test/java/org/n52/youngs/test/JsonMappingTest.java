@@ -90,7 +90,7 @@ public class JsonMappingTest {
     private static final String FIELDNAME_DISTRIBUTION = "distribution";
 
     private List<String> expectedKeywords = new ArrayList<String>();
-    
+
     private Map<String, String> expectedMappingStringMap;
 
     private Map<String, String> expectedValuesStringMap;
@@ -121,7 +121,7 @@ public class JsonMappingTest {
         JsonToBuilderMapper builderMapper = new JsonToBuilderMapper(mapper);
         JsonNode record;
         try {
-            record = objectMapper.readTree(getClass().getClassLoader().getResourceAsStream("records/json/record.json"));
+            record = objectMapper.readTree(getClass().getClassLoader().getResourceAsStream("records/json/record2.json"));
         } catch (IOException e) {
             fail(e.getMessage());
             return;
@@ -243,25 +243,35 @@ public class JsonMappingTest {
 
     private void extractExpectedTypicalFilenames(JsonNode metadataNode) {
         JsonNode digitalTransfersNode = metadataNode.path(FIELDNAME_DIGITAL_TRANSFERS);
-        ArrayNode formatsNode = (ArrayNode)digitalTransfersNode.path(FIELDNAME_FORMAT);
-        for (JsonNode jsonNode : formatsNode) {
-            expectedTypicalFilenameList.add(jsonNode.path(FIELDNAME_TYPICALFILENAME).asText());
+        JsonNode formatsNode = digitalTransfersNode.path(FIELDNAME_FORMAT);
+        if(formatsNode instanceof ArrayNode) {
+            for (JsonNode jsonNode : formatsNode) {
+                expectedTypicalFilenameList.add(jsonNode.path(FIELDNAME_TYPICALFILENAME).asText());
+            }
+            expectedTypicalFileNameArraySize = expectedTypicalFilenameList.size();
+        } else {
+            expectedTypicalFilenameList.add(formatsNode.path(FIELDNAME_TYPICALFILENAME).asText());
+            expectedTypicalFileNameArraySize = 1;
         }
-        expectedTypicalFileNameArraySize = expectedTypicalFilenameList.size();
     }
 
     private void extractAvailableFormats(JsonNode metadataNode) {
         JsonNode digitalTransfersNode = metadataNode.path(FIELDNAME_DIGITAL_TRANSFERS);
-        ArrayNode formatsNode = (ArrayNode)digitalTransfersNode.path(FIELDNAME_FORMAT);
-        for (JsonNode jsonNode : formatsNode) {
-            expectedAvailableFormatsList.add(jsonNode.path(FIELDNAME_NAME).asText());
+        JsonNode formatsNode = digitalTransfersNode.path(FIELDNAME_FORMAT);
+        if(formatsNode instanceof ArrayNode) {
+            for (JsonNode jsonNode : formatsNode) {
+                expectedAvailableFormatsList.add(jsonNode.path(FIELDNAME_NAME).asText());
+            }
+            expectedAvailableFormatsArraySize = expectedAvailableFormatsList.size();
+        } else {
+            expectedAvailableFormatsList.add(formatsNode.path(FIELDNAME_NAME).asText());
+            expectedAvailableFormatsArraySize = 1;
         }
-        expectedAvailableFormatsArraySize = expectedAvailableFormatsList.size();
     }
 
-    private ArrayNode getArrayNode(JsonNode keywordNode) {
-        assertTrue("Keywords not a list.", keywordNode instanceof ArrayNode);
-        return (ArrayNode) keywordNode;
+    private ArrayNode getArrayNode(JsonNode arrayNode) {
+        assertTrue("Node is not an ArrayNode.", arrayNode instanceof ArrayNode);
+        return (ArrayNode) arrayNode;
     }
 
     private void checkKeywords(JsonNode tree) {
