@@ -44,7 +44,7 @@ import org.xml.sax.SAXParseException;
  *
  * @author <a href="mailto:m.rieke@52north.org">Matthes Rieke</a>
  */
-public class XmlSchemaValidator {
+public class XmlSchemaValidator implements org.n52.youngs.validation.Validator {
 
     private static final Logger LOG = LoggerFactory.getLogger(XmlSchemaValidator.class.getName());
 

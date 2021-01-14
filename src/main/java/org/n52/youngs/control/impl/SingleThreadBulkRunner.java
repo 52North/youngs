@@ -35,6 +35,7 @@ import org.n52.youngs.api.Report.Level;
 import org.n52.youngs.control.Runner;
 import org.n52.youngs.exception.MappingError;
 import org.n52.youngs.exception.SinkError;
+import org.n52.youngs.harvest.JsonNodeSourceRecord;
 import org.n52.youngs.harvest.NodeSourceRecord;
 import org.n52.youngs.harvest.Source;
 import org.n52.youngs.harvest.SourceException;
@@ -45,6 +46,8 @@ import org.n52.youngs.load.SinkRecord;
 import org.n52.youngs.postprocess.PostProcessor;
 import org.n52.youngs.transform.Mapper;
 import org.n52.youngs.transform.MappingEntry;
+import org.n52.youngs.validation.JsonSchemaValidator;
+import org.n52.youngs.validation.Validator;
 import org.n52.youngs.validation.XmlSchemaValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,8 +85,8 @@ public class SingleThreadBulkRunner implements Runner {
 
     private long startPosition = 1;
     private PostProcessor postProcessor;
-    private boolean validateXml;
-    private List<XmlSchemaValidator> validators;
+    private boolean validate;
+    private List<Validator> validators;
 
     public SingleThreadBulkRunner() {
         //
@@ -126,9 +129,9 @@ public class SingleThreadBulkRunner implements Runner {
     }
 
     @Override
-    public Runner withValidators(List<XmlSchemaValidator> vals) {
+    public Runner withValidators(List<Validator> vals) {
         this.validators = vals;
-        this.validateXml = true;
+        this.validate = true;
         return this;
     }
 
@@ -185,7 +188,7 @@ public class SingleThreadBulkRunner implements Runner {
                 sourceTimer.stop();
 
                 Collection<SourceRecord> validRecords;
-                if (this.validateXml) {
+                if (this.validate) {
                     validRecords = Lists.newArrayList();
                     int index = 0;
                     for (SourceRecord record : records) {
@@ -323,9 +326,14 @@ public class SingleThreadBulkRunner implements Runner {
             NodeSourceRecord nsr = (NodeSourceRecord) sourceRecord;
 
             try {
-                XmlSchemaValidator val = resolveValidator(nsr.getRecord());
+                Validator val = resolveValidator(nsr.getRecord());
                 if (val != null) {
-                    return val.validate(nsr.getRecord());
+                    if(val instanceof XmlSchemaValidator) {
+                        return ((XmlSchemaValidator)val).validate(nsr.getRecord());
+                    } else {
+                        return Collections.singletonList("No schema validator available for namespace: " +
+                                nsr.getRecord().getNamespaceURI());
+                    }
                 } else {
                     return Collections.singletonList("No schema validator available for namespace: " +
                             nsr.getRecord().getNamespaceURI());
@@ -334,6 +342,20 @@ public class SingleThreadBulkRunner implements Runner {
                 String recordId = tryRecordIdExtraction((NodeSourceRecord) sourceRecord);
                 throw new SourceException("Validation failed for record '" + recordId + "': " + ex.getMessage(), ex);
             }
+        } else if (sourceRecord instanceof JsonNodeSourceRecord) {
+            JsonNodeSourceRecord nsr = (JsonNodeSourceRecord) sourceRecord;
+
+            Validator val = resolveJsonValidator();
+            if (val != null) {
+                if (val instanceof JsonSchemaValidator) {
+                    return ((JsonSchemaValidator) val).validate(nsr.getRecord());
+                } else {
+                    return Collections.singletonList("No schema validator available for JSON.");
+                }
+            } else {
+                return Collections.singletonList("No schema validator available for JSON.");
+            }
+
         } else {
             log.warn("The SourceRecord class {} is not supported", sourceRecord.getClass().getName());
         }
@@ -341,11 +363,26 @@ public class SingleThreadBulkRunner implements Runner {
         return Collections.emptyList();
     }
 
-    private XmlSchemaValidator resolveValidator(Node record) {
+    private Validator resolveJsonValidator() {
         if (this.validators != null && !this.validators.isEmpty()) {
-            for (XmlSchemaValidator validator : validators) {
-                if (validator.matchesNamespace(record.getNamespaceURI())) {
-                    return validator;
+            for (Validator validator : validators) {
+                if(validator instanceof JsonSchemaValidator) {
+                   return validator;
+                }
+            }
+        }
+        return null;
+    }
+
+    private Validator resolveValidator(Node record) {
+        if (this.validators != null && !this.validators.isEmpty()) {
+            for (Validator validator : validators) {
+                if(validator instanceof XmlSchemaValidator) {
+                    XmlSchemaValidator xmlSchemavalidator = (XmlSchemaValidator)validator;
+                    if (xmlSchemavalidator.matchesNamespace(record.getNamespaceURI())) {
+                        return validator;
+                    }
+
                 }
             }
         }

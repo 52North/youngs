@@ -22,6 +22,7 @@ import org.n52.youngs.harvest.Source;
 import org.n52.youngs.load.Sink;
 import org.n52.youngs.postprocess.PostProcessor;
 import org.n52.youngs.transform.Mapper;
+import org.n52.youngs.validation.Validator;
 import org.n52.youngs.validation.XmlSchemaValidator;
 
 /**
@@ -35,7 +36,7 @@ public interface Runner {
 
     Runner postTransformProcess(PostProcessor postProcessor);
 
-    Runner withValidators(List<XmlSchemaValidator> vals);
+    Runner withValidators(List<Validator> vals);
 
     Report load(Sink sink);
 

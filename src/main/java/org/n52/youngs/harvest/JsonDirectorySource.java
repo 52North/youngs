@@ -118,6 +118,8 @@ public class JsonDirectorySource implements Source {
                 .map(file -> {
                     try {
                         SourceRecord record = readRecordFromFile(file);
+                        //validate here!?
+
                         log.trace("Parsed record: {}", record);
                         return record;
                     } catch (IOException e) {
