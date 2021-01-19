@@ -51,6 +51,8 @@ This project further includes:
   Hamcrest library under New BSD License
   HdrHistogram under Public Domain, per Creative Commons CC0
   HPPC Collections under The Apache Software License, Version 2.0
+  ISO 19115-2:2009 Geographic information -- Metadata -- Part 2: Extensions for imagery and gridded data schema (v0.1) under The Apache Software License, Version 2.0
+  ISO/TC 211 XML schemas under The Apache Software License, Version 2.0
   Jackson dataformat: CBOR under The Apache Software License, Version 2.0
   Jackson dataformat: Smile under The Apache Software License, Version 2.0
   Jackson-annotations under The Apache Software License, Version 2.0
@@ -92,6 +94,7 @@ This project further includes:
   OGC CSW 2.0.2 under BSD-Style License
   OGC Filter 1.1.0 under BSD-Style License
   OGC GML 3.1.1 under BSD-Style License
+  OGC GML schema (spec. v3.2.1) under The Apache Software License, Version 2.0
   OGC OWS 1.0.0 under BSD-Style License
   parent-join under The Apache Software License, Version 2.0
   percolator under The Apache Software License, Version 2.0
@@ -115,6 +118,8 @@ This project further includes:
   transport under The Apache Software License, Version 2.0
   transport-netty4 under The Apache Software License, Version 2.0
   W3C XLink 1.0 under BSD-Style License
+  W3C xlink schema (spec. v1.1.0) under The Apache Software License, Version 2.0
+  XmlBeans under The Apache Software License, Version 2.0
   YAML API under Apache License, Version 2.0
   Youngs under The Apache Software License, Version 2.0
 
