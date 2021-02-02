@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2021 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,30 +16,25 @@
  */
 package org.n52.youngs.validation;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import javax.tools.JavaFileManager.Location;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Node;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion.VersionFlag;
 import com.networknt.schema.ValidationMessage;
+import com.networknt.schema.ValidatorTypeCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author bpr
@@ -79,6 +74,18 @@ public class JsonSchemaValidator implements org.n52.youngs.validation.Validator 
         for (ValidationMessage validationMessage : validationMessages) {
             result.add(validationMessage.toString());
         }
+
+        // TODO: add more possible breaking error codes
+        List<String> fatalCodes = Arrays.asList(ValidatorTypeCode.REQUIRED.getErrorCode());
+
+        String fatalErrors = validationMessages.stream()
+                .filter(vm -> fatalCodes.contains(vm.getCode()))
+                .map(vm -> vm.getMessage()).collect(Collectors.joining("; "));
+
+        if (fatalErrors != null && fatalErrors.length() > 0) {
+            throw new JsonValidationException("The validation encountered fatal errors: " + fatalErrors);
+        }
+
         return result;
     }
 
