@@ -30,6 +30,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import javax.xml.xpath.XPathExpressionException;
+
+import org.elasticsearch.index.mapper.SourceToParse;
 import org.n52.youngs.api.Report;
 import org.n52.youngs.api.Report.Level;
 import org.n52.youngs.control.Runner;
@@ -338,22 +340,27 @@ public class SingleThreadBulkRunner implements Runner {
                     return Collections.singletonList("No schema validator available for namespace: " +
                             nsr.getRecord().getNamespaceURI());
                 }
-            } catch (SAXException | IOException ex) {
+            } catch (SAXException | IOException | RuntimeException ex) {
                 String recordId = tryRecordIdExtraction((NodeSourceRecord) sourceRecord);
                 throw new SourceException("Validation failed for record '" + recordId + "': " + ex.getMessage(), ex);
             }
         } else if (sourceRecord instanceof JsonNodeSourceRecord) {
             JsonNodeSourceRecord nsr = (JsonNodeSourceRecord) sourceRecord;
 
-            Validator val = resolveJsonValidator();
-            if (val != null) {
-                if (val instanceof JsonSchemaValidator) {
-                    return ((JsonSchemaValidator) val).validate(nsr.getRecord());
+            try {
+                Validator val = resolveJsonValidator();
+                if (val != null) {
+                    if (val instanceof JsonSchemaValidator) {
+                        return ((JsonSchemaValidator) val).validate(nsr.getRecord());
+                    } else {
+                        return Collections.singletonList("No schema validator available for JSON.");
+                    }
                 } else {
                     return Collections.singletonList("No schema validator available for JSON.");
                 }
-            } else {
-                return Collections.singletonList("No schema validator available for JSON.");
+            } catch (RuntimeException ex) {
+                String recordId = tryRecordIdExtraction((JsonNodeSourceRecord) sourceRecord);
+                throw new SourceException("Validation failed for record '" + recordId + "': " + ex.getMessage(), ex);
             }
 
         } else {
@@ -401,6 +408,15 @@ public class SingleThreadBulkRunner implements Runner {
         }
 
         return String.format("[protocolIdentifier] %s", nodeSourceRecord.getProtocolIdentifier());
+    }
+
+    private String tryRecordIdExtraction(JsonNodeSourceRecord sourceRecord) {
+        try {
+            return sourceRecord.getRecord().get("id").asText();
+        } catch (Exception e) {
+            log.debug("Could not get id from JsonNodeSourceRecord: " + sourceRecord);
+        }
+        return "";
     }
 
 }

@@ -79,7 +79,12 @@ public class JsonToBuilderMapper implements Mapper {
             }
             Collection<LightweightMappingEntry> mappingEntries = mapper.getLightweightEntries();
             for (LightweightMappingEntry lightweightMappingEntry : mappingEntries) {
-                mapEntry((ObjectNode) metadataNode, lightweightMappingEntry, (ObjectNode) metadataNode);
+                try {
+                    mapEntry((ObjectNode) metadataNode, lightweightMappingEntry, (ObjectNode) metadataNode);
+                } catch (Exception e) {
+                    log.error("Could not map entry.", e);
+                    log.trace("Metadata node: \n" + metadataNode);
+                }
             }
             byte[] bytes = new ObjectMapper().writer().writeValueAsBytes(metadataNode);
             parser = JsonXContent.jsonXContent.createParser(NamedXContentRegistry.EMPTY, new ByteArrayInputStream(bytes));
