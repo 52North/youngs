@@ -91,7 +91,7 @@ public class JsonSchemaValidator implements org.n52.youngs.validation.Validator 
             }
 
             LOG.error("Fatal validation errors for record with id: " + id);
-            throw new JsonValidationException("The validation encountered fatal errors: " + fatalErrors);
+            throw new JsonValidationException(String.format("The validation of the record with id %s encountered fatal errors: ", id) + fatalErrors);
         }
 
         return result;
