@@ -30,4 +30,6 @@ public class JsonConstants {
 
     public static final String FIELDNAME_KEYWORDS_TYPES = "keywords_types";
 
+    public static final String FIELDNAME_FULL_TEXT = "fulltext";
+
 }

@@ -18,7 +18,6 @@ package org.n52.youngs.transform.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -40,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -52,8 +52,11 @@ public class JsonToBuilderMapper implements Mapper {
 
     private final LightweightYamlMappingConfiguration mapper;
 
+    private ObjectWriter objectWriter;
+
     public JsonToBuilderMapper(LightweightYamlMappingConfiguration mapper) {
         this.mapper = mapper;
+        objectWriter = new ObjectMapper().writer();
     }
 
     @Override
@@ -86,7 +89,8 @@ public class JsonToBuilderMapper implements Mapper {
                     log.trace("Metadata node: \n" + metadataNode);
                 }
             }
-            byte[] bytes = new ObjectMapper().writer().writeValueAsBytes(metadataNode);
+            addFulltext((ObjectNode) metadataNode, objectWriter.writeValueAsString(metadataNode));
+            byte[] bytes = objectWriter.writeValueAsBytes(metadataNode);
             parser = JsonXContent.jsonXContent.createParser(NamedXContentRegistry.EMPTY, new ByteArrayInputStream(bytes));
             XContentBuilder xContentBuilder = JsonXContent.contentBuilder().copyCurrentStructure(parser);
             return new BuilderRecord(id, xContentBuilder);
@@ -94,6 +98,10 @@ public class JsonToBuilderMapper implements Mapper {
             log.error("Could not create XContentBuilder from InputStream.", e);
             return null;
         }
+    }
+
+    private void addFulltext(ObjectNode metadataNode, String fulltext) {
+        metadataNode.put(JsonConstants.FIELDNAME_FULL_TEXT, fulltext);
     }
 
     private void mapEntry(ObjectNode recordNode,
