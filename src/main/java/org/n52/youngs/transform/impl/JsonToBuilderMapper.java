@@ -106,7 +106,10 @@ public class JsonToBuilderMapper implements Mapper {
 
     private void mapEntry(ObjectNode recordNode,
             LightweightMappingEntry mappingEntry, ObjectNode sourceNode) {
-        recordNode.set(mappingEntry.getFieldName(), resolveEntry(mappingEntry, sourceNode));
+        JsonNode mappedNode = resolveEntry(mappingEntry, sourceNode);
+        if(!(mappedNode instanceof MissingNode)) {
+            recordNode.set(mappingEntry.getFieldName(), mappedNode);
+        }
     }
 
     private JsonNode resolveEntry(LightweightMappingEntry mappingEntry, ObjectNode sourceNode) {
@@ -130,7 +133,9 @@ public class JsonToBuilderMapper implements Mapper {
                     currentNode = currentNode.get(pathArray[i]);
                 }
             }
-            result = currentNode;
+            if(!(currentNode instanceof MissingNode)) {
+                result = currentNode;
+            }
             return result;
         case STRING:
             result = new TextNode(expression);
@@ -140,7 +145,9 @@ public class JsonToBuilderMapper implements Mapper {
             if(pathArrayForList.length == 2) {
                 List<JsonNode> valuesList = sourceNode.path(pathArrayForList[0]).findValues(pathArrayForList[1]);
                 ArrayNode valuesArrayNode = new ArrayNode(JsonNodeFactory.instance, valuesList);
-                result = valuesArrayNode;
+                if(valuesArrayNode.size() > 0) {
+                    result = valuesArrayNode;
+                }
             }
             return result;
         default:
