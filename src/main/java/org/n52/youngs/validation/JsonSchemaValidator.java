@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
+import com.networknt.schema.SchemaValidatorsConfig;
 import com.networknt.schema.SpecVersion.VersionFlag;
 import com.networknt.schema.ValidationMessage;
 import com.networknt.schema.ValidatorTypeCode;
@@ -76,7 +77,8 @@ public class JsonSchemaValidator implements org.n52.youngs.validation.Validator 
         }
 
         // TODO: add more possible breaking error codes
-        List<String> fatalCodes = Arrays.asList(ValidatorTypeCode.REQUIRED.getErrorCode());
+        List<String> fatalCodes = Arrays.asList(ValidatorTypeCode.REQUIRED.getErrorCode(),
+                ValidatorTypeCode.ENUM.getErrorCode());
 
         String fatalErrors = validationMessages.stream()
                 .filter(vm -> fatalCodes.contains(vm.getCode()))
@@ -90,8 +92,10 @@ public class JsonSchemaValidator implements org.n52.youngs.validation.Validator 
     }
 
     private JsonSchema getJsonSchemaFromJsonNode(JsonNode jsonNode) {
+        SchemaValidatorsConfig config = new SchemaValidatorsConfig();
+        config.setTypeLoose(false);
         JsonSchemaFactory factory = JsonSchemaFactory.getInstance(VersionFlag.V7);
-        return factory.getSchema(jsonNode);
+        return factory.getSchema(jsonNode, config);
     }
 
 }

@@ -1,0 +1,1502 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "Root schema for the new PN Metadata Model",
+    "description": "Root schema for the new PN Metadata Model 4. Version 1.0, Uwe Voges, u.voges@conterra.de",
+    "definitions": {
+        "referencedProduct": {
+            "title": "ReferencedProduct",
+            "type": "object",
+            "description": "referencedProduct as an aggregation of functionCode, name, url",
+            "required": [
+                "functionCode",
+                "name",
+                "url"
+            ],
+            "properties": {
+                "functionCode": {
+                    "$id": "#/properties/referencedProducts/properties/functionCode",
+                    "type": "string",
+                    "enum": [
+                        "relatedProduct",
+                        "isPreviousVersionOf",
+                        "references",
+                        "isNewVersionOf",
+                        "isCitedBy",
+                        "priorVersion",
+                        "newVersion"
+                    ],
+                    "title": "The functionCode",
+                    "description": "The functionCode within the referencedProduct object.",
+                    "default": "",
+                    "examples": ["relatedProduct"]
+                },
+                "name": {
+                    "$id": "#/properties/referencedProducts/properties/name",
+                    "type": "string",
+                    "title": "The name",
+                    "description": "The name within the referencedProduct object.",
+                    "default": "",
+                    "examples": ["name"]
+                },
+                "url": {
+                    "$id": "#/properties/referencedProducts/properties/url",
+                    "type": "string",
+                    "format": "uri",
+                    "title": "The url",
+                    "description": "The url within the referencedProduct object.",
+                    "default": "",
+                    "examples": ["theme"]
+                }
+            },
+            "additionalProperties": false
+        },
+        "KeywordAsObject": {
+            "title": "KeywordAsObject",
+            "type": "object",
+            "description": "keyword as an aggregation of keyword name(s), type (e.g. Ocean) and a typelist schema.",
+            "required": [
+                "keyword",
+                "type",
+                "typeList"
+            ],
+            "properties": {
+                "keyword": {
+                    "$id": "#/properties/keywordsAsObjects/properties/keyword",
+                    "type": [
+                        "string",
+                        "array"
+                    ],
+                    "title": "The keyword",
+                    "description": "The keyword within the keyword object.",
+                    "additionalItems": true,
+                    "items": {
+                        "$id": "#/properties/keywordsAsObjects/properties/keyword/items",
+                        "anyOf": [
+                            {
+                                "$id": "#/properties/keywordsAsObjects/properties/keyword/items/anyOf/0",
+                                "type": "string",
+                                "title": "One single keyword",
+                                "description": "One keyword in the keyword array.",
+                                "default": "",
+                                "examples": [
+                                    "Atmosphere",
+                                    "Ocean"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "type": {
+                    "$id": "#/properties/keywordsAsObjects/properties/type",
+                    "type": "string",
+                    "title": "The keyword type.",
+                    "description": "The keyword type within the keyword object.",
+                    "default": "",
+                    "examples": ["theme"]
+                },
+                "typeList": {
+                    "$id": "#/properties/keywordsAsObjects/properties/typeList",
+                    "type": "string",
+                    "title": "The keyword type schema.",
+                    "description": "The keyword type schema within the keyword object.",
+                    "default": "",
+                    "examples": ["http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode"]
+                }
+            },
+            "additionalProperties": true
+        },
+        "Documentation": {
+            "title": "Documentation",
+            "type": "object",
+            "properties": {
+                "description": {
+                    "$id": "#/documentation/properties/description",
+                    "title": "documentation description",
+                    "description": "Description of a documentation.",
+                    "type": "string"
+                },
+                "url": {
+                    "$id": "#/documentation/properties/url",
+                    "title": "documentation url",
+                    "description": "The url of a documentation.",
+                    "type": "string",
+                    "format": "uri"
+                }
+            },
+            "required": ["url"],
+            "additionalProperties": true
+        },
+        "OnlineResource": {
+            "title": "OnlineResource",
+            "type": "object",
+            "properties": {
+                "function": {
+                    "$id": "#/properties/function",
+                    "title": "function",
+                    "description": "function of an onLineResource.",
+                    "type": "string"
+                },
+                "name": {
+                    "$id": "#/properties/name",
+                    "title": "name",
+                    "description": "name of an onLineResource.",
+                    "type": "string"
+                },
+                "protocol": {
+                    "$id": "#/properties/protocol",
+                    "title": "protocol",
+                    "description": "protocol to access an onLineResource.",
+                    "anyOf": [
+                        {
+                            "type": "string",
+                            "enum": [
+                                "http",
+                                "https",
+                                "ftp"
+                            ]
+                        },
+                        {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "http",
+                                    "https",
+                                    "ftp"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "url": {
+                    "$id": "#/properties/url",
+                    "title": "onLineResource url",
+                    "description": "url of an onLineResource.",
+                    "type": "string",
+                    "format": "uri"
+                }
+            },
+            "required": [
+                "name",
+                "url"
+            ],
+            "additionalProperties": true
+        },
+        "Availability": {
+            "title": "Availability",
+            "type": "object",
+            "required": [
+                "availability",
+                "function",
+                "protocol",
+                "url"
+            ],
+            "properties": {
+                "availability": {
+                    "$id": "#/availability/properties/availability",
+                    "title": "availability - how to get access to the data",
+                    "description": "availability - the kind of access, e.g. Data Store or EUMETCast",
+                    "type": "string"
+                },
+                "channels": {
+                    "$id": "#/availability/properties/channels",
+                    "title": "EUMETCAST channels",
+                    "description": "EUMETCASTChannels - which channels are supported.",
+                    "type": "string"
+                },
+                "function": {
+                    "$id": "#/availability/properties/function",
+                    "title": "function code ",
+                    "description": "the function code, e.g. download or view",
+                    "type": "string",
+                    "enum": [
+                        "order",
+                        "view",
+                        "download"
+                    ]
+                },
+                "label": {
+                    "$id": "#/availability/properties/label",
+                    "title": "label (name) of the availability",
+                    "description": "the name (label) of the availability.",
+                    "type": "string"
+                },
+                "protocol": {
+                    "$id": "#/availability/properties/protocol",
+                    "title": "availability access protocol",
+                    "description": "protocol to get access to the of the availability.",
+                    "anyOf": [
+                        {
+                            "type": "string",
+                            "enum": [
+                                "http",
+                                "https",
+                                "ftp"
+                            ]
+                        },
+                        {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "http",
+                                    "https",
+                                    "ftp"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "url": {
+                    "$id": "#/availability/properties/url",
+                    "title": "availability url",
+                    "description": "url of the of the availability",
+                    "type": "string",
+                    "format": "uri"
+                }
+            },
+            "additionalProperties": true
+        },
+        "Format": {
+            "title": "Format",
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+                "averageFileSize": {
+                    "$id": "#/format/properties/averageFileSize",
+                    "title": "averageFileSize",
+                    "description": "averageFileSize",
+                    "type": "string"
+                },
+                "averageFileSizeUnits": {
+                    "$id": "#/format/properties/averageFileSizeUnits",
+                    "title": "averageFileSizeUnits",
+                    "description": "averageFileSizeUnits",
+                    "type": "string"
+                },
+                "fileFormatDescription": {
+                    "$id": "#/format/properties/fileFormatDescription",
+                    "title": "fileFormatDescription",
+                    "description": "fileFormatDescription",
+                    "anyOf": [
+                        {"type": "string"},
+                        {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {"type": "string"}
+                        }
+                    ]
+                },
+                "filenameConvention": {
+                    "$id": "#/format/properties/filenameConvention",
+                    "title": "filenameConvention",
+                    "description": "filenameConvention",
+                    "anyOf": [
+                        {"type": "string"},
+                        {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {"type": "string"}
+                        }
+                    ]
+                },
+                "format4DataCite": {
+                    "$id": "#/format/properties/format4DataCite",
+                    "title": "format4DataCite",
+                    "description": "is the format to be provided in the DataCite metadata upon doi export?",
+                    "type": "string",
+                    "enum": [
+                        "true",
+                        "false"
+                    ]
+                },
+                "frequency": {
+                    "$id": "#/format/properties/frequency",
+                    "title": "frequency",
+                    "description": "How frequently are products of the collection published",
+                    "type": "string"
+                },
+                "name": {
+                    "$id": "#/format/properties/name",
+                    "title": "format name",
+                    "description": "the name of the format",
+                    "type": "string"
+                },
+                "typicalFilename": {
+                    "$id": "#/format/properties/typicalFilename",
+                    "anyOf": [
+                        {"type": "string"},
+                        {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {"type": "string"}
+                        }
+                    ],
+                    "title": "filename schema",
+                    "description": "The typicalFilename schema.",
+                    "default": [],
+                    "examples": [
+                        [
+                            "H-000-MSG1__-MSG1_IODC___-IR_016___-000001___-201706121600-C_",
+                            "H-000-MSG1__-MSG1_IODC___-WV_062___-000001___-201706121600-C_"
+                        ]
+                    ]
+                },
+                "version": {
+                    "$id": "#/format/properties/version",
+                    "title": "format version",
+                    "description": "version of the format",
+                    "type": "string"
+                },
+                "tool": {
+                    "$id": "#/format/properties/tool",
+                    "title": "format tool",
+                    "description": "Format tool. Associated tool for reading the data for the format",
+                    "type": "object",
+                    "allOf": [
+                        {"$ref": "#/definitions/OnlineResource"}
+                    ]
+                },
+                "documentation": {
+                    "$id": "#/format/properties/documentation",
+                    "description": "Format Documentation",
+                    "type": "object",
+                    "allOf": [
+                        {"$ref": "#/definitions/Documentation"}
+                    ]
+                },
+                "dataSampleLink": {
+                    "$id": "#/format/properties/dataSampleLink",
+                    "title": "data sample link",
+                    "description": "Simple link (URL) adressing one file",
+                    "type": "object",
+                    "allOf": [
+                        {"$ref": "#/definitions/OnlineResource"}
+                    ]
+                },
+                "bulletin": {
+                    "$id": "#/format/properties/bulletin",
+                    "title": "bulletin",
+                    "description": "bulletin...",
+                    "type": "string"
+                }
+            },
+            "additionalProperties": true
+        },
+        "DigitalTransfer": {
+            "title": "DigitalTransfer",
+            "type": "object",
+            "properties": {
+                "availability": {
+                    "description": "availability",
+                    "anyOf": [
+                        {"$ref": "#/definitions/Availability"},
+                        {
+                            "type": "array",
+                            "items": {"$ref": "#/definitions/Availability"}
+                        }
+                    ]
+                },
+                "format": {
+                    "description": "format",
+                    "anyOf": [
+                        {"$ref": "#/definitions/Format"},
+                        {
+                            "type": "array",
+                            "items": {"$ref": "#/definitions/Format"}
+                        }
+                    ]
+                }
+            }
+        },
+        "DistributorContact": {
+            "title": "DistributorContact",
+            "type": "object",
+            "properties": {
+                "email": {
+                    "$id": "#/properties/distributorContact/items/anyOf/0/properties/email",
+                    "anyOf": [
+                        {
+                            "type": "string",
+                            "format": "email"
+                        },
+                        {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {
+                                "type": "string",
+                                "format": "email"
+                            }
+                        }
+                    ],
+                    "title": "The email schema",
+                    "description": "The email schema.",
+                    "default": "",
+                    "examples": ["ops@eumetsat.int"]
+                },
+                "facsimile": {
+                    "$id": "#/properties/distributorContact/items/anyOf/0/properties/facsimile",
+                    "anyOf": [
+                        {"type": "string"},
+                        {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {"type": "string"}
+                        }
+                    ],
+                    "title": "The facsimile schema",
+                    "description": "The facsimile schema.",
+                    "default": "",
+                    "examples": ["+49(0)6151-807 3790"]
+                },
+                "individualName": {
+                    "$id": "#/properties/distributorContact/items/anyOf/0/properties/individualName",
+                    "anyOf": [
+                        {"type": "string"},
+                        {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {"type": "string"}
+                        }
+                    ],
+                    "title": "The individualName schema",
+                    "description": "The individualName schema.",
+                    "default": "",
+                    "examples": ["European Organisation for the Exploitation of Meteorological Satellites"]
+                },
+                "organisationName": {
+                    "$id": "#/properties/distributorContact/items/anyOf/0/properties/organisationName",
+                    "anyOf": [
+                        {"type": "string"},
+                        {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {"type": "string"}
+                        }
+                    ],
+                    "title": "The organisationName schema",
+                    "description": "The organisationName schema.",
+                    "default": "",
+                    "examples": ["EUMETSAT"]
+                },
+                "phone": {
+                    "$id": "#/properties/distributorContact/items/anyOf/0/properties/phone",
+                    "anyOf": [
+                        {"type": "string"},
+                        {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {"type": "string"}
+                        }
+                    ],
+                    "title": "The phone schema",
+                    "description": "The phone schema.",
+                    "default": "",
+                    "examples": ["+49(0)6151-807 3660/3770"]
+                },
+                "responsiblePartyRole": {
+                    "$id": "#/properties/distributorContact/items/anyOf/0/properties/responsiblePartyRole",
+                    "type": "string",
+                    "title": "The responsiblePartyRole schema",
+                    "description": "The responsiblePartyRole schema.",
+                    "default": "",
+                    "examples": ["distributor"]
+                },
+                "url": {
+                    "$id": "#/properties/distributorContact/items/anyOf/0/properties/url",
+                    "type": "string",
+                    "format": "uri",
+                    "title": "The url schema",
+                    "description": "The url schema.",
+                    "default": "",
+                    "examples": ["http://www.eumetsat.int"]
+                }
+            },
+            "required": ["responsiblePartyRole"],
+            "additionalProperties": true
+        },
+        "Envelope": {
+            "title": "Envelope",
+            "type": "object",
+            "properties": {
+                "coordinates": {
+                    "title": "coordinates",
+                    "description": "Array of linestrings",
+                    "type": "array",
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "items": {
+                        "description": "Linear ring, i.e. linestring or array of positions",
+                        "type": "array",
+                        "minItems": 2,
+                        "maxItems": 2,
+                        "items": {
+                            "description": "One position",
+                            "type": "number"
+                        }
+                    }
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["envelope"]
+                }
+            },
+            "required": [
+                "coordinates",
+                "type"
+            ],
+            "additionalProperties": false
+        },
+        "Coordinates": {
+            "title": "Coordinates",
+            "type": "object",
+            "oneOf": [
+                {"$ref": "#/definitions/Envelope"}
+            ]
+        }
+    },
+    "properties": {
+        "abstract": {
+            "$id": "#/properties/abstract",
+            "title": "The abstract schema",
+            "description": "Text description of data.",
+            "type": "string"
+        },
+        "access_constraint": {
+            "$id": "#/properties/access_constraint",
+            "type": "string",
+            "enum": [
+                "copyright",
+                "license"
+            ],
+            "title": "The access_constraint schema",
+            "description": "Applied to assure the protection of privacy or intellectual property, and any special restrictions or limitations on obtaining false the resource. To clarify and simplify the representation of data policies in OLDA collection metadata only one block /<gmd:resourceConstraints>/<gmd:MD_LegalConstraints> will be used with one accessConstraints / otherConstraints, where the otherConstraints element (can be duplicated) includes the link to one of the licenses",
+            "default": "",
+            "examples": ["copyright"]
+        },
+        "alternateTitle": {
+            "$id": "#/properties/alternateTitle",
+            "anyOf": [
+                {"type": "string"},
+                {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {"type": "string"}
+                }
+            ],
+            "title": "The alternateTitle schema",
+            "description": "Easier to remeber for customer than datasetTitle.",
+            "default": [],
+            "examples": [
+                [
+                    "MSG15",
+                    "HRSEVIRI-IODC"
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/alternateTitle/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/alternateTitle/items/anyOf/0",
+                        "type": "string",
+                        "title": "The first anyOf schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "MSG15",
+                            "HRSEVIRI-IODC-TestMD"
+                        ]
+                    }
+                ]
+            }
+        },
+        "conditions": {
+            "$id": "#/properties/conditions",
+            "anyOf": [
+                {"type": "string"},
+                {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {"type": "string"}
+                }
+            ],
+            "title": "The conditions schema",
+            "description": "This includes the former useLimitations including FedEO, CWIC etc.",
+            "default": "",
+            "examples": ["-"]
+        },
+        "coverage": {
+            "$id": "#/properties/coverage",
+            "type": "array",
+            "title": "The coverage schema",
+            "description": "GeographicDescription (Coverage/Footprint).",
+            "default": [],
+            "examples": [
+                ["Regional"]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/coverage/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/coverage/items/anyOf/0",
+                        "type": "string",
+                        "title": "The first anyOf schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": ["Regional"]
+                    }
+                ]
+            }
+        },
+        "creation_date": {
+            "$id": "#/properties/creation_date",
+            "type": "string",
+            "format": "date",
+            "description": "Creation date of the dataset.",
+            "default": "",
+            "examples": ["2017-02-01"]
+        },
+        "data_policy": {
+            "$id": "#/properties/data_policy",
+            "type": "string",
+            "title": "The data_policy schema",
+            "description": "Data policy (e.g. restricted) for the dataset.",
+            "default": "",
+            "examples": ["restricted"]
+        },
+        "datasetLanguage": {
+            "$id": "#/properties/datasetLanguage",
+            "type": "string",
+            "title": "The datasetLanguage schema",
+            "description": "Language of the dataset.",
+            "default": "",
+            "examples": ["eng"]
+        },
+        "datasetTitle": {
+            "$id": "#/properties/datasetTitle",
+            "type": "string",
+            "title": "The datasetTitle schema",
+            "description": "Title of the dataset.",
+            "default": "",
+            "examples": ["High Rate SEVIRI Level 1.5 Image Data - MSG - Indian Ocean 41.5 degrees E - Test Metadata"]
+        },
+        "dateStamp": {
+            "$id": "#/properties/dateStamp",
+            "type": "string",
+            "format": "date",
+            "title": "metadata dateStamp.",
+            "description": "date stamp of the metadata.",
+            "default": "",
+            "examples": ["2020-02-27"]
+        },
+        "degree": {
+            "$id": "#/properties/degree",
+            "type": "string",
+            "title": "The degree schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": ["false"]
+        },
+        "digitalTransfers": {
+            "$id": "#/properties/digitalTransfers",
+            "title": "The digitalTransfers schema",
+            "description": "Array of DigitalTransfers",
+            "anyOf": [
+                {"$ref": "#/definitions/DigitalTransfer"},
+                {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {"$ref": "#/definitions/DigitalTransfer"}
+                }
+            ]
+        },
+        "distributorContact": {
+            "$id": "#/properties/distributorContact",
+            "anyOf": [
+                {"$ref": "#/definitions/DistributorContact"},
+                {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/DistributorContact"}
+                }
+            ],
+            "title": "The distributorContact schema",
+            "description": "Array of DistributorContacts."
+        },
+        "eumdata": {
+            "$id": "#/properties/eumdata",
+            "type": "string",
+            "enum": [
+                "true",
+                "false"
+            ],
+            "title": "eumdata yes/no",
+            "description": "Is it data from EUMETSAT or external?",
+            "default": "",
+            "examples": ["true"]
+        },
+        "eumetcast_channels": {
+            "$id": "#/properties/eumetcast_channels",
+            "type": [
+                "array",
+                "string"
+            ],
+            "title": "eumetcast_channels",
+            "description": "The eumetcast_channels schema.",
+            "default": [],
+            "examples": [
+                [
+                    "A1C-GEO-1",
+                    "E1B-GEO-1"
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/eumetcast_channels/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/eumetcast_channels/items/anyOf/0",
+                        "type": "string",
+                        "title": "The first anyOf schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "A1C-GEO-1",
+                            "E1B-GEO-1"
+                        ]
+                    }
+                ]
+            }
+        },
+        "eumetsatDataPolicyWithUrl": {
+            "$id": "#/properties/eumetsatDataPolicyWithUrl",
+            "type": "object",
+            "title": "The eumetsatDataPolicyWithUrl schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "policy": [
+                        "NRTLicense - required for accessing the data less than 3 hours old",
+                        "GeneralLicense"
+                    ],
+                    "url": "http://eumetsat.int/data-policy/eumetsat-data-policy.pdf#page=13"
+                }
+            ],
+            "required": [
+                "policy",
+                "url"
+            ],
+            "properties": {
+                "policy": {
+                    "$id": "#/properties/eumetsatDataPolicyWithUrl/properties/policy",
+                    "type": "array",
+                    "title": "The policy schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": [],
+                    "examples": [
+                        [
+                            "NRTLicense - required for accessing the data less than 3 hours old",
+                            "GeneralLicense"
+                        ]
+                    ],
+                    "additionalItems": true,
+                    "items": {
+                        "$id": "#/properties/eumetsatDataPolicyWithUrl/properties/policy/items",
+                        "anyOf": [
+                            {
+                                "$id": "#/properties/eumetsatDataPolicyWithUrl/properties/policy/items/anyOf/0",
+                                "type": "string",
+                                "title": "The first anyOf schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "NRTLicense - required for accessing the data less than 3 hours old",
+                                    "GeneralLicense"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "url": {
+                    "$id": "#/properties/eumetsatDataPolicyWithUrl/properties/url",
+                    "type": "string",
+                    "format": "uri",
+                    "title": "The url schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": ["http://eumetsat.int/data-policy/eumetsat-data-policy.pdf#page=13"]
+                }
+            },
+            "additionalProperties": true
+        },
+        "file_format_description": {
+            "$id": "#/properties/file_format_description",
+            "type": [
+                "string",
+                "array"
+            ],
+            "title": "The file_format_description schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "examples": [
+                [
+                    "JPEG (Grayscale)",
+                    "PNG (Grayscale)"
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/file_format_description/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/file_format_description/items/anyOf/0",
+                        "type": "string",
+                        "title": "The first anyOf schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "JPEG (Grayscale)",
+                            "PNG (Grayscale)"
+                        ]
+                    }
+                ]
+            }
+        },
+        "hierarchyLevel": {
+            "$id": "#/properties/hierarchyLevel",
+            "type": "string",
+            "enum": [
+                "series",
+                "bulletin",
+                "document",
+                "software",
+                "climate"
+            ],
+            "title": "The hierarchyLevel schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": ["series"]
+        },
+        "hierarchyLevelName": {
+            "$id": "#/properties/hierarchyLevelName",
+            "anyOf": [
+                {"type": "string"},
+                {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {"type": "string"}
+                }
+            ],
+            "title": "The hierarchyLevelName schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "examples": [
+                [
+                    "dis.EUMETCast-Europe",
+                    "sat.MSG"
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/hierarchyLevelName/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/hierarchyLevelName/items/anyOf/0",
+                        "type": "string",
+                        "title": "The first anyOf schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "dis.EUMETCast-Europe",
+                            "sat.MSG"
+                        ]
+                    }
+                ]
+            }
+        },
+        "id": {
+            "$id": "#/properties/id",
+            "type": "string",
+            "title": "The id schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": ["EO:EUM:DAT:MSG:HRSEVIRI-IODC-TestMD"]
+        },
+        "instrument": {
+            "$id": "#/properties/instrument",
+            "anyOf": [
+                {"type": "string"},
+                {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {"type": "string"}
+                }
+            ],
+            "title": "The instrument schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": ["SEVIRI"]
+        },
+        "instrument_type": {
+            "$id": "#/properties/instrument_type",
+            "anyOf": [
+                {
+                    "type": "string",
+                    "enum": [
+                        "OPTICAL",
+                        "RADAR",
+                        "ALTIMETRIC",
+                        "ATMOSPHERIC",
+                        "RADIOMETER",
+                        "IMAGER",
+                        "SPECTRORADIOMETER",
+                        "INTERFEROMETER",
+                        "SCATTEROMETER",
+                        "SPECTROMETER",
+                        "SOUNDER",
+                        "NA",
+                        "SBUV",
+                        "SPECTROGRAPH",
+                        "MULTIPLE",
+                        "MW_RADIOMETER",
+                        "Optical",
+                        "Radar",
+                        "Altimetric",
+                        "Atmospheric",
+                        "Radiometer",
+                        "Imager",
+                        "Spectroradiometer",
+                        "Interferometer",
+                        "Scatterometer",
+                        "Spectrometer",
+                        "Sounder",
+                        "NA",
+                        "SBUV",
+                        "Spectrograph",
+                        "Multiple",
+                        "MW_Radiometer"
+                    ]
+                },
+                {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "OPTICAL",
+                            "RADAR",
+                            "ALTIMETRIC",
+                            "ATMOSPHERIC",
+                            "RADIOMETER",
+                            "IMAGER",
+                            "SPECTRORADIOMETER",
+                            "INTERFEROMETER",
+                            "SCATTEROMETER",
+                            "SPECTROMETER",
+                            "SOUNDER",
+                            "NA",
+                            "SBUV",
+                            "SPECTROGRAPH",
+                            "MULTIPLE",
+                            "MW_RADIOMETER",
+                            "Optical",
+                            "Radar",
+                            "Altimetric",
+                            "Atmospheric",
+                            "Radiometer",
+                            "Imager",
+                            "Spectroradiometer",
+                            "Interferometer",
+                            "Scatterometer",
+                            "Spectrometer",
+                            "Sounder",
+                            "NA",
+                            "SBUV",
+                            "Spectrograph",
+                            "Multiple",
+                            "MW_Radiometer"
+                        ]
+                    }
+                }
+            ],
+            "title": "The instrument_type schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": ["Optical"]
+        },
+        "iopaccess": {
+            "$id": "#/properties/iopaccess",
+            "type": "string",
+            "enum": [
+                "true",
+                "false"
+            ],
+            "title": "The iopaccess schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": ["true"]
+        },
+        "keywordsAsObjects": {
+            "$id": "#/properties/keywordsAsObjects",
+            "anyOf": [
+                {"$ref": "#/definitions/KeywordAsObject"},
+                {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/KeywordAsObject"}
+                }
+            ]
+        },
+        "referencedProducts": {
+            "$id": "#/properties/referencedProducts",
+            "anyOf": [
+                {"$ref": "#/definitions/referencedProduct"},
+                {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/referencedProduct"}
+                }
+            ]
+        },
+        "language": {
+            "$id": "#/properties/language",
+            "type": "string",
+            "pattern": "[A-Za-z]{1,8}(-[A-Za-z0-9]{1,8})*",
+            "title": "The language schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": ["eng"]
+        },
+        "location": {
+            "$id": "#/properties/location",
+            "type": "object",
+            "title": "The location schema",
+            "description": "An explanation about the purpose of this instance.",
+            "oneOf": [
+                {"$ref": "#/definitions/Coordinates"}
+            ]
+        },
+        "onlineResource": {
+            "$id": "#/properties/onlineResource",
+            "type": [
+                "array",
+                "object"
+            ],
+            "title": "The onlineResource schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "label": "MSG Level 1.5 Image Data Format Description",
+                        "url": "http://www.eumetsat.int/website/wcm/idc/idcplg?IdcService=GET_FILE&dDocName=PDF_TEN_05105_MSG_IMG_DATA&RevisionSelectionMethod=LatestReleased&Rendition=Web"
+                    },
+                    {
+                        "label": "Meteorological Use Of The Seviri Ir3.9 Channel",
+                        "url": "http://eumetrain.org/IntGuide/PowerPoints/Channels/Channel_IR39.ppt"
+                    }
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/onlineResource/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/onlineResource/items/anyOf/0",
+                        "type": "object",
+                        "title": "The first anyOf schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": {},
+                        "examples": [
+                            {
+                                "label": "MSG Level 1.5 Image Data Format Description",
+                                "url": "http://www.eumetsat.int/website/wcm/idc/idcplg?IdcService=GET_FILE&dDocName=PDF_TEN_05105_MSG_IMG_DATA&RevisionSelectionMethod=LatestReleased&Rendition=Web"
+                            }
+                        ],
+                        "required": [
+                            "label",
+                            "url"
+                        ],
+                        "properties": {
+                            "label": {
+                                "$id": "#/properties/onlineResource/items/anyOf/0/properties/label",
+                                "type": "string",
+                                "title": "The label schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": ["MSG Level 1.5 Image Data Format Description"]
+                            },
+                            "url": {
+                                "$id": "#/properties/onlineResource/items/anyOf/0/properties/url",
+                                "type": "string",
+                                "format": "uri",
+                                "title": "The url schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": ["http://www.eumetsat.int/website/wcm/idc/idcplg?IdcService=GET_FILE&dDocName=PDF_TEN_05105_MSG_IMG_DATA&RevisionSelectionMethod=LatestReleased&Rendition=Web"]
+                            }
+                        },
+                        "additionalProperties": false
+                    }
+                ]
+            }
+        },
+        "orbitNominalLongitude": {
+            "$id": "#/properties/orbitNominalLongitude",
+            "type": "number",
+            "minimum": -180.0,
+            "maximum": 180.0,
+            "title": "The orbitNominalLongitude schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": ["41.5"]
+        },
+        "orbitType": {
+            "$id": "#/properties/orbitType",
+            "title": "The orbitType schema",
+            "description": "An explanation about the purpose of this instance.",
+            "anyOf": [
+                {
+                    "type": "string",
+                    "enum": [
+                        "GEO",
+                        "LEO"
+                    ]
+                },
+                {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "GEO",
+                            "LEO"
+                        ]
+                    }
+                }
+            ]
+        },
+        "processingLevel": {
+            "$id": "#/properties/processingLevel",
+            "type": "string",
+            "title": "The processingLevel schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": ["Level 1 Data"]
+        },
+        "productStatus": {
+            "$id": "#/properties/productStatus",
+            "type": "string",
+            "enum": [
+                "Operational",
+                "Released",
+                "Discontinued",
+                "Demonstration",
+                "Pre-operational",
+                "Superseded",
+                "Development"
+            ],
+            "title": "The productStatus schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": ["Operational"]
+        },
+        "quality_statement": {
+            "$id": "#/properties/quality_statement",
+            "type": "string",
+            "title": "The quality_statement schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": ["-"]
+        },
+        "resourceType": {
+            "$id": "#/properties/resourceType",
+            "type": "string",
+            "enum": [
+                "series",
+                "software",
+                "documentation",
+                "bulletin"
+            ],
+            "title": "The resourceType schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": ["series"]
+        },
+        "responsibleParty": {
+            "$id": "#/properties/responsibleParty",
+            "type": "object",
+            "title": "The responsibleParty schema",
+            "description": "The responsibleParty schema.",
+            "default": {},
+            "examples": [
+                {
+                    "email": "ops@eumetsat.int",
+                    "facsimile": "+49(0)6151-807 3790",
+                    "individualName": "European Organisation for the Exploitation of Meteorological Satellites",
+                    "organisationName": "EUMETSAT",
+                    "phone": "+49(0)6151-807 3660/3770",
+                    "responsiblePartyRole": "originator",
+                    "url": "http://www.eumetsat.int"
+                }
+            ],
+            "required": ["responsiblePartyRole"],
+            "properties": {
+                "email": {
+                    "$id": "#/properties/responsibleParty/properties/email",
+                    "type": "string",
+                    "title": "The email schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": ["ops@eumetsat.int"]
+                },
+                "facsimile": {
+                    "$id": "#/properties/responsibleParty/properties/facsimile",
+                    "type": "string",
+                    "title": "The facsimile schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": ["+49(0)6151-807 3790"]
+                },
+                "individualName": {
+                    "$id": "#/properties/responsibleParty/properties/individualName",
+                    "type": "string",
+                    "title": "The individualName schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": ["European Organisation for the Exploitation of Meteorological Satellites"]
+                },
+                "organisationName": {
+                    "$id": "#/properties/responsibleParty/properties/organisationName",
+                    "type": "string",
+                    "title": "The organisationName schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": ["EUMETSAT"]
+                },
+                "phone": {
+                    "$id": "#/properties/responsibleParty/properties/phone",
+                    "type": "string",
+                    "title": "The phone schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": ["+49(0)6151-807 3660/3770"]
+                },
+                "responsiblePartyRole": {
+                    "$id": "#/properties/responsibleParty/properties/responsiblePartyRole",
+                    "type": "string",
+                    "enum": [
+                        "resourceProvider",
+                        "custodian",
+                        "owner",
+                        "user",
+                        "distributor",
+                        "originator",
+                        "pointOfContact",
+                        "principalInvestigator",
+                        "processor",
+                        "publisher",
+                        "author"
+                    ],
+                    "title": "The responsiblePartyRole schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": ["originator"]
+                },
+                "url": {
+                    "$id": "#/properties/responsibleParty/properties/url",
+                    "type": "string",
+                    "format": "uri",
+                    "title": "The url schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": ["http://www.eumetsat.int"]
+                }
+            },
+            "additionalProperties": true
+        },
+        "satellite": {
+            "$id": "#/properties/satellite",
+            "anyOf": [
+                {"type": "string"},
+                {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {"type": "string"}
+                }
+            ],
+            "title": "The satellite schema",
+            "description": "Satellite Name (used as ID for the Satellite).",
+            "default": "",
+            "examples": ["MSG"]
+        },
+        "satellite_description": {
+            "$id": "#/properties/satellite_description",
+            "anyOf": [
+                {"type": "string"},
+                {
+                    "type": "array",
+                    "items": {"type": "string"}
+                }
+            ],
+            "title": "The satellite_description schema",
+            "description": "Satellite Description.",
+            "default": "",
+            "examples": ["Meteosat Second Generation (MSG)"]
+        },
+        "spatialResolution": {
+            "$id": "#/properties/spatialResolution",
+            "type": "string",
+            "title": "The spatialResolution schema",
+            "description": "The productResolution.",
+            "default": "",
+            "examples": ["3"]
+        },
+        "spatialResolutionUom": {
+            "$id": "#/properties/spatialResolutionUom",
+            "type": "string",
+            "title": "The spatialResolutionUom schema",
+            "description": "Should be something like m / km / pixel / ...",
+            "default": "",
+            "examples": ["km"]
+        },
+        "tempextent_begin": {
+            "$id": "#/properties/tempextent_begin",
+            "type": "string",
+            "format": "date",
+            "title": "The tempextent_begin schema",
+            "description": "When the first products are found.",
+            "default": "",
+            "examples": ["2017-02-01"]
+        },
+        "themes": {
+            "$id": "#/properties/themes",
+            "anyOf": [
+                {"type": "string"},
+                {
+                    "type": "array",
+                    "items": {"type": "string"}
+                }
+            ],
+            "title": "The themes keyword schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "examples": [
+                [
+                    "Level 1 Data",
+                    "Land"
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/themes/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/themes/items/anyOf/0",
+                        "type": "string",
+                        "title": "The first anyOf schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "Level 1 Data",
+                            "Land"
+                        ]
+                    }
+                ]
+            }
+        },
+        "thumbnails": {
+            "$id": "#/properties/thumbnails",
+            "type": "string",
+            "title": "The thumbnails schema",
+            "description": "A preview or quickview of the product.",
+            "default": "",
+            "examples": ["https://eum-dcsi.demo.52north.org/IMG_MTG_FCI_TEST_DATA_2017.jpg"]
+        },
+        "topicCategory": {
+            "$id": "#/properties/topicCategory",
+            "anyOf": [
+                {
+                    "type": "string",
+                    "enum": [
+                        "farming",
+                        "biota",
+                        "boundaries",
+                        "climatologyMeteorologyAtmosphere",
+                        "economy",
+                        "elevation",
+                        "environment",
+                        "geoscientificInformation",
+                        "health",
+                        "imageryBaseMapsEarthCover",
+                        "intelligenceMilitary",
+                        "inlandWaters",
+                        "location",
+                        "oceans",
+                        "planningCadastre",
+                        "society",
+                        "structure",
+                        "transportation",
+                        "utilitiesCommunication"
+                    ]
+                },
+                {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "farming",
+                            "biota",
+                            "boundaries",
+                            "climatologyMeteorologyAtmosphere",
+                            "economy",
+                            "elevation",
+                            "environment",
+                            "geoscientificInformation",
+                            "health",
+                            "imageryBaseMapsEarthCover",
+                            "intelligenceMilitary",
+                            "inlandWaters",
+                            "location",
+                            "oceans",
+                            "planningCadastre",
+                            "society",
+                            "structure",
+                            "transportation",
+                            "utilitiesCommunication"
+                        ]
+                    }
+                }
+            ],
+            "title": "The topicCategory schema",
+            "description": "ISO19115 topicCategory.",
+            "default": "",
+            "examples": ["climatologyMeteorologyAtmosphere"]
+        },
+        "use_constraint": {
+            "$id": "#/properties/use_constraint",
+            "type": "string",
+            "enum": [
+                "license",
+                "copyright",
+                "otherRestrictions"
+            ],
+            "title": "The use_constraint schema",
+            "description": "Constraints applied to assure the protection of privacy or intellectual property using the resource. Currently only copyright, license and otherRestrictions are distinguished.",
+            "default": "",
+            "examples": ["otherRestrictions"]
+        }
+    },
+    "required": [
+        "abstract",
+        "datasetTitle",
+        "distributorContact",
+        "hierarchyLevel"
+    ],
+    "additionalProperties": true
+}
