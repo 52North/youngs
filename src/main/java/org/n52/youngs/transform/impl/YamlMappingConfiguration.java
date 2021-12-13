@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2020 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -426,7 +426,7 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
                                         subFieldValues.entries().stream()
                                                 .filter((Entry<YamlNode, YamlNode> fieldNodeProperties) -> {
                                                     String propertyKey = fieldNodeProperties.getKey().asTextValue();
-                                                    if ("type".equals(propertyKey) || "index".equals(propertyKey)) {
+                                                    if ("type".equals(propertyKey) || "index".equals(propertyKey) || "normalizer".equals(propertyKey)) {
                                                         YamlNode propertyValue = fieldNodeProperties.getValue();
                                                         if (propertyValue.isText()) {
                                                             return true;
@@ -441,6 +441,7 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
                                                     subFieldProperties.put(propertyKey, propertyValue);
                                                 });
                                         subFields.put(subFieldName, subFieldProperties);
+                                        log.info("{}: {}", subFieldName, subFieldProperties);
                                     }
                                 });
                             value = Optional.of(subFields);

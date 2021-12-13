@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2020 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -61,5 +61,11 @@ public interface Report {
     public void addMessage(String message, Level level);
 
     public Collection<MessageWithDate> getMessages();
+
+    /**
+     * return the total count of records identified for the source (e.g. files)
+     * @return the total number
+     */
+    public int getIdentifiedRecordCount();
 
 }

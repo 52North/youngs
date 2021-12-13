@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2020 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,18 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.n52.youngs.validation;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Locale;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.n52.youngs.harvest.InMemoryStreamSource;
 import org.n52.youngs.harvest.NodeSourceRecord;
@@ -40,6 +38,12 @@ import org.xml.sax.SAXException;
  * @author <a href="mailto:m.rieke@52north.org">Matthes Rieke</a>
  */
 public class XmlSchemaValidatorTest {
+
+    @BeforeClass
+    public static void setup() {
+        Locale.setDefault(Locale.ENGLISH);
+    }
+
 
     @Test
     public void testValidXmlFile() throws SAXException, SourceException, IOException {

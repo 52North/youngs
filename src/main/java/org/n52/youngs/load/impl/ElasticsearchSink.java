@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2021 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,8 +56,10 @@ import org.n52.youngs.load.SchemaGenerator;
 import org.n52.youngs.load.Sink;
 import org.n52.youngs.load.SinkRecord;
 import org.n52.youngs.transform.MappingConfiguration;
+import org.n52.youngs.transform.MappingEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
 /**
  *
@@ -146,6 +148,15 @@ public abstract class ElasticsearchSink implements Sink {
                 return updateMapping(indexId, mapping);
             } else {
                 log.info("Index {} does not exist, creating it ...", indexId);
+                if (metaIndexExists(indexId)) {
+                    log.info("meta index already exists for index {}", indexId);
+                    log.info("delete existing meta index for index {} before re-creating it", indexId);
+                    boolean isDeleteAcknowledged = deleteIndexById(deriveMetadataIndexName(indexId));
+
+                    if(!isDeleteAcknowledged){
+                        log.warn("failed to delete meta index {} for index {}", deriveMetadataIndexName(indexId), indexId);
+                    }
+                }
                 return createMapping(mapping, indexId);
             }
         } catch (RuntimeException e) {
@@ -282,9 +293,8 @@ public abstract class ElasticsearchSink implements Sink {
         if (value instanceof SingleEsParameter) {
             SingleEsParameter single = (SingleEsParameter) value;
             if (single.getType() == ElasticsearchTypeRegistry.stringField) {
-                map.put(single.getName(), new ElasticsearchTypeRegistry.ElasticsearchType(ImmutableMap.<String, Object> of("type", "text", "index", "false")).getType());
-            }
-            else {
+                map.put(single.getName(), new ElasticsearchTypeRegistry.ElasticsearchType(ImmutableMap.<String, Object>of("type", "text", "index", "false")).getType());
+            } else {
                 map.put(single.getName(), single.getTypeAsMap());
             }
         } else if (value instanceof ObjectEsParameter) {
@@ -337,16 +347,7 @@ public abstract class ElasticsearchSink implements Sink {
 
     @Override
     public boolean clear(MappingConfiguration mapping) {
-        log.info("Deleting index '{}'", mapping.getIndex());
-        DeleteIndexRequest request = new DeleteIndexRequest(mapping.getIndex());
-        try {
-            DeleteIndexResponse delete = getClient().admin().indices().delete(request).actionGet();
-            log.info("Delete acknowledged: {}", delete.isAcknowledged());
-            return delete.isAcknowledged();
-        } catch (Exception e) {
-            log.info("Index does not exist, no need to delete: {}", e.getMessage());
-            return true;
-        }
+        return deleteIndexById(mapping.getIndex());
     }
 
     @Override
@@ -361,6 +362,34 @@ public abstract class ElasticsearchSink implements Sink {
 
     private String deriveMetadataIndexName(String indexId) {
         return indexId + "-meta";
+    }
+
+    /**
+     * @param indexId
+     * @return true if meta index for provided index already exists
+     */
+    private boolean metaIndexExists(String indexId) {
+        String metaIndexId = deriveMetadataIndexName(indexId);
+        IndicesAdminClient indices = getClient().admin().indices();
+
+        return indices.prepareExists(metaIndexId).get().isExists();
+    }
+
+    /**
+     * @param indexId
+     * @return true if deletion of index is acknowledged
+     */
+    private boolean deleteIndexById(String indexId) {
+        log.info("Deleting index '{}'", indexId);
+        DeleteIndexRequest request = new DeleteIndexRequest(indexId);
+        try {
+            DeleteIndexResponse delete = getClient().admin().indices().delete(request).actionGet();
+            log.info("Delete acknowledged: {}", delete.isAcknowledged());
+            return delete.isAcknowledged();
+        } catch (Exception e) {
+            log.info("Index does not exist, no need to delete: {}", e.getMessage());
+            return true;
+        }
     }
 
 }

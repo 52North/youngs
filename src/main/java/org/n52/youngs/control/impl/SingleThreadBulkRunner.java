@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2020 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import javax.xml.xpath.XPathExpressionException;
 import org.n52.youngs.api.Report;
@@ -139,7 +140,7 @@ public class SingleThreadBulkRunner implements Runner {
         Objects.nonNull(this.sink);
 
         log.info("Starting harvest from {} to {} with {}", source, this.sink, mapper);
-        Report report = new ReportImpl();
+        ReportImpl report = new ReportImpl();
 
         try {
             boolean prepareSink = sink.prepare(mapper.getMapper());
@@ -208,11 +209,13 @@ public class SingleThreadBulkRunner implements Runner {
 
                 log.debug("Mapping {} retrieved valid records.", validRecords.size());
                 mappingTimer.start();
+                AtomicInteger totalIdenfiedCount = new AtomicInteger(0);
                 List<SinkRecord> mappedRecords = validRecords.stream()
                         .map(record -> {
+                            totalIdenfiedCount.incrementAndGet();
                             try {
                                 SinkRecord r = mapper.map(record);
-                                if (this.postProcessor != null) {
+                                if (this.postProcessor != null && r != null) {
                                     return this.postProcessor.process(r);
                                 }
                                 return r;
@@ -224,6 +227,7 @@ public class SingleThreadBulkRunner implements Runner {
                         .filter(Objects::nonNull)
                         .collect(Collectors.toList());
                 mappingTimer.stop();
+                report.setIdentifiedRecordCount(totalIdenfiedCount.get());
 
                 log.debug("Storing {} mapped records.", mappedRecords.size());
                 if (!testRun) {
