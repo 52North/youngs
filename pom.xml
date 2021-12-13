@@ -79,7 +79,7 @@
         <config.logger.fileappender.filename>${project.build.finalName}</config.logger.fileappender.filename>
         <version.java>1.8</version.java>
         <version.log4j>2.15.0</version.log4j>
-        <elasticsearch.version>6.2.2</elasticsearch.version>
+        <elasticsearch.version>6.8.17</elasticsearch.version>
     </properties>
 
     <profiles>
