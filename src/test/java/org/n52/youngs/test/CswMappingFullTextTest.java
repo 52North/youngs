@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2021 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,7 @@ import java.io.IOException;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
+import org.elasticsearch.common.Strings;
 import org.junit.Before;
 import org.junit.Test;
 import org.n52.youngs.harvest.SourceRecord;
@@ -52,7 +53,7 @@ public class CswMappingFullTextTest {
     public void fullXml() throws Exception {
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/gmd/metadata_fulltext_oneline.xml");
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
-        String mappedRecordString = mappedRecord.getBuilder().string();
+        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
 
         assertThat("Mapped record contains xml snippets", mappedRecordString,
                 allOf(containsString("EO:EUM:CM:MULT:SARAH_V001 "),

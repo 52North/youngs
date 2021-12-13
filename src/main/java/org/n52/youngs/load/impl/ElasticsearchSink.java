@@ -35,12 +35,11 @@ import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
@@ -217,7 +216,7 @@ public abstract class ElasticsearchSink implements Sink {
                 .preparePutMapping(indexId)
                 .setType(mapping.getType())
                 .setSource(schema);
-        PutMappingResponse updateMappingResponse = request.get();
+        AcknowledgedResponse updateMappingResponse = request.get();
         log.info("Update mapping of type {} acknowledged: {}", mapping.getType(), updateMappingResponse.isAcknowledged());
         if (!updateMappingResponse.isAcknowledged()) {
             log.error("Problem updating mapping for type {}", mapping.getType());
@@ -383,7 +382,7 @@ public abstract class ElasticsearchSink implements Sink {
         log.info("Deleting index '{}'", indexId);
         DeleteIndexRequest request = new DeleteIndexRequest(indexId);
         try {
-            DeleteIndexResponse delete = getClient().admin().indices().delete(request).actionGet();
+            AcknowledgedResponse delete = getClient().admin().indices().delete(request).actionGet();
             log.info("Delete acknowledged: {}", delete.isAcknowledged());
             return delete.isAcknowledged();
         } catch (Exception e) {

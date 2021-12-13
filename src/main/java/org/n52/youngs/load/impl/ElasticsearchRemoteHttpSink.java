@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2021 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -70,11 +70,7 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
                     this.client = tClient;
                     break;
                 case NODE:
-                    settings.put("http.enabled", false);
-                    settings.put("path.home", Files.createTempDir().toPath());
-                    Node node = new Node(settings.build());
-                    this.client = node.client();
-                    break;
+                throw new SinkError("Node mode is deprecated: %s", mode);
                 default:
                     throw new SinkError("Unsupported mode %s", mode);
             }

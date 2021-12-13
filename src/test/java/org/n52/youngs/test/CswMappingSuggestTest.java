@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2021 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,6 +29,7 @@ import java.util.Spliterators;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import org.elasticsearch.common.Strings;
 import org.hamcrest.CoreMatchers;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -64,7 +65,7 @@ public class CswMappingSuggestTest {
     public void suggest() throws Exception {
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/gmd/metadata_1000.xml");
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
-        String mappedRecordString = mappedRecord.getBuilder().string();
+        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
 
         JsonNode json = new ObjectMapper().readTree(mappedRecordString);
         Assert.assertThat(json.has("title"), CoreMatchers.is(true));
