@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2022 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,8 @@ import java.io.Reader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
+import javax.xml.transform.Source;
+import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.xmlbeans.XmlException;

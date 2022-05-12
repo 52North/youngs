@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2022 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -119,7 +119,8 @@ public class JsonTransformerTest {
         XmlObject xmlObject = XmlObject.Factory.newInstance();
 
         try {
-            xmlObject = XmlObject.Factory.parse(new JsonTransformer().transformWithStream(writer.toString()));
+            String jsonString = writer.toString();
+            xmlObject = XmlObject.Factory.parse(new JsonTransformer().transformWithStream(jsonString));
             assertTrue(xmlObject != null);
         } catch (Exception e) {
             fail(e.getMessage());
