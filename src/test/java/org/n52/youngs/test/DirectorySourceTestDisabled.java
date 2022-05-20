@@ -35,6 +35,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
+import org.elasticsearch.common.Strings;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -116,7 +117,7 @@ public class DirectorySourceTestDisabled {
 
         Iterator<SourceRecord> iter = records.iterator();
         BuilderRecord mappedRecord = (BuilderRecord) mapper.map(iter.next());
-        String mappedRecordString = mappedRecord.getBuilder().string();
+        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
 
         assertThat("record id is in mapped record", mappedRecordString, containsString("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f"));
     }
@@ -177,8 +178,8 @@ public class DirectorySourceTestDisabled {
                 .map(BuilderRecord::getBuilder)
                 .map((xContentBuilder) -> {
                     try {
-                        return xContentBuilder.string();
-                    } catch (IOException ex) {
+                        return Strings.toString(xContentBuilder);
+                    } catch (RuntimeException ex) {
                         return null;
                     }
                 })

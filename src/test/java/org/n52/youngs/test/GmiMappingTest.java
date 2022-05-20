@@ -19,6 +19,7 @@ package org.n52.youngs.test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.n52.youngs.impl.SourceRecordHelper;
+import org.elasticsearch.common.Strings;
 import com.google.common.io.Resources;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -46,7 +47,7 @@ public class GmiMappingTest {
 
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/gmi/metadata_10.xml");
         BuilderRecord mappedRecord = mapper.map(record);
-        String mappedRecordString = mappedRecord.getBuilder().string();
+        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
 
         ObjectMapper mapperJson = new ObjectMapper();
         mapperJson.disable(SerializationFeature.INDENT_OUTPUT);

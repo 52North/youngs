@@ -60,14 +60,7 @@ public class ElasticsearchServer extends ExternalResource {
                         System.getProperty(SYSTEM_PROPERTY_START_ES))
                 .orElse(startElasticsearch.toString()));
         if (startEs) {
-            String fileName = "elasticsearch-it.yml";
-            Settings settings = Settings.builder().loadFromStream(fileName, getClass().getResourceAsStream(fileName), false).build();
-            cluster = settings.get("cluster.name");
-
-            embeddedNode = new Node(settings);
-            embeddedNode.start();
-            client = embeddedNode.client();
-            System.out.println(String.format("### Elasticsearch server '%s' started ###", cluster));
+            throw new RuntimeException("embedded Elasticsearch is deprecated");
         }
     }
 

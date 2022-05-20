@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2022 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2020 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import org.n52.youngs.impl.SourceRecordHelper;
 import com.google.common.io.Resources;
 import java.io.IOException;
+import org.elasticsearch.common.Strings;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
@@ -58,7 +59,7 @@ public class CswMappingTest {
     public void bbox() throws Exception {
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_1ef30a8b-876d-4828-9246-c37ab4510bbd.xml");
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
-        String mappedRecordString = mappedRecord.getBuilder().string();
+        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
 
         mapper.disable(SerializationFeature.INDENT_OUTPUT);
         mappedRecordString = mapper.readTree(mappedRecordString).toString();
@@ -75,7 +76,7 @@ public class CswMappingTest {
     public void fullXml() throws Exception {
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_1ef30a8b-876d-4828-9246-c37ab4510bbd.xml");
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
-        String mappedRecordString = mappedRecord.getBuilder().string();
+        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
 
         assertThat("Mapped record contains xml field name", mappedRecordString, containsString("raw_xml"));
         assertThat("Mapped record contains xml snippets", mappedRecordString,
@@ -88,7 +89,7 @@ public class CswMappingTest {
     public void xmlSubelement() throws Exception {
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_1ef30a8b-876d-4828-9246-c37ab4510bbd.xml");
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
-        String mappedRecordString = mappedRecord.getBuilder().string();
+        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
 
         assertThat("Mapped record contains xmldoc field name", mappedRecordString, containsString("raw_bbox"));
         assertThat("Mapped record contains xml snippets", mappedRecordString,
@@ -103,7 +104,7 @@ public class CswMappingTest {
     public void replace() throws Exception {
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_1ef30a8b-876d-4828-9246-c37ab4510bbd.xml");
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
-        String mappedRecordString = mappedRecord.getBuilder().string();
+        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
 
         mapper.disable(SerializationFeature.INDENT_OUTPUT);
         mappedRecordString = mapper.readTree(mappedRecordString).toString();

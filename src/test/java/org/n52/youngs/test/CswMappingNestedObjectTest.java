@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.n52.youngs.impl.SourceRecordHelper;
 import com.google.common.io.Resources;
 import java.io.IOException;
+import org.elasticsearch.common.Strings;
 import org.hamcrest.CoreMatchers;
 import static org.hamcrest.CoreMatchers.containsString;
 import org.junit.Before;
@@ -57,7 +58,7 @@ public class CswMappingNestedObjectTest {
     public void nestedOne() throws Exception {
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/gmd/metadata_1000.xml");
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
-        String mappedRecordString = mappedRecord.getBuilder().string();
+        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
 
         assertThat("Mapped record does not contain xml snippets", mappedRecordString,
                 allOf(containsString("EO:EUM:CM:MULT:SARAH_V001")

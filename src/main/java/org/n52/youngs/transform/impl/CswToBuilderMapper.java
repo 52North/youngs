@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2022 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2020 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,6 +38,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
+import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.n52.youngs.load.impl.BuilderRecord;
@@ -189,7 +190,7 @@ public class CswToBuilderMapper implements Mapper {
         builder.endObject();
         builder.close();
 
-        log.trace("Created content for id '{}':\n{}", id, builder.string());
+        log.trace("Created content for id '{}':\n{}", id, Strings.toString(builder));
 
         return new IdAndBuilder(id, builder);
     }
