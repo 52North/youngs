@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
+import org.elasticsearch.common.xcontent.DeprecationHandler;
 import org.elasticsearch.common.xcontent.NamedXContentRegistry;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentParser;
@@ -51,12 +52,32 @@ public class JsonToBuilderMapper implements Mapper {
     private static final Logger log = LoggerFactory.getLogger(JsonToBuilderMapper.class);
 
     private final LightweightYamlMappingConfiguration mapper;
+    private final DeprecationHandler deprecationHandler;
 
     private ObjectWriter objectWriter;
 
     public JsonToBuilderMapper(LightweightYamlMappingConfiguration mapper) {
         this.mapper = mapper;
         objectWriter = new ObjectMapper().writer();
+        this.deprecationHandler = new DeprecationHandler() {
+
+            @Override
+            public void usedDeprecatedName(String usedName, String modernName) {
+                log.info("Deprecated name: {}, modernName: {}", usedName, modernName);
+            }
+
+            @Override
+            public void usedDeprecatedField(String usedName, String replacedWith) {
+                log.info("Deprecated field: {}, replacedWith: {}", usedName, replacedWith);
+            }
+
+            @Override
+            public void deprecated(String message, Object... params) {
+                // TODO Auto-generated method stub
+
+            }
+
+        };
     }
 
     @Override
@@ -91,7 +112,7 @@ public class JsonToBuilderMapper implements Mapper {
             }
             addFulltext((ObjectNode) metadataNode, objectWriter.writeValueAsString(metadataNode));
             byte[] bytes = objectWriter.writeValueAsBytes(metadataNode);
-            parser = JsonXContent.jsonXContent.createParser(NamedXContentRegistry.EMPTY, new ByteArrayInputStream(bytes));
+            parser = JsonXContent.jsonXContent.createParser(NamedXContentRegistry.EMPTY, this.deprecationHandler, new ByteArrayInputStream(bytes));
             XContentBuilder xContentBuilder = JsonXContent.contentBuilder().copyCurrentStructure(parser);
             return new BuilderRecord(id, xContentBuilder);
         } catch (IOException e) {

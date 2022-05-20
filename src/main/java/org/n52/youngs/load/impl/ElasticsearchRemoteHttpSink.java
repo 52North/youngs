@@ -70,11 +70,7 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
                     this.client = tClient;
                     break;
                 case NODE:
-                    settings.put("http.enabled", false);
-                    settings.put("path.home", Files.createTempDir().toPath());
-                    Node node = new Node(settings.build());
-                    this.client = node.client();
-                    break;
+                throw new SinkError("Node mode is deprecated: %s", mode);
                 default:
                     throw new SinkError("Unsupported mode %s", mode);
             }

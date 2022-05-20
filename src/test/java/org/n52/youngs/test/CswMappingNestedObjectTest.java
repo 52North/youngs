@@ -77,7 +77,7 @@ public class CswMappingNestedObjectTest {
     public void nestedTwo() throws Exception {
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/gmd/metadata_1000b.xml");
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
-        String mappedRecordString = mappedRecord.getBuilder().string();
+        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
 
         assertThat("Mapped record does not contain xml snippets", mappedRecordString,
                 allOf(containsString("EO:EUM:CM:MULT:SARAH_V001")

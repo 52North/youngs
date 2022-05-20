@@ -210,7 +210,7 @@ public class CswToBuilderMapperTest {
         assertThat("XML field has no new lines between elements", mappedRecordString,
                 hasJsonPath("raw_xml", containsString("\n")));
         assertThat("XML has some whitespace before elements", mappedRecordString,
-                hasJsonPath("raw_xml", containsString("    <dc:subject")));
+                hasJsonPath("raw_xml", containsString("   <dc:subject")));
     }
 
     @Test

@@ -27,6 +27,7 @@ This project further includes:
   AOP alliance under Public Domain
   Apache Commons Codec under Apache License, Version 2.0
   Apache Commons Compress under Apache License, Version 2.0
+  Apache Commons IO under Apache License, Version 2.0
   Apache Commons Lang under Apache License, Version 2.0
   Apache Commons Logging under The Apache Software License, Version 2.0
   Apache HttpAsyncClient under Apache License, Version 2.0
@@ -37,11 +38,10 @@ This project further includes:
   Apache Log4j Core under Apache License, Version 2.0
   Apache Log4j SLF4J Binding under Apache License, Version 2.0
   cli under The Apache Software License, Version 2.0
-  Commons IO under The Apache Software License, Version 2.0
   compiler under Apache License 2.0
-  Elastic JNA Distribution under The Apache Software License, Version 2.0
-  Elasticsearch SecureSM under The Apache Software License, Version 2.0
-  elasticsearch-core under The Apache Software License, Version 2.0
+  core under The Apache Software License, Version 2.0
+  Elastic JNA Distribution under Apache License, Version 2.0
+  elasticsearch-ssl-config under The Apache Software License, Version 2.0
   Guava: Google Core Libraries for Java under The Apache Software License, Version 2.0
   HdrHistogram under Public Domain, per Creative Commons CC0
   HPPC Collections under The Apache Software License, Version 2.0
@@ -51,6 +51,8 @@ This project further includes:
   Jackson-core under The Apache Software License, Version 2.0
   jackson-databind under The Apache Software License, Version 2.0
   Jackson-dataformat-YAML under The Apache Software License, Version 2.0
+  jakarta.xml.bind-api under Eclipse Distribution License - v 1.0
+  JavaBeans Activation Framework API jar under EDL 1.0
   javax.inject under The Apache Software License, Version 2.0
   JAXB2 Basics - Runtime under BSD-Style License
   Joda-Time under Apache 2
@@ -88,10 +90,10 @@ This project further includes:
   reindex under The Apache Software License, Version 2.0
   rest under The Apache Software License, Version 2.0
   Saxon-HE under Mozilla Public License Version 2.0
+  secure-sm under The Apache Software License, Version 2.0
   server under The Apache Software License, Version 2.0
   SLF4J API Module under MIT License
-  SnakeYAML under Apache License Version 2.0
-  Spatial4J under The Apache Software License, Version 2.0
+  SnakeYAML under Apache License, Version 2.0
   Spring AOP under The Apache Software License, Version 2.0
   Spring Beans under The Apache Software License, Version 2.0
   Spring Context under The Apache Software License, Version 2.0
@@ -103,6 +105,7 @@ This project further includes:
   transport under The Apache Software License, Version 2.0
   transport-netty4 under The Apache Software License, Version 2.0
   W3C XLink 1.0 under BSD-Style License
+  x-content under The Apache Software License, Version 2.0
   XmlBeans under The Apache Software License, Version 2.0
   YAML API under Apache License, Version 2.0
   Youngs under The Apache Software License, Version 2.0
