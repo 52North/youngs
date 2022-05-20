@@ -22,3 +22,5 @@ pom.xml.releaseBackup
 .classpath
 .project
 .settings/
+.vscode
+
