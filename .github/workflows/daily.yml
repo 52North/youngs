@@ -3,6 +3,7 @@ name: Daily Snapshot build
 on:
   schedule:
     - cron:  '30 1 * * *'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -28,6 +29,7 @@ jobs:
   publish-snapshot:
     needs: build
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
 
     steps:
       - uses: actions/checkout@v3
