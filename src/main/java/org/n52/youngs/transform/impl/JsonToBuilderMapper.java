@@ -143,40 +143,64 @@ public class JsonToBuilderMapper implements Mapper {
         String expression = mappingEntry.getExpression();
         MappingType type = mappingEntry.getType();
         switch (type) {
-        case DATE:
-            if(expression.equals("current-dateTime()")) {
-                result = new TextNode(DateTime.now().toString());
-            }
-            return result;
-        case NODE:
-            String[] pathArray = expression.substring(1, expression.length()).split("/");
-            JsonNode currentNode = sourceNode.path(pathArray[0]);
-            for (int i = 1; i < pathArray.length; i++) {
-                if(currentNode instanceof ArrayNode) {
-                    currentNode = ((ArrayNode)currentNode).get(0);//TODO check if applicable
-                    currentNode = currentNode.get(pathArray[i]);
-                } else {
-                    currentNode = currentNode.get(pathArray[i]);
+            case DATE:
+                if (expression.equals("current-dateTime()")) {
+                    result = new TextNode(DateTime.now()
+                                                  .toString());
                 }
-            }
-            result = currentNode;
-            return result;
-        case STRING:
-            result = new TextNode(expression);
-            return result;
-        case LIST:
-            String[] pathArrayForList = expression.substring(1, expression.length()).split("//");
-            if(pathArrayForList.length == 2) {
-                List<JsonNode> valuesList = sourceNode.path(pathArrayForList[0]).findValues(pathArrayForList[1]);
-                ArrayNode valuesArrayNode = new ArrayNode(JsonNodeFactory.instance, valuesList);
-                if(valuesArrayNode.size() > 0) {
-                    result = valuesArrayNode;
+                return result;
+            case NODE:
+                expression = stripPreceedingSlash(expression);
+                result = resolveValue(sourceNode, expression);
+                return result;
+            case STRING:
+                result = new TextNode(expression);
+                return result;
+            case LIST:
+                expression = stripPreceedingSlash(expression);
+                String[] pathArrayForList = expression.split("//");
+                if (pathArrayForList.length == 2) {
+                    JsonNode arrayNode = sourceNode.path(pathArrayForList[0]);
+                    ArrayNode valuesArrayNode = new ArrayNode(JsonNodeFactory.instance);
+                    for (JsonNode itemNode : arrayNode) {
+                        JsonNode valueNode = resolveValue(itemNode, pathArrayForList[1]);
+                        if (!valueNode.isMissingNode()) {
+                            valuesArrayNode.add(valueNode);
+                        }
+                    }
+                    if (valuesArrayNode.size() > 0) {
+                        result = valuesArrayNode;
+                    }
                 }
-            }
-            return result;
-        default:
-            log.warn("Entry could not be resolved." + mappingEntry.toString());
-            return result;
+
+                if (pathArrayForList.length > 2) {
+                    throw new IllegalStateException("At maximum one list indicator (//) is supported: " + expression);
+                }
+                return result;
+            default:
+                log.warn("Entry could not be resolved." + mappingEntry.toString());
+                return result;
         }
+    }
+
+    private String stripPreceedingSlash(String expression) {
+        return expression != null
+                && expression.matches("^/{1}.*$")
+                        ? expression.substring(1, expression.length())
+                        : expression;
+    }
+
+    private JsonNode resolveValue(JsonNode sourceNode, String expression) {
+        JsonNode result;
+        String[] pathArray = expression.split("/");
+        JsonNode currentNode = sourceNode.path(pathArray[0]);
+        for (int i = 1; i < pathArray.length; i++) {
+            if (currentNode instanceof ArrayNode) {
+                currentNode = ((ArrayNode) currentNode).path(0);// TODO check if applicable
+            }
+            currentNode = currentNode.path(pathArray[i]);
+        }
+        result = currentNode;
+        return result;
     }
 }
