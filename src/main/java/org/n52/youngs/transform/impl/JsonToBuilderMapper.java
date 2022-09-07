@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.n52.youngs.transform.impl;
 
 import java.io.ByteArrayInputStream;
@@ -97,7 +98,8 @@ public class JsonToBuilderMapper implements Mapper {
             JsonNode metadataNode = ((JsonNodeSourceRecord) sourceRecord).getRecord();
             String id = "";
             try {
-                id = metadataNode.path(JsonConstants.FIELDNAME_ID).asText();
+                id = metadataNode.path(JsonConstants.FIELDNAME_ID)
+                                 .asText();
             } catch (Exception e) {
                 log.error("Could not fetch id.", e);
             }
@@ -112,8 +114,11 @@ public class JsonToBuilderMapper implements Mapper {
             }
             addFulltext((ObjectNode) metadataNode, objectWriter.writeValueAsString(metadataNode));
             byte[] bytes = objectWriter.writeValueAsBytes(metadataNode);
-            parser = JsonXContent.jsonXContent.createParser(NamedXContentRegistry.EMPTY, this.deprecationHandler, new ByteArrayInputStream(bytes));
-            XContentBuilder xContentBuilder = JsonXContent.contentBuilder().copyCurrentStructure(parser);
+            parser = JsonXContent.jsonXContent.createParser(NamedXContentRegistry.EMPTY,
+                                                            this.deprecationHandler,
+                                                            new ByteArrayInputStream(bytes));
+            XContentBuilder xContentBuilder = JsonXContent.contentBuilder()
+                                                          .copyCurrentStructure(parser);
             return new BuilderRecord(id, xContentBuilder);
         } catch (IOException e) {
             log.error("Could not create XContentBuilder from InputStream.", e);
@@ -128,7 +133,7 @@ public class JsonToBuilderMapper implements Mapper {
     private void mapEntry(ObjectNode recordNode,
             LightweightMappingEntry mappingEntry, ObjectNode sourceNode) {
         JsonNode mappedNode = resolveEntry(mappingEntry, sourceNode);
-        if(mappedNode != null &&!(mappedNode instanceof MissingNode)) {
+        if (mappedNode != null && !(mappedNode instanceof MissingNode)) {
             recordNode.set(mappingEntry.getFieldName(), mappedNode);
         }
     }
