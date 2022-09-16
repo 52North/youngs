@@ -16,28 +16,22 @@
  */
 package org.n52.youngs.validation;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.n52.youngs.harvest.InMemoryStreamSource;
-import org.n52.youngs.harvest.JsonNodeSourceRecord;
-import org.n52.youngs.harvest.NodeSourceRecord;
-import org.n52.youngs.harvest.Source;
-import org.n52.youngs.harvest.SourceException;
-import org.n52.youngs.harvest.SourceRecord;
-import org.n52.youngs.impl.ReportImpl;
-import org.xml.sax.SAXException;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.n52.youngs.harvest.JsonNodeSourceRecord;
+import org.n52.youngs.harvest.SourceException;
+import org.xml.sax.SAXException;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  *
@@ -50,7 +44,6 @@ public class JsonSchemaValidatorTest {
         Locale.setDefault(Locale.ENGLISH);
     }
 
-
     @Test(expected = JsonValidationException.class)
     public void testInvalidFile() throws SAXException, SourceException, IOException, URISyntaxException {
         JsonSchemaValidator val = new JsonSchemaValidator(getClass().getResource("/schemas/PNModel4_Schema_V10.json").toURI());
@@ -58,6 +51,7 @@ public class JsonSchemaValidatorTest {
 
         JsonNodeSourceRecord source = new JsonNodeSourceRecord(om.readTree(getClass().getResourceAsStream("/records/json/record_enum_invalid.json")), "json");
         List<String> result = val.validate(source.getRecord());
+        assertTrue(result.stream().collect(Collectors.joining("\n")).isEmpty());
     }
 
     @Test
@@ -69,6 +63,5 @@ public class JsonSchemaValidatorTest {
         List<String> result = val.validate(source.getRecord());
         Assert.assertTrue("valid document expected", result.isEmpty());
     }
-
 
 }
