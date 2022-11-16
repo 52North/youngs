@@ -18,7 +18,7 @@ package org.n52.youngs.load.impl;
 
 import com.google.common.base.MoreObjects;
 import java.util.Optional;
-import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.xcontent.XContentBuilder;
 import org.n52.youngs.load.SinkRecord;
 
 /**

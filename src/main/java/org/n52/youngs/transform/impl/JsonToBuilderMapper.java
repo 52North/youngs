@@ -16,18 +16,16 @@
  */
 
 package org.n52.youngs.transform.impl;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-
-import org.elasticsearch.common.xcontent.DeprecationHandler;
-import org.elasticsearch.common.xcontent.NamedXContentRegistry;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentParser;
-import org.elasticsearch.common.xcontent.json.JsonXContent;
+import org.elasticsearch.xcontent.DeprecationHandler;
+import org.elasticsearch.xcontent.NamedXContentRegistry;
+import org.elasticsearch.xcontent.XContentBuilder;
+import org.elasticsearch.xcontent.XContentParser;
+import org.elasticsearch.xcontent.json.JsonXContent;
 import org.joda.time.DateTime;
 import org.n52.youngs.harvest.JsonNodeSourceRecord;
 import org.n52.youngs.harvest.SourceRecord;
@@ -47,6 +45,8 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import java.util.function.Supplier;
+import org.elasticsearch.xcontent.XContentLocation;
 
 public class JsonToBuilderMapper implements Mapper {
 
@@ -61,7 +61,7 @@ public class JsonToBuilderMapper implements Mapper {
         this.mapper = mapper;
         objectWriter = new ObjectMapper().writer();
         this.deprecationHandler = new DeprecationHandler() {
-
+            /*
             @Override
             public void usedDeprecatedName(String usedName, String modernName) {
                 log.info("Deprecated name: {}, modernName: {}", usedName, modernName);
@@ -76,6 +76,21 @@ public class JsonToBuilderMapper implements Mapper {
             public void deprecated(String message, Object... params) {
                 // TODO Auto-generated method stub
 
+            }*/
+
+            @Override
+            public void usedDeprecatedName(String parserName, Supplier<XContentLocation> location, String usedName, String modernName) {
+                log.info("Deprecated name: {}, modernName: {}", usedName, modernName);
+            }
+
+            @Override
+            public void usedDeprecatedField(String parserName, Supplier<XContentLocation> location, String usedName, String replacedWith) {
+                log.info("Deprecated field: {}, replacedWith: {}", usedName, replacedWith);
+            }
+
+            @Override
+            public void usedDeprecatedField(String parserName, Supplier<XContentLocation> location, String usedName) {
+               log.info("Deprecated field: {}", usedName);
             }
 
         };

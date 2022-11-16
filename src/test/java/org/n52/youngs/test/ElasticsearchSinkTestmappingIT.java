@@ -25,7 +25,7 @@ import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsAction;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequestBuilder;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
 import org.elasticsearch.client.IndicesAdminClient;
-import org.elasticsearch.cluster.metadata.MappingMetaData;
+import org.elasticsearch.cluster.metadata.MappingMetadata;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -79,7 +79,7 @@ public class ElasticsearchSinkTestmappingIT {
         GetMappingsRequestBuilder builder = new GetMappingsRequestBuilder(indicesClient, GetMappingsAction.INSTANCE, mapping.getIndex())
                 .addTypes(mapping.getType());
         GetMappingsResponse response = indicesClient.getMappings(builder.request()).actionGet();
-        ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>> mappings = response.getMappings();
+        ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetadata>> mappings = response.getMappings();
 
         Map<String, Object> recordTypeMap = mappings.get(mapping.getIndex()).get(mapping.getType()).getSourceAsMap();
         assertThat("dynamic value is correct", Boolean.valueOf(recordTypeMap.get("dynamic").toString()), is(mapping.isDynamicMappingEnabled()));

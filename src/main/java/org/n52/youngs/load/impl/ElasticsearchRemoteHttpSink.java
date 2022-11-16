@@ -16,15 +16,13 @@
  */
 package org.n52.youngs.load.impl;
 
-import com.google.common.io.Files;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.RestHighLevelClientBuilder;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.TransportAddress;
-import org.elasticsearch.node.Node;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.n52.youngs.exception.SinkError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +44,7 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
 
     private final int port;
 
-    private final Client client;
+    private final RestHighLevelClient client;
 
     public ElasticsearchRemoteHttpSink(String host, int port, String cluster, String index, String type) {
         this(host, port, cluster, index, type, Mode.TRANSPORT);
@@ -64,11 +62,11 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
         try {
             switch (mode) {
                 case TRANSPORT:
-                    TransportClient tClient = new PreBuiltTransportClient(settings.build());
-                    tClient.addTransportAddress(
-                            new TransportAddress(InetAddress.getByName(this.host), this.port));
-                    this.client = tClient;
+                    RestClient restClient = RestClient.builder(new HttpHost(InetAddress.getByName(this.host), this.port)).build();
+                    RestHighLevelClient highLevelClient = new RestHighLevelClientBuilder(restClient).setApiCompatibilityMode(true).build(); //compatibilty mode for ES 8.x
+                    this.client = highLevelClient;
                     break;
+
                 case NODE:
                 throw new SinkError("Node mode is deprecated: %s", mode);
                 default:
@@ -81,7 +79,7 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
     }
 
     @Override
-    public Client getClient() {
+    public RestHighLevelClient getClient() {
         return this.client;
     }
 

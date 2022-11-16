@@ -79,7 +79,7 @@
         <config.logger.fileappender.filename>${project.build.finalName}</config.logger.fileappender.filename>
         <version.java>1.8</version.java>
         <version.log4j>2.15.0</version.log4j>
-        <elasticsearch.version>6.8.17</elasticsearch.version>
+        <elasticsearch.version>7.17.7</elasticsearch.version>
     </properties>
 
     <profiles>
@@ -178,13 +178,13 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
+            <!--<plugin>
                 <groupId>org.jasig.maven</groupId>
                 <artifactId>maven-notice-plugin</artifactId>
                 <configuration>
                     <noticeTemplate>etc/notice-template.txt</noticeTemplate>
                     <licenseMapping>
-                        <!--<param>file:///${basedir}/../cdn/licenses/license-mappings.xml</param>-->
+                        <param>file:///${basedir}/../cdn/licenses/license-mappings.xml</param>
                         <param>http://52north.github.io/cdn/licenses/license-mappings.xml</param>
                     </licenseMapping>
                     <generateChildNotices>false</generateChildNotices>
@@ -198,7 +198,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
             
             <plugin>
                 <groupId>org.codehaus.gmaven</groupId>
@@ -430,7 +430,7 @@
             <artifactId>iso19139-v_20070417</artifactId>
             <version>2.5.1</version>
         </dependency>-->
-        <dependency>
+        <!--<dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
             <version>${elasticsearch.version}</version>
@@ -453,10 +453,10 @@
                     <artifactId>log4j-api</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
-            <artifactId>transport</artifactId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
             <version>${elasticsearch.version}</version>
             <exclusions>
                 <exclusion>
@@ -467,8 +467,39 @@
                     <groupId>org.apache.logging.log4j</groupId>
                     <artifactId>log4j-api</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.yaml</groupId>
+                    <artifactId>snakeyaml</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>joda-time</groupId>
+                    <artifactId>joda-time</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
+        <!--<dependency>
+          <groupId>org.elasticsearch</groupId>
+          <artifactId>elasticsearch</artifactId>
+          <version>${elasticsearch.version}</version>
+                      <exclusions>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.yaml</groupId>
+                    <artifactId>snakeyaml</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>joda-time</groupId>
+                    <artifactId>joda-time</artifactId>
+                </exclusion>
+            </exclusions>
+      </dependency>-->
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch-x-content</artifactId>

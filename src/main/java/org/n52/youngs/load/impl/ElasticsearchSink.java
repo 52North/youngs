@@ -19,6 +19,7 @@ package org.n52.youngs.load.impl;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -32,18 +33,20 @@ import java.util.Objects;
 import java.util.UUID;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.DocWriteResponse;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
+import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.index.IndexRequestBuilder;
+import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
+import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.IndicesAdminClient;
-import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.client.indices.PutMappingRequest;
+import org.elasticsearch.xcontent.XContentType;
 import org.joda.time.DateTimeZone;
 import org.n52.iceland.statistics.api.mappings.MetadataDataMapping;
 import org.n52.iceland.statistics.api.parameters.AbstractEsParameter;
@@ -55,10 +58,8 @@ import org.n52.youngs.load.SchemaGenerator;
 import org.n52.youngs.load.Sink;
 import org.n52.youngs.load.SinkRecord;
 import org.n52.youngs.transform.MappingConfiguration;
-import org.n52.youngs.transform.MappingEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 /**
  *
@@ -82,7 +83,7 @@ public abstract class ElasticsearchSink implements Sink {
         this.type = type;
     }
 
-    public abstract Client getClient();
+    public abstract RestHighLevelClient getClient();
 
     protected final String getCluster() {
         return cluster;
@@ -95,26 +96,27 @@ public abstract class ElasticsearchSink implements Sink {
 
         if (record instanceof BuilderRecord) {
             BuilderRecord builderRecord = (BuilderRecord) record;
-            Client client = getClient();
+            RestHighLevelClient client = getClient();
 
             log.trace("Indexing record: {}", record);
-            IndexRequestBuilder request = client.prepareIndex(index, type)
-                    .setSource(builderRecord.getBuilder());
+
+            IndexRequest indexRequest = new IndexRequest(this.index).opType(this.type).source(builderRecord.getBuilder());
             if (record.hasId()) {
-                request.setId(builderRecord.getId());
+                indexRequest.id(record.getId());
             }
 
             try {
                 log.trace("Sending record to sink...");
-                IndexResponse response = request.execute().actionGet();
+                IndexResponse response = client.index(indexRequest, RequestOptions.DEFAULT);
                 log.trace("Created [{}] with id {} @ {}/{}, version {}", response.getResult() == DocWriteResponse.Result.CREATED,
                         response.getId(), response.getIndex(), response.getType(), response.getVersion());
 
                 return response.getResult() == DocWriteResponse.Result.CREATED || (response.getResult() != DocWriteResponse.Result.CREATED && (response.getVersion() > 1));
-            } catch (ElasticsearchException e) {
+            } catch (IOException | ElasticsearchException e) {
                 log.error("Could not store record {}", builderRecord.getId(), e);
                 return false;
             }
+
         } else {
             throw new SinkError("The provided record class '%s' is not supported", record.getClass());
         }
@@ -140,9 +142,11 @@ public abstract class ElasticsearchSink implements Sink {
         }
 
         try {
-            IndicesAdminClient indices = getClient().admin().indices();
             String indexId = mapping.getIndex();
-            if (indices.prepareExists(indexId).get().isExists()) {
+            GetIndexRequest existsRequest = new GetIndexRequest(indexId);
+            boolean isExists = getClient().indices().exists(existsRequest, RequestOptions.DEFAULT);
+
+            if (isExists) {
                 log.info("Index {} already exists, updating the mapping ...", indexId);
                 return updateMapping(indexId, mapping);
             } else {
@@ -152,34 +156,51 @@ public abstract class ElasticsearchSink implements Sink {
                     log.info("delete existing meta index for index {} before re-creating it", indexId);
                     boolean isDeleteAcknowledged = deleteIndexById(deriveMetadataIndexName(indexId));
 
-                    if(!isDeleteAcknowledged){
+                    if (!isDeleteAcknowledged) {
                         log.warn("failed to delete meta index {} for index {}", deriveMetadataIndexName(indexId), indexId);
                     }
                 }
                 return createMapping(mapping, indexId);
             }
-        } catch (RuntimeException e) {
+        } catch (RuntimeException | IOException e) {
             log.warn(e.getMessage(), e);
             throw new SinkError(e, "Problem preparing sink: %s", e.getMessage());
         }
     }
 
     protected boolean createMapping(MappingConfiguration mapping, String indexId) {
-        IndicesAdminClient indices = getClient().admin().indices();
-
         Map<String, Object> schema = schemaGenerator.generate(mapping);
         log.trace("Built schema creation request:\n{}", Arrays.toString(schema.entrySet().toArray()));
 
-        // create metadata mapping and schema mapping
-        CreateIndexRequestBuilder request = indices.prepareCreate(indexId)
-                .addMapping(mapping.getType(), schema);
+
+        /*
+             // create metadata mapping and schema mapping
+         CreateIndexRequestBuilder request = indices.prepareCreate(indexId)
+                .addMapping(mapping.getType(), schema); //what is type
         if (mapping.hasIndexCreationRequest()) {
             request.setSettings(mapping.getIndexCreationRequest(), XContentType.YAML);
         }
 
         CreateIndexResponse response = request.get();
         log.debug("Created indices: {}, acknowledged: {}", response, response.isAcknowledged());
+        */
 
+         // create metadata mapping and schema mapping
+        CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexId).mapping(schema); //type?
+        if (mapping.hasIndexCreationRequest()) {
+            createIndexRequest.settings(mapping.getIndexCreationRequest(), XContentType.YAML);
+        }
+
+        org.elasticsearch.client.indices.CreateIndexResponse response;
+        try {
+            response = getClient().indices().create(createIndexRequest, RequestOptions.DEFAULT);
+            log.debug("Created indices: {}, acknowledged: {}", response, response.isAcknowledged());
+        } catch (IOException ex) {
+            log.error("unnable to create index " + indexId, ex);
+            return false;
+        }
+
+        /*
         // elasticsearch 6.x removed support for multiple types in one index, we need a separate one
         // create metadata mapping and schema mapping
         CreateIndexRequestBuilder requestMeta = indices.prepareCreate(deriveMetadataIndexName(indexId))
@@ -190,15 +211,35 @@ public abstract class ElasticsearchSink implements Sink {
 
         CreateIndexResponse responseMeta = requestMeta.get();
         log.debug("Created indices: {}, acknowledged: {}", responseMeta, responseMeta.isAcknowledged());
+        */
+
+        CreateIndexRequest createMetaIndexRequest = new CreateIndexRequest(deriveMetadataIndexName(indexId)).mapping(getMetadataSchema()); //type?
+        if (mapping.hasIndexCreationRequest()) {
+            createMetaIndexRequest.settings(mapping.getIndexCreationRequest(), XContentType.YAML);
+        }
+        try {
+            org.elasticsearch.client.indices.CreateIndexResponse responseMeta = getClient().indices().create(createIndexRequest, RequestOptions.DEFAULT);
+            log.debug("Created indices: {}, acknowledged: {}", responseMeta, responseMeta.isAcknowledged());
+        } catch (IOException ex) {
+            log.error("unnable to create index " + deriveMetadataIndexName(indexId), ex);
+            return false; //did not return false (or any exception)  before migration if not acknowledged
+        }
 
         Map<String, Object> mdRecord = createMetadataRecord(mapping.getVersion(), mapping.getName());
-        IndexResponse mdResponse = getClient().prepareIndex(deriveMetadataIndexName(indexId), MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID).setSource(mdRecord).get();
+        IndexRequest mdIndexReqeuest = new IndexRequest(deriveMetadataIndexName(indexId), MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID).source(mdRecord);
+        IndexResponse mdResponse;
+        try {
+            mdResponse = getClient().index(mdIndexReqeuest, RequestOptions.DEFAULT);
+        } catch (IOException ex) {
+            log.error("unable to index metadata record", ex);
+            return false;
+        }
         log.debug("Saved mapping metadata '{}': {}", mdResponse.getResult() == DocWriteResponse.Result.CREATED, Arrays.toString(mdRecord.entrySet().toArray()));
 
         return response.isAcknowledged();
     }
 
-    protected boolean updateMapping(String indexId, MappingConfiguration mapping) throws SinkError {
+    protected boolean updateMapping(String indexId, MappingConfiguration mapping) throws SinkError, IOException {
         double version = getCurrentVersion(indexId);
         log.info("Existing mapping version is {}, vs. c version {}", version, mapping.getVersion());
         if (version < 0) {
@@ -212,19 +253,24 @@ public abstract class ElasticsearchSink implements Sink {
         // schema can be updated
         Map<String, Object> schema = schemaGenerator.generate(mapping);
 
-        PutMappingRequestBuilder request = getClient().admin().indices()
+        /*        PutMappingRequestBuilder request = getClient().admin().indices()
                 .preparePutMapping(indexId)
-                .setType(mapping.getType())
+                .setType(mapping.getType()) //What is type?
                 .setSource(schema);
-        AcknowledgedResponse updateMappingResponse = request.get();
+        */
+        PutMappingRequest putMappingRequest = new PutMappingRequest(indexId);
+        putMappingRequest.source(schema);
+
+        AcknowledgedResponse updateMappingResponse = getClient().indices().putMapping(putMappingRequest, RequestOptions.DEFAULT);
         log.info("Update mapping of type {} acknowledged: {}", mapping.getType(), updateMappingResponse.isAcknowledged());
         if (!updateMappingResponse.isAcknowledged()) {
             log.error("Problem updating mapping for type {}", mapping.getType());
         }
 
         Map<String, Object> updatedMetadata = createUpdatedMetadata(deriveMetadataIndexName(indexId));
-        UpdateResponse mdUpdate = getClient().prepareUpdate(deriveMetadataIndexName(indexId), MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID)
-                .setDoc(updatedMetadata).get();
+        UpdateRequest updateRequest = new UpdateRequest(deriveMetadataIndexName(indexId), MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID);
+        updateRequest.doc(updatedMetadata);
+        UpdateResponse mdUpdate = getClient().update(updateRequest, RequestOptions.DEFAULT);
         log.info("Update metadata record created: {} | id = {} @ {}/{}",
                 mdUpdate.getResult() == DocWriteResponse.Result.CREATED, mdUpdate.getId(), mdUpdate.getIndex(), mdUpdate.getType());
 
@@ -232,9 +278,9 @@ public abstract class ElasticsearchSink implements Sink {
                 && updateMappingResponse.isAcknowledged());
     }
 
-    private double getCurrentVersion(String indexId) {
-        GetResponse resp = getClient().prepareGet(deriveMetadataIndexName(indexId), MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID)
-                .get();
+    private double getCurrentVersion(String indexId) throws IOException {
+        GetRequest getRequest = new GetRequest(deriveMetadataIndexName(indexId), MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID);
+        GetResponse resp = getClient().get(getRequest, RequestOptions.DEFAULT);
         if (resp.isExists()) {
             Object versionString = resp.getSourceAsMap().get(MetadataDataMapping.METADATA_VERSION_FIELD.getName());
             if (versionString == null) {
@@ -247,30 +293,30 @@ public abstract class ElasticsearchSink implements Sink {
         }
     }
 
-    private Map<String, Object> createUpdatedMetadata(String indexId) throws SinkError {
-        GetResponse resp = getClient().prepareGet(indexId, MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID)
-                .get();
-        Object retrievedValues = resp.getSourceAsMap().get(MetadataDataMapping.METADATA_UUIDS_FIELD.getName());
-        List<String> values;
+    private Map<String, Object> createUpdatedMetadata(String indexId) throws SinkError, IOException {
+            GetRequest getRequest = new GetRequest(indexId, MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID);
+            GetResponse resp = getClient().get(getRequest, RequestOptions.DEFAULT);
+            Object retrievedValues = resp.getSourceAsMap().get(MetadataDataMapping.METADATA_UUIDS_FIELD.getName());
+            List<String> values;
 
-        if (retrievedValues instanceof String) {
-            values = new LinkedList<>();
-            values.add((String) retrievedValues);
-        } else if (retrievedValues instanceof List<?>) {
-            values = (List<String>) retrievedValues;
-        } else {
-            throw new SinkError("Invalid %s field type %s should have String or java.util.Collection<String>",
-                    MetadataDataMapping.METADATA_UUIDS_FIELD, retrievedValues.getClass());
-        }
+            if (retrievedValues instanceof String) {
+                values = new LinkedList<>();
+                values.add((String) retrievedValues);
+            } else if (retrievedValues instanceof List<?>) {
+                values = (List<String>) retrievedValues;
+            } else {
+                throw new SinkError("Invalid %s field type %s should have String or java.util.Collection<String>",
+                        MetadataDataMapping.METADATA_UUIDS_FIELD, retrievedValues.getClass());
+            }
 
-        String uuid = UUID.randomUUID().toString();
-        Map<String, Object> updatedMetadata = Maps.newHashMap();
-        values.add(uuid);
-        updatedMetadata.put(MetadataDataMapping.METADATA_UUIDS_FIELD.getName(), values);
-        updatedMetadata.put(MetadataDataMapping.METADATA_UPDATE_TIME_FIELD.getName(), Calendar.getInstance(DateTimeZone.UTC.toTimeZone()));
-        log.info("UUID {} is added to the {} type", uuid, MetadataDataMapping.METADATA_TYPE_NAME);
+            String uuid = UUID.randomUUID().toString();
+            Map<String, Object> updatedMetadata = Maps.newHashMap();
+            values.add(uuid);
+            updatedMetadata.put(MetadataDataMapping.METADATA_UUIDS_FIELD.getName(), values);
+            updatedMetadata.put(MetadataDataMapping.METADATA_UPDATE_TIME_FIELD.getName(), Calendar.getInstance(DateTimeZone.UTC.toTimeZone()));
+            log.info("UUID {} is added to the {} type", uuid, MetadataDataMapping.METADATA_TYPE_NAME);
 
-        return updatedMetadata;
+            return updatedMetadata;
     }
 
     private Map<String, Object> getMetadataSchema() {
@@ -369,9 +415,13 @@ public abstract class ElasticsearchSink implements Sink {
      */
     private boolean metaIndexExists(String indexId) {
         String metaIndexId = deriveMetadataIndexName(indexId);
-        IndicesAdminClient indices = getClient().admin().indices();
-
-        return indices.prepareExists(metaIndexId).get().isExists();
+        GetIndexRequest indexRequest = new GetIndexRequest(metaIndexId);
+        try {
+            return getClient().indices().exists(indexRequest, RequestOptions.DEFAULT);
+        } catch (IOException ex) {
+            log.error("unnable to check if index " + metaIndexId + " exists", ex);
+            return false;
+        }
     }
 
     /**
@@ -380,12 +430,12 @@ public abstract class ElasticsearchSink implements Sink {
      */
     private boolean deleteIndexById(String indexId) {
         log.info("Deleting index '{}'", indexId);
-        DeleteIndexRequest request = new DeleteIndexRequest(indexId);
+        DeleteIndexRequest deleteRequest = new DeleteIndexRequest(indexId);
         try {
-            AcknowledgedResponse delete = getClient().admin().indices().delete(request).actionGet();
+            AcknowledgedResponse delete = getClient().indices().delete(deleteRequest, RequestOptions.DEFAULT);
             log.info("Delete acknowledged: {}", delete.isAcknowledged());
             return delete.isAcknowledged();
-        } catch (Exception e) {
+        } catch (IOException e) {
             log.info("Index does not exist, no need to delete: {}", e.getMessage());
             return true;
         }

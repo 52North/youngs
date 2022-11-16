@@ -16,7 +16,7 @@
  */
 package org.n52.youngs.load.impl;
 
-import org.elasticsearch.client.Client;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,16 +28,16 @@ public class ElasticsearchClientSink extends ElasticsearchSink {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticsearchClientSink.class);
 
-    private final Client client;
+    private final RestHighLevelClient client;
 
-    public ElasticsearchClientSink(Client client, String cluster, String index, String type) {
+    public ElasticsearchClientSink(RestHighLevelClient client, String cluster, String index, String type) {
         super(cluster, index, type);
         this.client = client;
         log.info("Created new client with client {}", client);
     }
 
     @Override
-    public Client getClient() {
+    public RestHighLevelClient getClient() {
         return this.client;
     }
 
