@@ -36,6 +36,7 @@ import org.n52.youngs.api.Report.Level;
 import org.n52.youngs.control.Runner;
 import org.n52.youngs.exception.MappingError;
 import org.n52.youngs.exception.SinkError;
+import org.n52.youngs.exception.SinkException;
 import org.n52.youngs.harvest.JsonNodeSourceRecord;
 import org.n52.youngs.harvest.NodeSourceRecord;
 import org.n52.youngs.harvest.Source;
@@ -238,12 +239,11 @@ public class SingleThreadBulkRunner implements Runner {
                     sinkTimer.start();
                     mappedRecords.forEach(record -> {
                         try {
-                            boolean result = sink.store(record);
-                            if (result) {
-                                report.addSuccessfulRecord(record.getId());
-                            } else {
-                                report.addFailedRecord(record.getId(), "see sink log");
-                            }
+                            sink.storeWithExceptions(record);
+                            report.addSuccessfulRecord(record.getId());
+                        } catch (SinkException e) {
+                            log.warn("Problem during mapping: ", e);
+                            report.addFailedRecord(record.getId(), e.getMessage());
                         } catch (SinkError e) {
                             log.warn("Problem during mapping: ", e);
                             report.addFailedRecord(record.toString(), "Problem during mapping: " + e.getMessage());
