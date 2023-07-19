@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2022 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2023 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@ package org.n52.youngs.load;
 
 import java.util.Collection;
 import org.n52.youngs.exception.SinkError;
+import org.n52.youngs.exception.SinkException;
 import org.n52.youngs.transform.MappingConfiguration;
 
 /**
@@ -47,6 +48,20 @@ public interface Sink {
      * @throws SinkError on no-recoverable errors
      */
     public boolean store(Collection<SinkRecord> records) throws SinkError;
+
+    /**
+     * Same as store(), but throws exceptions on failures.
+     * returns if no errors were identified.
+     *
+     * @param record the record to store
+     * @throws SinkException on record-level exceptions
+     * @throws SinkError on no-recoverable errors
+     */
+    public default void storeWithExceptions(SinkRecord record) throws SinkException {
+        if (!this.store(record)) {
+            throw new SinkException("Record {} could not be stored.", record.getId());
+        };
+    };
 
     /**
      * remove all traces of any loading that took or might have taken place for the provided mapping

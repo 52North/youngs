@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2022 52°North Initiative for Geospatial Open Source
+ * Copyright 2015-2023 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,6 +51,7 @@ import org.n52.iceland.statistics.api.parameters.ElasticsearchTypeRegistry;
 import org.n52.iceland.statistics.api.parameters.ObjectEsParameter;
 import org.n52.iceland.statistics.api.parameters.SingleEsParameter;
 import org.n52.youngs.exception.SinkError;
+import org.n52.youngs.exception.SinkException;
 import org.n52.youngs.load.SchemaGenerator;
 import org.n52.youngs.load.Sink;
 import org.n52.youngs.load.SinkRecord;
@@ -89,7 +90,7 @@ public abstract class ElasticsearchSink implements Sink {
     }
 
     @Override
-    public boolean store(SinkRecord record) {
+    public void storeWithExceptions(SinkRecord record) throws SinkException {
         log.trace("Storing record: {}", record);
         Objects.nonNull(record);
 
@@ -110,14 +111,28 @@ public abstract class ElasticsearchSink implements Sink {
                 log.trace("Created [{}] with id {} @ {}/{}, version {}", response.getResult() == DocWriteResponse.Result.CREATED,
                         response.getId(), response.getIndex(), response.getType(), response.getVersion());
 
-                return response.getResult() == DocWriteResponse.Result.CREATED || (response.getResult() != DocWriteResponse.Result.CREATED && (response.getVersion() > 1));
+                if (response.getResult() == DocWriteResponse.Result.CREATED || (response.getResult() != DocWriteResponse.Result.CREATED && (response.getVersion() > 1))) {
+                    return;
+                } else {
+                    throw new SinkException("Record {} could not be stored due to unforeseen error.", builderRecord.getId());
+                }
             } catch (ElasticsearchException e) {
-                log.error("Could not store record {}", builderRecord.getId(), e);
-                return false;
+                throw new SinkException(String.format("Could not store record {}", builderRecord.getId()), e);
             }
         } else {
             throw new SinkError("The provided record class '%s' is not supported", record.getClass());
         }
+    }
+
+    @Override
+    public boolean store(SinkRecord record) {
+        try {
+            this.storeWithExceptions(record);
+        } catch (SinkException e) {
+            log.error("Could not store record {}", record.getId(), e);
+            return false;
+        }
+        return true;
     }
 
     @Override
