@@ -113,10 +113,10 @@ public abstract class ElasticsearchSink implements Sink {
                 if (response.getResult() == DocWriteResponse.Result.CREATED || (response.getResult() != DocWriteResponse.Result.CREATED && (response.getVersion() > 1))) {
                     return;
                 } else {
-                    throw new SinkException("Record {} could not be stored due to unforeseen error.", builderRecord.getId());
+                    throw new SinkException("Record '%s' could not be stored due to unforeseen error.", builderRecord.getId());
                 }
             } catch (ElasticsearchException e) {
-                throw new SinkException(String.format("Could not store record {}", builderRecord.getId()), e);
+                throw new SinkException(String.format("Could not store record '%s'", builderRecord.getId()), e);
             }
         } else {
             throw new SinkError("The provided record class '%s' is not supported", record.getClass());

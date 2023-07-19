@@ -243,10 +243,10 @@ public class SingleThreadBulkRunner implements Runner {
                             report.addSuccessfulRecord(record.getId());
                         } catch (SinkException e) {
                             log.warn("Problem during mapping: ", e);
-                            report.addFailedRecord(record.getId(), e.getMessage());
+                            report.addFailedRecord(record.getId(), this.createMeaningfulErrorMessage(e));
                         } catch (SinkError e) {
                             log.warn("Problem during mapping: ", e);
-                            report.addFailedRecord(record.toString(), "Problem during mapping: " + e.getMessage());
+                            report.addFailedRecord(record.toString(), "Problem during mapping: " + this.createMeaningfulErrorMessage(e));
                         }
                     });
                     sinkTimer.stop();
@@ -297,6 +297,23 @@ public class SingleThreadBulkRunner implements Runner {
                 mappingTimer.elapsed(TimeUnit.MINUTES), sinkTimer.elapsed(TimeUnit.MINUTES));
 
         return report;
+    }
+
+    private String createMeaningfulErrorMessage(Throwable e) {
+        String result = e.getMessage();
+
+        Throwable current = e.getCause();
+        int maxDepth = 2;
+        for (int index = 0; index < maxDepth; index++) {
+            if (current != null) {
+                result = String.format("%s: %s", result, current.getMessage());
+                current = current.getCause();
+            } else {
+                break;
+            }
+        }
+
+        return result;
     }
 
     @Override
