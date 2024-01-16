@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2023 52°North Spatial Information Research GmbH
+ * Copyright 2015-2023 52Â°North Spatial Information Research GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,28 +15,28 @@
  */
 package org.n52.youngs.load.impl;
 
-import org.elasticsearch.client.Client;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
+ * @author <a href="mailto:d.nuest@52north.org">Daniel NÃ¼st</a>
  */
 public class ElasticsearchClientSink extends ElasticsearchSink {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticsearchClientSink.class);
 
-    private final Client client;
+    private final ElasticsearchClient client;
 
-    public ElasticsearchClientSink(Client client, String cluster, String index, String type) {
+    public ElasticsearchClientSink(ElasticsearchClient client, String cluster, String index, String type) {
         super(cluster, index, type);
         this.client = client;
         log.info("Created new client with client {}", client);
     }
 
     @Override
-    public Client getClient() {
+    public ElasticsearchClient getClient() {
         return this.client;
     }
 

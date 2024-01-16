@@ -79,7 +79,7 @@
         <config.logger.fileappender.filename>${project.build.finalName}</config.logger.fileappender.filename>
         <version.java>1.8</version.java>
         <version.log4j>2.15.0</version.log4j>
-        <elasticsearch.version>6.8.17</elasticsearch.version>
+        <elasticsearch.version>8.11.4</elasticsearch.version>
     </properties>
 
     <profiles>
@@ -431,8 +431,8 @@
             <version>2.5.1</version>
         </dependency>-->
         <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch</artifactId>
+            <groupId>co.elastic.clients</groupId>
+            <artifactId>elasticsearch-java</artifactId>
             <version>${elasticsearch.version}</version>
             <type>jar</type>
             <exclusions>
@@ -444,21 +444,6 @@
                     <groupId>joda-time</groupId>
                     <artifactId>joda-time</artifactId>
                 </exclusion>
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>transport</artifactId>
-            <version>${elasticsearch.version}</version>
-            <exclusions>
                 <exclusion>
                     <groupId>org.apache.logging.log4j</groupId>
                     <artifactId>log4j-core</artifactId>

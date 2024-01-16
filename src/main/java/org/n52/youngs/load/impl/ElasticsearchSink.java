@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2023 52°North Spatial Information Research GmbH
+ * Copyright 2015-2023 52Â°North Spatial Information Research GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,21 @@
  */
 package org.n52.youngs.load.impl;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.AcknowledgedResponse;
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
+import co.elastic.clients.elasticsearch._types.Result;
+import co.elastic.clients.elasticsearch.core.GetResponse;
+import co.elastic.clients.elasticsearch.core.IndexRequest;
+import co.elastic.clients.elasticsearch.core.IndexResponse;
+import co.elastic.clients.elasticsearch.indices.ElasticsearchIndicesClient;
+import co.elastic.clients.json.JsonData;
+import co.elastic.clients.transport.endpoints.BooleanResponse;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -29,20 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.DocWriteResponse;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
-import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.index.IndexRequestBuilder;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.support.master.AcknowledgedResponse;
-import org.elasticsearch.action.update.UpdateResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.IndicesAdminClient;
-import org.elasticsearch.common.xcontent.XContentType;
 import org.joda.time.DateTimeZone;
 import org.n52.iceland.statistics.api.mappings.MetadataDataMapping;
 import org.n52.iceland.statistics.api.parameters.AbstractEsParameter;
@@ -62,7 +60,7 @@ import org.w3c.dom.Document;
 
 /**
  *
- * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
+ * @author <a href="mailto:d.nuest@52north.org">Daniel NÃ¼st</a>
  */
 public abstract class ElasticsearchSink implements Sink {
 
@@ -82,7 +80,7 @@ public abstract class ElasticsearchSink implements Sink {
         this.type = type;
     }
 
-    public abstract Client getClient();
+    public abstract ElasticsearchClient getClient();
 
     protected final String getCluster() {
         return cluster;
@@ -95,27 +93,28 @@ public abstract class ElasticsearchSink implements Sink {
 
         if (record instanceof BuilderRecord) {
             BuilderRecord builderRecord = (BuilderRecord) record;
-            Client client = getClient();
+            ElasticsearchClient client = getClient();
 
             log.trace("Indexing record: {}", record);
-            IndexRequestBuilder request = client.prepareIndex(index, type)
-                    .setSource(builderRecord.getBuilder());
+            IndexRequest.Builder<JsonData> requestBuilder = new IndexRequest.Builder<>(); 
+            requestBuilder.index(this.index);
+            requestBuilder.document(builderRecord.getData());
             if (record.hasId()) {
-                request.setId(builderRecord.getId());
+                requestBuilder.id(builderRecord.getId());
             }
 
             try {
                 log.trace("Sending record to sink...");
-                IndexResponse response = request.execute().actionGet();
-                log.trace("Created [{}] with id {} @ {}/{}, version {}", response.getResult() == DocWriteResponse.Result.CREATED,
-                        response.getId(), response.getIndex(), response.getType(), response.getVersion());
+                IndexResponse response = client.index(requestBuilder.build());
+                log.trace("Created [{}] with id {} @ {}, version {}", response.result() == Result.Created ,
+                        response.id(), response.index(), response.version());
 
-                if (response.getResult() == DocWriteResponse.Result.CREATED || (response.getResult() != DocWriteResponse.Result.CREATED && (response.getVersion() > 1))) {
+                if (response.result() == Result.Created  || (response.result() != Result.Created && (response.version() > 1))) {
                     return;
                 } else {
                     throw new SinkException("Record '%s' could not be stored due to unforeseen error.", builderRecord.getId());
                 }
-            } catch (ElasticsearchException e) {
+            } catch (ElasticsearchException | IOException e) {
                 throw new SinkException(String.format("Could not store record '%s'", builderRecord.getId()), e);
             }
         } else {
@@ -154,9 +153,10 @@ public abstract class ElasticsearchSink implements Sink {
         }
 
         try {
-            IndicesAdminClient indices = getClient().admin().indices();
+            ElasticsearchIndicesClient indices = getClient().indices();
             String indexId = mapping.getIndex();
-            if (indices.prepareExists(indexId).get().isExists()) {
+            BooleanResponse exists = indices.exists(i -> i.index(this.index));
+            if (exists.value()) {
                 log.info("Index {} already exists, updating the mapping ...", indexId);
                 return updateMapping(indexId, mapping);
             } else {
@@ -172,7 +172,7 @@ public abstract class ElasticsearchSink implements Sink {
                 }
                 return createMapping(mapping, indexId);
             }
-        } catch (RuntimeException e) {
+        } catch (ElasticsearchException | IOException e) {
             log.warn(e.getMessage(), e);
             throw new SinkError(e, "Problem preparing sink: %s", e.getMessage());
         }
@@ -246,13 +246,18 @@ public abstract class ElasticsearchSink implements Sink {
                 && updateMappingResponse.isAcknowledged());
     }
 
-    private double getCurrentVersion(String indexId) {
-        GetResponse resp = getClient().prepareGet(deriveMetadataIndexName(indexId), MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID)
-                .get();
-        if (resp.isExists()) {
-            Object versionString = resp.getSourceAsMap().get(MetadataDataMapping.METADATA_VERSION_FIELD.getName());
+    private double getCurrentVersion(String indexId) throws IOException {
+        
+        GetResponse<ObjectNode> response = getClient().get(g -> g
+            .index(indexId)
+            .id(MetadataDataMapping.METADATA_ROW_ID),
+            ObjectNode.class     //raw json
+         );
+              
+        if (response.found() && response.source() != null) {
+            Object versionString = response.source().get(MetadataDataMapping.METADATA_VERSION_FIELD.getName());
             if (versionString == null) {
-                throw new ElasticsearchException(String.format("Database inconsistency. Version can't be found in row %s/%s/%s",
+                throw new IOException(String.format("Database inconsistency. Version can't be found in row %s/%s/%s",
                         deriveMetadataIndexName(indexId), MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID));
             }
             return Double.valueOf(versionString.toString());
@@ -381,11 +386,12 @@ public abstract class ElasticsearchSink implements Sink {
      * @param indexId
      * @return true if meta index for provided index already exists
      */
-    private boolean metaIndexExists(String indexId) {
+    private boolean metaIndexExists(String indexId) throws ElasticsearchException, IOException  {
         String metaIndexId = deriveMetadataIndexName(indexId);
-        IndicesAdminClient indices = getClient().admin().indices();
-
-        return indices.prepareExists(metaIndexId).get().isExists();
+        ElasticsearchIndicesClient indices = getClient().indices();
+        BooleanResponse exists = indices.exists(i -> i.index(metaIndexId));
+        
+        return exists.value();
     }
 
     /**
@@ -394,12 +400,11 @@ public abstract class ElasticsearchSink implements Sink {
      */
     private boolean deleteIndexById(String indexId) {
         log.info("Deleting index '{}'", indexId);
-        DeleteIndexRequest request = new DeleteIndexRequest(indexId);
         try {
-            AcknowledgedResponse delete = getClient().admin().indices().delete(request).actionGet();
-            log.info("Delete acknowledged: {}", delete.isAcknowledged());
-            return delete.isAcknowledged();
-        } catch (Exception e) {
+            AcknowledgedResponse delete = getClient().indices().delete(i -> i.index(indexId));
+            log.info("Delete acknowledged: {}", delete.acknowledged());
+            return delete.acknowledged();
+        } catch (ElasticsearchException | IOException e) {
             log.info("Index does not exist, no need to delete: {}", e.getMessage());
             return true;
         }

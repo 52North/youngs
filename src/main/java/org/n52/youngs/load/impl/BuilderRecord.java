@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2023 52°North Spatial Information Research GmbH
+ * Copyright 2015-2023 52Â°North Spatial Information Research GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,32 +15,32 @@
  */
 package org.n52.youngs.load.impl;
 
+import co.elastic.clients.json.JsonData;
 import com.google.common.base.MoreObjects;
 import java.util.Optional;
-import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.xcontent.XContentBuilder;
 import org.n52.youngs.load.SinkRecord;
 
 /**
  *
- * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
+ * @author <a href="mailto:d.nuest@52north.org">Daniel NÃ¼st</a>
  */
 public class BuilderRecord implements SinkRecord {
 
-    private final XContentBuilder builder;
-
+    private final JsonData data;
     private Optional<String> id = Optional.empty();
 
-    public BuilderRecord(String id, XContentBuilder builder) {
+    public BuilderRecord(String id, JsonData data) {
         this.id = Optional.ofNullable(id);
-        this.builder = builder;
+        this.data = data;
     }
 
-    public BuilderRecord(XContentBuilder builder) {
-        this(null, builder);
+    public BuilderRecord(JsonData data) {
+        this(null, data);
     }
 
-    public XContentBuilder getBuilder() {
-        return builder;
+    public JsonData getData() {
+        return this.data;
     }
 
     @Override
