@@ -18,7 +18,6 @@ package org.n52.youngs.load.impl;
 import co.elastic.clients.json.JsonData;
 import com.google.common.base.MoreObjects;
 import java.util.Optional;
-import org.elasticsearch.xcontent.XContentBuilder;
 import org.n52.youngs.load.SinkRecord;
 
 /**

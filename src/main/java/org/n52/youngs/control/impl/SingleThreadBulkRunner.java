@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2023 52°North Spatial Information Research GmbH
+ * Copyright 2015-2023 52Â°North Spatial Information Research GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import javax.xml.xpath.XPathExpressionException;
-
-import org.elasticsearch.index.mapper.SourceToParse;
 import org.n52.youngs.api.Report;
 import org.n52.youngs.api.Report.Level;
 import org.n52.youngs.control.Runner;
@@ -63,7 +61,7 @@ import org.xml.sax.SAXException;
  * Everything happens within one thread and consequtively when the method "load"
  * is called.
  *
- * @author <a href="mailto:d.nuest@52north.org">Daniel Nüst</a>
+ * @author <a href="mailto:d.nuest@52north.org">Daniel NÃ¼st</a>
  */
 public class SingleThreadBulkRunner implements Runner {
 
