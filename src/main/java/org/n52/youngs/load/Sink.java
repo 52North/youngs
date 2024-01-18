@@ -70,4 +70,13 @@ public interface Sink {
      */
     public boolean clear(MappingConfiguration mapping);
 
+    /**
+     * remove all traces of any loading that took or might have taken place for the provided mapping
+     *
+     * @param mapping the mapping providing the information that shall be cleared from the sink
+     * @param clearMetadata also clear the metadata index
+     * @return false if there were problems with clearing, true otherwise
+     */
+    public boolean clear(MappingConfiguration mapping, boolean clearMetadata);
+
 }
