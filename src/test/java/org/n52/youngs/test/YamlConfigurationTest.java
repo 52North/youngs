@@ -282,9 +282,11 @@ public class YamlConfigurationTest {
         assertThat("create is true", config.isIndexCreationEnabled(), is(true));
         assertThat("dynamic mapping false", config.isDynamicMappingEnabled(), is(false));
         assertThat("index request is provided", config.hasIndexCreationRequest(), is(true));
-        assertThat("index request correct", config.getIndexCreationRequest(), allOf(
-                containsString("number_of_shards: 1"),
-                containsString("number_of_replicas: 1")));
+        Map<String, Object> indexSettings = (Map) config.getIndexCreationRequest().get("settings");
+        int shards =  (int) indexSettings.get("number_of_shards");
+        int replicas =  (int) indexSettings.get("number_of_replica");
+        assertThat("number of shards is 1", shards, is(1));
+        assertThat("number of replicas is 1", replicas, is(1));
     }
 
     @Test(expected = MappingError.class)
