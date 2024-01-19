@@ -84,7 +84,7 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
 
     private boolean dynamicMappingEnabled;
 
-    private Optional<String> indexCreationRequest = Optional.empty();
+    private Optional<Map<String, Object>> indexCreationRequest = Optional.empty();
 
     private final XPathHelper xpathHelper;
 
@@ -128,7 +128,8 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
             this.dynamicMappingEnabled = indexField.path("dynamic_mapping").asBooleanValue(DEFAULT_DYNAMIC_MAPPING);
             this.type = indexField.path("type").asTextValue(DEFAULT_TYPE);
             if (indexField.hasNotNull("settings")) {
-                this.indexCreationRequest = Optional.of(indexField.get("settings").asTextValue());
+                Map<String, Object> yamlAsMap = new org.yaml.snakeyaml.Yaml().load(indexField.get("settings").asTextValue());   
+                this.indexCreationRequest = Optional.of(yamlAsMap);
             }
         }
 
@@ -529,7 +530,7 @@ public class YamlMappingConfiguration extends NamespacedYamlConfiguration implem
     }
 
     @Override
-    public String getIndexCreationRequest() {
+    public Map<String, Object> getIndexCreationRequest() {
         return indexCreationRequest.get();
     }
 

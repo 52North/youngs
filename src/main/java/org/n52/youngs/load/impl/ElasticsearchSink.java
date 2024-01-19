@@ -36,6 +36,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -61,10 +62,8 @@ import org.n52.youngs.load.SchemaGenerator;
 import org.n52.youngs.load.Sink;
 import org.n52.youngs.load.SinkRecord;
 import org.n52.youngs.transform.MappingConfiguration;
-import org.n52.youngs.transform.MappingEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 /**
  *
@@ -191,19 +190,16 @@ public abstract class ElasticsearchSink implements Sink {
 
         Map<String, Object> schema = schemaGenerator.generate(mapping);
         log.trace("Built schema creation request:\n{}", Arrays.toString(schema.entrySet().toArray()));
-
+        Map<String, Object> requestBody = new HashMap<>();
+        if (mapping.hasIndexCreationRequest()) {
+            requestBody.put("settings",mapping.getIndexCreationRequest());
+        }
+        requestBody.put("mappings", schema);
+        String requestJson = JsonData.of(requestBody).toString();
         
         CreateIndexRequest.Builder createBuilder = new CreateIndexRequest.Builder();
         createBuilder.index(indexId);
-        //createBuilder.mappings(fn) //new
-        // .addMapping(mapping.getType(), schema); //old
-        if (mapping.hasIndexCreationRequest()) {
-            //what is this?
-            //createBuilder.settings(mapping.getIndexCreationRequest());
-            request.setSettings(mapping.getIndexCreationRequest(), XContentType.YAML); //old
-        }
-        
-       
+        createBuilder.withJson(new StringReader(requestJson));
         CreateIndexRequest request = createBuilder.build();
 
         CreateIndexResponse response = indices.create(request);
@@ -211,32 +207,28 @@ public abstract class ElasticsearchSink implements Sink {
 
         // elasticsearch 6.x removed support for multiple types in one index, we need a separate one
         // create metadata mapping and schema mapping
+        requestBody = new HashMap<>();
+        if (mapping.hasIndexCreationRequest()) {
+            requestBody.put("settings", mapping.getIndexCreationRequest());
+        }
+        requestBody.put("mappings", getMetadataSchema());
         CreateIndexRequest.Builder createBuilderMeta = new CreateIndexRequest.Builder();
         createBuilderMeta.index(deriveMetadataIndexName(indexId));
-                .addMapping(MetadataDataMapping.METADATA_TYPE_NAME, getMetadataSchema());
-        if (mapping.hasIndexCreationRequest()) {
-            requestMeta.setSettings(mapping.getIndexCreationRequest(), XContentType.YAML);
-        }
-
-         CreateIndexRequest requestMeta = createBuilder.build();
+        requestJson = JsonData.of(requestBody).toString();
+        createBuilderMeta.withJson(new StringReader(requestJson));
+        CreateIndexRequest requestMeta = createBuilderMeta.build();
+        
         CreateIndexResponse responseMeta = indices.create(requestMeta);
         log.debug("Created indices: {}, acknowledged: {}", responseMeta, responseMeta.acknowledged());
 
        
         Map<String, Object> mdRecord = createMetadataRecord(mapping.getVersion(), mapping.getName());
-         //new
-        /*
         IndexResponse mdResponse = getClient().index(i -> i
             .index(deriveMetadataIndexName(indexId))
             .id(MetadataDataMapping.METADATA_ROW_ID)
-            .document(JsonData.of(mdRecord)) //does this work?
+            .document(JsonData.of(mdRecord))
         );
         log.debug("Saved mapping metadata '{}': {}", mdResponse.result() == Result.Created, Arrays.toString(mdRecord.entrySet().toArray()));
-        */
-        
-        //old
-        IndexResponse mdResponse = getClient().prepareIndex(deriveMetadataIndexName(indexId), MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID).setSource(mdRecord).get();
-        log.debug("Saved mapping metadata '{}': {}", mdResponse.getResult() == DocWriteResponse.Result.CREATED, Arrays.toString(mdRecord.entrySet().toArray()));
 
         return response.acknowledged();
     }
@@ -259,19 +251,19 @@ public abstract class ElasticsearchSink implements Sink {
 
         // schema can be updated
         Map<String, Object> schema = schemaGenerator.generate(mapping);
-
+        String requestJson = JsonData.of(schema).toString();
+        
         PutMappingResponse response;
         try {
              response = getClient().indices().putMapping(m -> m
             .index(indexId)
-            .properties(schema));
+            .withJson(new StringReader(requestJson))
+          );
         } catch (IOException | ElasticsearchException  ex) {
             throw new SinkError("error while executing put mapping request for index " + indexId, ex);
         }
  
-                //.preparePutMapping(indexId)
-                //.setType(mapping.getType())
-                //.setSource(schema);
+
         log.info("Update mapping for index {} acknowledged: {}", indexId, response.acknowledged());
         if (!response.acknowledged()) {
             log.error("Problem updating mapping for intex {}", indexId);
@@ -279,16 +271,14 @@ public abstract class ElasticsearchSink implements Sink {
 
        
         Map<String, Object> updatedMetadata = createUpdatedMetadata(deriveMetadataIndexName(indexId));
+        JsonData updateMetadataJson = JsonData.of(updatedMetadata);
         //new
         UpdateResponse mdUpdate = getClient().update(i -> i
                 .index(deriveMetadataIndexName(indexId))
                 .id(MetadataDataMapping.METADATA_ROW_ID)
-                .doc(updatedMetadata) // does this work
+                .doc(updateMetadataJson)
                 , JsonData.class);
         
-        //old
-        UpdateResponse mdUpdate = getClient().prepareUpdate(deriveMetadataIndexName(indexId), MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID)
-                .setDoc(updatedMetadata).get();
         log.info("Update metadata record created: {} | id = {} @ {}",
                 mdUpdate.result()== Result.Created, mdUpdate.id(), mdUpdate.index());
 

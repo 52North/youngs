@@ -57,7 +57,7 @@ public class LightweightYamlMappingConfiguration implements MappingConfiguration
 
     private String type;
 
-    private Optional<String> indexCreationRequest;
+    private Optional<Map<String, Object>> indexCreationRequest;
 
     private Map<String, LightweightMappingEntry> entries;
 
@@ -90,7 +90,8 @@ public class LightweightYamlMappingConfiguration implements MappingConfiguration
             this.dynamicMappingEnabled = indexField.path("dynamic_mapping").asBooleanValue(DEFAULT_DYNAMIC_MAPPING);
             this.type = indexField.path("type").asTextValue(DEFAULT_TYPE);
             if (indexField.hasNotNull("settings")) {
-                this.indexCreationRequest = Optional.of(indexField.get("settings").asTextValue());
+                Map<String, Object> yamlAsMap = new org.yaml.snakeyaml.Yaml().load(indexField.get("settings").asTextValue());   
+                this.indexCreationRequest = Optional.of(yamlAsMap);
             }
         }
         YamlMapNode valueMap = configurationNodes.path("mappings").asMap();
@@ -197,9 +198,8 @@ public class LightweightYamlMappingConfiguration implements MappingConfiguration
     }
 
     @Override
-    public String getIndexCreationRequest() {
-        // TODO Auto-generated method stub
-        return null;
+    public Map<String, Object> getIndexCreationRequest() {
+        return this.indexCreationRequest.get();
     }
 
 }

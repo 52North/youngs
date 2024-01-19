@@ -81,7 +81,7 @@ public interface MappingConfiguration {
 
     public boolean hasIndexCreationRequest();
 
-    public String getIndexCreationRequest();
+    public Map<String, Object> getIndexCreationRequest();
 
     default boolean hasSuggest() {
         return false;
