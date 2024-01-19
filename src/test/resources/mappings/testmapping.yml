@@ -66,7 +66,6 @@ mappings:
         isoqueryableName: language
         properties:
             index: false
-            null_value: "N/A"
     date:
         xpath: "//date"
         properties:

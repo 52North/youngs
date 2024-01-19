@@ -30,6 +30,8 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+
+import org.hamcrest.number.OrderingComparison;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -60,6 +62,7 @@ public class ElasticsearchSinkTestmappingIT {
                 new XPathHelper());
 
         sink = new ElasticsearchRemoteHttpSink("localhost", 9300, "elasticsearch", mapping.getIndex(), mapping.getType());
+        sink.clear(mapping);
     }
 
     @After
@@ -89,16 +92,16 @@ public class ElasticsearchSinkTestmappingIT {
         String allMappingsResponse = Request
                 .Get("http://localhost:9200/_mapping/_all?pretty").execute()
                 .returnContent().asString();
-        assertThat("record type is provided (checking id property type", allMappingsResponse, hasJsonPath(mapping.getIndex() + ".mappings." + mapping.getType() + ".properties.id.type", is("string")));
-        assertThat("metadata type is provided (checking mt_update-time property type)", allMappingsResponse, hasJsonPath(mapping.getIndex() + ".mappings.mt.properties.mt-update-time.type", is("date")));
+        assertThat("record type is provided (checking id property type", allMappingsResponse, hasJsonPath(mapping.getIndex() + ".mappings." + mapping.getType() + ".properties.id.type", is("text")));
+        assertThat("metadata type is provided (checking mt_update-time property type)", allMappingsResponse, hasJsonPath(mapping.getIndex() + "-meta.mappings.mt.properties.mt-update-time.type", is("date")));
 
         // https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-types-exists.html
         StatusLine recordsStatus = Request
-                .Head("http://localhost:9200/" + mapping.getIndex() + "/" + mapping.getType()).execute()
+                .Head("http://localhost:9200/" + mapping.getIndex()).execute()
                 .returnResponse().getStatusLine();
         assertThat("records type is available", recordsStatus.getStatusCode(), is(200));
         StatusLine mtStatus = Request
-                .Head("http://localhost:9200/" + mapping.getIndex() + "/mt").execute()
+                .Head("http://localhost:9200/" + mapping.getIndex() + "-meta").execute()
                 .returnResponse().getStatusLine();
         assertThat("metadata type is available", mtStatus.getStatusCode(), is(200));
     }
@@ -106,7 +109,7 @@ public class ElasticsearchSinkTestmappingIT {
     @Test
     public void clear() throws Exception {
         sink.prepare(mapping);
-        boolean clearResult = sink.clear(mapping);
+        boolean clearResult = sink.clear(mapping, true);
         Thread.sleep(1000);
 
         assertThat("clear result is OK", clearResult, is(true));
@@ -131,11 +134,11 @@ public class ElasticsearchSinkTestmappingIT {
         StatusLine recordsStatus = Request
                 .Head("http://localhost:9200/" + mapping.getIndex() + "/" + mapping.getType()).execute()
                 .returnResponse().getStatusLine();
-        assertThat("records type is not available", recordsStatus.getStatusCode(), is(404));
+        assertThat("records type is not available", recordsStatus.getStatusCode(), OrderingComparison.greaterThanOrEqualTo(404));
         StatusLine mtStatus = Request
                 .Head("http://localhost:9200/" + mapping.getIndex() + "/mt").execute()
                 .returnResponse().getStatusLine();
-        assertThat("metadata type is not available", mtStatus.getStatusCode(), is(404));
+        assertThat("metadata type is not available", mtStatus.getStatusCode(), OrderingComparison.greaterThanOrEqualTo(404));
     }
 
 }

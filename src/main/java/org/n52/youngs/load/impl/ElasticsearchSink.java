@@ -431,6 +431,14 @@ public abstract class ElasticsearchSink implements Sink {
     }
 
     @Override
+    public boolean clear(MappingConfiguration mapping, boolean clearMetadata) {
+        if (clearMetadata) {
+            return deleteIndexById(mapping.getIndex()) && deleteIndexById(mapping.getIndex() + "-meta");
+        }
+        return deleteIndexById(mapping.getIndex());
+    }
+
+    @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("cluster", cluster)
