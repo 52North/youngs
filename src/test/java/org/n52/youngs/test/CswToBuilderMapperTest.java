@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2023 52°North Spatial Information Research GmbH
+ * Copyright 2015-2024 52°North Spatial Information Research GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import org.n52.youngs.impl.SourceRecordHelper;
 import com.google.common.io.Resources;
 import java.io.IOException;
 import java.util.Collection;
-import org.elasticsearch.common.Strings;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -61,7 +60,7 @@ public class CswToBuilderMapperTest {
     public void singleElementsAreParsedWithoutSlashText() throws Exception {
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_829babb0-b2f1-49e1-8cd5-7b489fe71a1e.xml");
         BuilderRecord mappedRecord = cswMapper.map(record);
-        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
+        String mappedRecordString = mappedRecord.getData().toString();
 
         assertThat("Mapped record contains identifier", mappedRecordString,
                 hasJsonPath("id", is("urn:uuid:829babb0-b2f1-49e1-8cd5-7b489fe71a1e")));
@@ -73,7 +72,7 @@ public class CswToBuilderMapperTest {
     public void singleElementsAreParsedWithSlashText() throws Exception {
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_829babb0-b2f1-49e1-8cd5-7b489fe71a1e.xml");
         BuilderRecord mappedRecord = cswMapper.map(record);
-        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
+        String mappedRecordString = mappedRecord.getData().toString();
 
         assertThat("Mapped record contains format", mappedRecordString,
                 hasJsonPath("format", is("image/jp2")));
@@ -83,7 +82,7 @@ public class CswToBuilderMapperTest {
     public void multipleElementsAreParsed() throws Exception {
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
         BuilderRecord mappedRecord = cswMapper.map(record);
-        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
+        String mappedRecordString = mappedRecord.getData().toString();
 
         mapper.disable(SerializationFeature.INDENT_OUTPUT);
         mappedRecordString = mapper.readTree(mappedRecordString).toString();
@@ -101,7 +100,7 @@ public class CswToBuilderMapperTest {
 
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
         BuilderRecord mappedRecord = m.map(record);
-        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
+        String mappedRecordString = mappedRecord.getData().toString();
 
 //        assertThat("Mapped record contains all subjects", mappedRecordString,
 //                equalToIgnoringWhiteSpace("[ \"Otherography\", \"Physiography\", \"Morography\" ]"));
@@ -120,7 +119,7 @@ public class CswToBuilderMapperTest {
 
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
         BuilderRecord mappedRecord = m.map(record);
-        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
+        String mappedRecordString = mappedRecord.getData().toString();
 
         assertThat("Mapped record contains created_on field", mappedRecordString,
                 containsString("created_on"));
@@ -135,7 +134,7 @@ public class CswToBuilderMapperTest {
 
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
         BuilderRecord mappedRecord = m.map(record);
-        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
+        String mappedRecordString = mappedRecord.getData().toString();
 
         assertThat("Mapped record contains full_text field", mappedRecordString,
                 containsString("full_text"));
@@ -164,7 +163,7 @@ public class CswToBuilderMapperTest {
 
         Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
         BuilderRecord mappedRecord = m.map(record.iterator().next());
-        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
+        String mappedRecordString = mappedRecord.getData().toString();
 
         mapper.disable(SerializationFeature.INDENT_OUTPUT);
         mappedRecordString = mapper.readTree(mappedRecordString).toString();
@@ -183,7 +182,7 @@ public class CswToBuilderMapperTest {
 
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
         BuilderRecord mappedRecord = m.map(record);
-        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
+        String mappedRecordString = mappedRecord.getData().toString();
 
         assertThat("Mapped record contains identifier", mappedRecordString, hasJsonPath("id", is("testid")));
         assertThat("Mapped record contains field", mappedRecordString, containsString("raw_xml"));
@@ -201,7 +200,7 @@ public class CswToBuilderMapperTest {
 
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
         BuilderRecord mappedRecord = m.map(record);
-        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
+        String mappedRecordString = mappedRecord.getData().toString();
 
         assertThat("Mapped record contains identifier", mappedRecordString, hasJsonPath("id", is("testid")));
         assertThat("Mapped record contains field", mappedRecordString, containsString("raw_xml"));
@@ -221,7 +220,7 @@ public class CswToBuilderMapperTest {
 
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/csw/Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml");
         BuilderRecord mappedRecord = m.map(record);
-        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
+        String mappedRecordString = mappedRecord.getData().toString();
 
         assertThat("Mapped record contains identifier", mappedRecordString, hasJsonPath("id", is("testid")));
         assertThat("Mapped record contains field", mappedRecordString, containsString("raw_xml"));

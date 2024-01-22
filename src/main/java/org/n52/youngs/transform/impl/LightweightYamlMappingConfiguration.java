@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2023 52°North Spatial Information Research GmbH
+ * Copyright 2015-2024 52°North Spatial Information Research GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,7 +90,7 @@ public class LightweightYamlMappingConfiguration implements MappingConfiguration
             this.dynamicMappingEnabled = indexField.path("dynamic_mapping").asBooleanValue(DEFAULT_DYNAMIC_MAPPING);
             this.type = indexField.path("type").asTextValue(DEFAULT_TYPE);
             if (indexField.hasNotNull("settings")) {
-                Map<String, Object> yamlAsMap = new org.yaml.snakeyaml.Yaml().load(indexField.get("settings").asTextValue());   
+                Map<String, Object> yamlAsMap = new org.yaml.snakeyaml.Yaml().load(indexField.get("settings").asTextValue());
                 this.indexCreationRequest = Optional.of(yamlAsMap);
             }
         }

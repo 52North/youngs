@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2023 52°North Spatial Information Research GmbH
+ * Copyright 2015-2024 52°North Spatial Information Research GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,10 @@
  */
 package org.n52.youngs.transform.impl;
 
+import co.elastic.clients.json.JsonData;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.MoreObjects;
 import com.google.common.io.Resources;
 import java.io.IOException;
@@ -37,9 +41,6 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
-import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
 import org.n52.youngs.load.impl.BuilderRecord;
 import org.n52.youngs.harvest.SourceRecord;
 import org.n52.youngs.harvest.NodeSourceRecord;
@@ -101,13 +102,13 @@ public class CswToBuilderMapper implements Mapper {
         if (sourceRecord instanceof NodeSourceRecord) {
             try {
                 NodeSourceRecord object = (NodeSourceRecord) sourceRecord;
-                IdAndBuilder mappedRecord = mapNodeToBuilder(object.getRecord());
+                IdAndData mappedRecord = mapNodeToBuilder(object.getRecord());
 
                 if (mappedRecord == null) {
                     return null;
                 }
 
-                record = new BuilderRecord(mappedRecord.id, mappedRecord.builder);
+                record = new BuilderRecord(mappedRecord.id, mappedRecord.data);
                 return record;
             } catch (IOException e) {
                 log.warn("Error mapping the source {}", sourceRecord, e);
@@ -120,11 +121,10 @@ public class CswToBuilderMapper implements Mapper {
         return record;
     }
 
-    private IdAndBuilder mapNodeToBuilder(final Node node) throws IOException {
-        XContentBuilder builder = XContentFactory.jsonBuilder()
-                .humanReadable(true)
-                .prettyPrint()
-                .startObject();
+    private IdAndData mapNodeToBuilder(final Node node) throws IOException {
+        ObjectMapper builder = new ObjectMapper();
+        ObjectNode root = builder.createObjectNode();
+
 
         // evaluate xpaths and save the results in the builder
         Collection<MappingEntry> entries = mapper.getEntries();
@@ -149,7 +149,7 @@ public class CswToBuilderMapper implements Mapper {
 
         // handle non-geo entries
         List<EvalResult> mappedEntries = entries.stream().filter(e -> !e.hasCoordinates() && !e.isRawXml())
-                .map(entry -> mapEntry(entry, node, builder))
+                .map(entry -> mapEntry(entry, node))
                 .filter(entry -> entry.isPresent())
                 .map(entry -> entry.get())
                 .collect(Collectors.toList());
@@ -163,38 +163,36 @@ public class CswToBuilderMapper implements Mapper {
         mappedEntries.stream()
                 .forEach(er -> {
                     try {
-                        Object value = er.value;
-                        builder.field(er.name);
-                        builder.value(value);
-                        log.debug("Added field: {} = {}", er.name, (value instanceof Object[]) ? Arrays.toString((Object[]) value) : value);
-                    } catch (IOException e) {
+                        JsonNode value = builder.valueToTree(er.value);
+                        root.set(er.name, value);
+                        log.debug("Added field: {} = {}", er.name, (er.value instanceof Object[]) ? Arrays.toString((Object[]) er.value) : er.value);
+                    } catch (IllegalArgumentException e) {
                         log.warn("Error adding field {}: {}", er.name, e);
                     }
                 });
 
         // handle geo types
         entries.stream().filter(e -> e.hasCoordinates() && !e.isRawXml()).forEach(entry -> {
-            mapSpatialEntry(entry, node, builder);
+            mapSpatialEntry(entry, node, builder, root);
         });
 
         // handle raw types
         entries.stream().filter(e -> e.isRawXml()).forEach(entry -> {
-            mapRawEntry(entry, node, builder);
+            mapRawEntry(entry, node, root);
         });
 
         if (mapper.hasSuggest()) {
-            handleSuggest(builder, mapper.getSuggest(), mappedEntries);
+            handleSuggest( builder, root, mapper.getSuggest(), mappedEntries);
         }
 
-        builder.endObject();
-        builder.close();
+        String jsonString = builder.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+        log.trace("Created content for id '{}':\n{}", id, jsonString);
+        JsonData data = JsonData.fromJson(jsonString);
 
-        log.trace("Created content for id '{}':\n{}", id, Strings.toString(builder));
-
-        return new IdAndBuilder(id, builder);
+        return new IdAndData(id, data);
     }
 
-    private void mapSpatialEntry(MappingEntry entry, final Node node, XContentBuilder builder) {
+    private void mapSpatialEntry(MappingEntry entry, final Node node, ObjectMapper builder, ObjectNode root) {
         log.trace("Applying field mapping '{}' to node: {}", entry.getFieldName(), node);
         try {
             Object coordsNode = entry.getXPath().evaluate(node, XPathConstants.NODE);
@@ -220,10 +218,12 @@ public class CswToBuilderMapper implements Mapper {
                     log.trace("Evaluated {} expressions and got {} points: {}", pointsXPaths.size(),
                             pointsDoubles.size(), Arrays.deepToString(pointsDoubles.toArray()));
 
-                    builder.startObject(field)
-                            .field(MappingEntry.IndexProperties.TYPE, entry.getCoordinatesType())
-                            .field("coordinates", pointsDoubles)
-                            .endObject();
+                    Map<String, Object>  spatialEntry = new HashMap<>();
+                    spatialEntry.put(MappingEntry.IndexProperties.TYPE, entry.getCoordinatesType());
+                    spatialEntry.put("coordinates", pointsDoubles);
+                    JsonNode child = builder.valueToTree(spatialEntry);
+                    root.set(field, child);
+
                     log.debug("Added points '{}' as {} of type {}", Arrays.deepToString(pointsDoubles.toArray()),
                             geoType, entry.getCoordinatesType());
                 } else {
@@ -235,23 +235,23 @@ public class CswToBuilderMapper implements Mapper {
             } else {
                 log.warn("Coords node is null, no result evaluating {} on {]", entry.getXPath(), node);
             }
-        } catch (XPathExpressionException | IOException e) {
+        } catch (XPathExpressionException | IllegalArgumentException e) {
             log.warn("Error selecting coordinate-field {} as node. Error was: {}", entry.getFieldName(), e.getMessage());
             log.trace("Error selecting field {} as nodeset", entry.getFieldName(), e);
         }
     }
 
-    private Optional<EvalResult> mapEntry(MappingEntry entry, final Node node, XContentBuilder builder) {
+    private Optional<EvalResult> mapEntry(MappingEntry entry, final Node node) {
         Optional<EntryMapper.EvalResult> result = new EntryMapper().mapEntry(entry, node);
 
         return result;
     }
 
-    private void mapRawEntry(MappingEntry entry, Node node, XContentBuilder builder) {
+    private void mapRawEntry(MappingEntry entry, Node node, ObjectNode root) {
         try {
             String xmldoc = new EntryMapper(stripspaceTransformer, defaultTransformer).mapRawEntry(entry, node);
-            builder.field(entry.getFieldName(), xmldoc);
-        } catch (IOException | XPathExpressionException e) {
+            root.put(entry.getFieldName(), xmldoc);
+        } catch (IllegalArgumentException | XPathExpressionException e) {
             log.warn("Error adding field {}: {}", entry.getFieldName(), e);
         }
     }
@@ -266,7 +266,7 @@ public class CswToBuilderMapper implements Mapper {
                 .toString();
     }
 
-    private void handleSuggest(XContentBuilder builder, Map<String, Object> suggestDef, List<EvalResult> mappingEntries) throws IOException {
+    private void handleSuggest(ObjectMapper builder, ObjectNode root, Map<String, Object> suggestDef, List<EvalResult> mappingEntries) throws IOException {
         Map<String, Object> suggest = (Map<String, Object>) suggestDef.get("mappingConfiguration");
         List<String> inputs = new ArrayList<>();
 
@@ -313,22 +313,13 @@ public class CswToBuilderMapper implements Mapper {
         if (suggestEntries.isEmpty()) {
             return;
         }
-
-        if (suggestEntries.size() > 1) {
-            builder.startArray("suggest");
+        else if (suggestEntries.size() > 1) {
+            JsonNode value = builder.valueToTree(suggestEntries);
+            root.set("suggest", value);
         }
-        else {
-            builder.field("suggest");
-        }
-        for (Map<String, Object> suggestEntry : suggestEntries) {
-            builder.startObject();
-            builder.field("input", suggestEntry.get("inputs"));
-            builder.field("output", suggestEntry.get("output"));
-            builder.field("weight", suggestEntry.get("weight"));
-            builder.endObject();
-        }
-        if (suggestEntries.size() > 1) {
-            builder.endArray();
+        else { //exactly one suggestEntry
+            JsonNode value = builder.valueToTree(suggestEntries.get(0));
+            root.set("suggest", value);
         }
     }
 
@@ -347,16 +338,16 @@ public class CswToBuilderMapper implements Mapper {
         return true;
     }
 
-    private static class IdAndBuilder {
+    private static class IdAndData {
 
         protected final String id;
 
-        protected final XContentBuilder builder;
+        protected final JsonData data;
 
-        public IdAndBuilder(String id, XContentBuilder builder) {
-            Objects.nonNull(builder);
+        public IdAndData(String id, JsonData data) {
+            Objects.nonNull(data);
             this.id = id;
-            this.builder = builder;
+            this.data = data;
         }
     }
 

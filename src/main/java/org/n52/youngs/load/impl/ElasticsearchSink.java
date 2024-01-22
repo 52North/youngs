@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2023 52Â°North Spatial Information Research GmbH
+ * Copyright 2015-2024 52°North Spatial Information Research GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,7 +103,7 @@ public abstract class ElasticsearchSink implements Sink {
             ElasticsearchClient client = getClient();
 
             log.trace("Indexing record: {}", record);
-            IndexRequest.Builder<JsonData> requestBuilder = new IndexRequest.Builder<>(); 
+            IndexRequest.Builder<JsonData> requestBuilder = new IndexRequest.Builder<>();
             requestBuilder.index(this.index);
             requestBuilder.document(builderRecord.getData());
             if (record.hasId()) {
@@ -196,7 +196,7 @@ public abstract class ElasticsearchSink implements Sink {
         }
         requestBody.put("mappings", schema);
         String requestJson = JsonData.of(requestBody).toString();
-        
+
         CreateIndexRequest.Builder createBuilder = new CreateIndexRequest.Builder();
         createBuilder.index(indexId);
         createBuilder.withJson(new StringReader(requestJson));
@@ -217,11 +217,11 @@ public abstract class ElasticsearchSink implements Sink {
         requestJson = JsonData.of(requestBody).toString();
         createBuilderMeta.withJson(new StringReader(requestJson));
         CreateIndexRequest requestMeta = createBuilderMeta.build();
-        
+
         CreateIndexResponse responseMeta = indices.create(requestMeta);
         log.debug("Created indices: {}, acknowledged: {}", responseMeta, responseMeta.acknowledged());
 
-       
+
         Map<String, Object> mdRecord = createMetadataRecord(mapping.getVersion(), mapping.getName());
         IndexResponse mdResponse = getClient().index(i -> i
             .index(deriveMetadataIndexName(indexId))
@@ -252,7 +252,7 @@ public abstract class ElasticsearchSink implements Sink {
         // schema can be updated
         Map<String, Object> schema = schemaGenerator.generate(mapping);
         String requestJson = JsonData.of(schema).toString();
-        
+
         PutMappingResponse response;
         try {
              response = getClient().indices().putMapping(m -> m
@@ -262,14 +262,14 @@ public abstract class ElasticsearchSink implements Sink {
         } catch (IOException | ElasticsearchException  ex) {
             throw new SinkError("error while executing put mapping request for index " + indexId, ex);
         }
- 
+
 
         log.info("Update mapping for index {} acknowledged: {}", indexId, response.acknowledged());
         if (!response.acknowledged()) {
             log.error("Problem updating mapping for intex {}", indexId);
         }
 
-       
+
         Map<String, Object> updatedMetadata = createUpdatedMetadata(deriveMetadataIndexName(indexId));
         JsonData updateMetadataJson = JsonData.of(updatedMetadata);
         //new
@@ -278,7 +278,7 @@ public abstract class ElasticsearchSink implements Sink {
                 .id(MetadataDataMapping.METADATA_ROW_ID)
                 .doc(updateMetadataJson)
                 , JsonData.class);
-        
+
         log.info("Update metadata record created: {} | id = {} @ {}",
                 mdUpdate.result()== Result.Created, mdUpdate.id(), mdUpdate.index());
 
@@ -287,13 +287,13 @@ public abstract class ElasticsearchSink implements Sink {
     }
 
     private double getCurrentVersion(String indexId) throws IOException {
-        
+
         GetResponse<ObjectNode> response = getClient().get(g -> g
             .index(indexId)
             .id(MetadataDataMapping.METADATA_ROW_ID),
             ObjectNode.class     //raw json
          );
-              
+
         if (response.found() && response.source() != null) {
             JsonNode versionString = response.source().get(MetadataDataMapping.METADATA_VERSION_FIELD.getName());
             if (versionString == null || !versionString.isTextual() || versionString.asText().isEmpty()) {
@@ -317,8 +317,8 @@ public abstract class ElasticsearchSink implements Sink {
             );
         } catch (IOException | ElasticsearchException ex) {
             throw new SinkError("unable to retrieve document " + MetadataDataMapping.METADATA_ROW_ID + " from index " + indexId, ex);
-        } 
- 
+        }
+
         if(response.source() == null ||!response.found()){
             throw new SinkError("source of retrieved document " + MetadataDataMapping.METADATA_ROW_ID + " from index " + indexId + " is empty") ;
         }
@@ -460,7 +460,7 @@ public abstract class ElasticsearchSink implements Sink {
         String metaIndexId = deriveMetadataIndexName(indexId);
         ElasticsearchIndicesClient indices = getClient().indices();
         BooleanResponse exists = indices.exists(i -> i.index(metaIndexId));
-        
+
         return exists.value();
     }
 
