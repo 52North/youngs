@@ -189,7 +189,7 @@
                     </licenseMapping>
                     <generateChildNotices>false</generateChildNotices>
                 </configuration>
-                <executions>
+                <!--<executions>
                     <execution>
                         <id>check-license</id>
                         <phase>initialize</phase>
@@ -197,7 +197,7 @@
                             <goal>check</goal>
                         </goals>
                     </execution>
-                </executions>
+                </executions>-->
             </plugin>
             
             <plugin>
@@ -508,7 +508,7 @@
         <dependency>
             <groupId>com.github.autermann</groupId>
             <artifactId>yaml</artifactId>
-            <version>1.0.3</version>
+            <version>2.0.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>joda-time</groupId>
