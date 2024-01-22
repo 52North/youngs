@@ -20,12 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.n52.youngs.impl.SourceRecordHelper;
 import com.google.common.io.Resources;
 import java.io.IOException;
-import org.elasticsearch.common.Strings;
 import org.hamcrest.CoreMatchers;
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.containsString;
 import org.junit.Assert;
-import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 import org.n52.youngs.harvest.SourceRecord;
@@ -56,7 +52,7 @@ public class CswMappingDoiTest {
     public void doi() throws Exception {
         SourceRecord record = SourceRecordHelper.getSourceRecordFromFile("records/gmd/metadata_1000.xml");
         BuilderRecord mappedRecord = (BuilderRecord) cswMapper.map(record);
-        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
+        String mappedRecordString = mappedRecord.getData().toString();
 
         JsonNode parent = new ObjectMapper().readTree(mappedRecordString);
 

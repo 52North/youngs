@@ -22,7 +22,6 @@ import com.google.common.io.Resources;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
-import org.elasticsearch.common.Strings;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
@@ -60,7 +59,7 @@ public class GmdMappingTest {
     public void keywordTypeConcatenation() throws Exception {
         Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
         BuilderRecord mappedRecord = cswMapper.map(record.iterator().next());
-        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
+        String mappedRecordString = mappedRecord.getData().toString();
 
         assertThat("Mapped record contains type", mappedRecordString,
                 allOf(containsString("keywords"), containsString("theme:GEOSS"), containsString("theme:HelioClim"),
@@ -71,7 +70,7 @@ public class GmdMappingTest {
     public void temporalExtentWithPositions() throws Exception {
         Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
         BuilderRecord mappedRecord = cswMapper.map(record.iterator().next());
-        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
+        String mappedRecordString = mappedRecord.getData().toString();
 
         assertThat("Mapped record contains extend timestamps", mappedRecordString,
                 allOf(containsString("\"extent_begin\" : \"1985-01-01T00:00:00\""),
@@ -91,7 +90,7 @@ public class GmdMappingTest {
         iter.next();
 
         BuilderRecord mappedRecord = cswMapper.map(iter.next());
-        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
+        String mappedRecordString = mappedRecord.getData().toString();
 
         assertThat("Mapped record contains extend timestamps", mappedRecordString,
                 allOf(containsString("\"extent_begin\" : \"1991-08-22\""),
@@ -102,7 +101,7 @@ public class GmdMappingTest {
     public void id() throws Exception {
         Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
         BuilderRecord mappedRecord = cswMapper.map(record.iterator().next());
-        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
+        String mappedRecordString = mappedRecord.getData().toString();
 
         assertThat("Mapped record contains extent timestamps", mappedRecordString,
                 allOf(containsString("\"id\" : \"5a716d99-afac-47e0-9de9-14cf707be994\"")));
@@ -112,7 +111,7 @@ public class GmdMappingTest {
     public void bbox() throws Exception {
         Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso.xml")).openStream());
         BuilderRecord mappedRecord = cswMapper.map(record.iterator().next());
-        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
+        String mappedRecordString = mappedRecord.getData().toString();
 
         mapper.disable(SerializationFeature.INDENT_OUTPUT);
         mappedRecordString = mapper.readTree(mappedRecordString).toString();
@@ -126,7 +125,7 @@ public class GmdMappingTest {
     public void maintenanceFrequency() throws Exception {
         Collection<SourceRecord> record = SourceRecordHelper.loadGetRecordsResponse(Resources.asByteSource(Resources.getResource("responses/dab-records-iso-2.xml")).openStream());
         BuilderRecord mappedRecord = cswMapper.map(record.iterator().next());
-        String mappedRecordString = Strings.toString(mappedRecord.getBuilder());
+        String mappedRecordString = mappedRecord.getData().toString();
 
         assertThat("Mapped record contains update frequency", mappedRecordString,
                 allOf(containsString("\"metadata_maintenance\" : \"asNeeded\"")));

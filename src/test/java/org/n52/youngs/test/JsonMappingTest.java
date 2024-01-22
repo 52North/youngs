@@ -28,8 +28,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.elasticsearch.common.Strings;
 import org.junit.Before;
 import org.junit.Test;
 import org.n52.youngs.harvest.JsonNodeSourceRecord;
@@ -133,7 +131,7 @@ public class JsonMappingTest {
         BuilderRecord mappedBuilderRecord = (BuilderRecord) mappedRecord;
         JsonNode mappedRecordJsonNode;
         try {
-            mappedRecordJsonNode = objectMapper.readTree(Strings.toString(mappedBuilderRecord.getBuilder()));
+            mappedRecordJsonNode = objectMapper.readTree(mappedBuilderRecord.getData().toString());
         } catch (IOException e) {
             fail(e.getMessage());
             return;
