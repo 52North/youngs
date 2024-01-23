@@ -28,7 +28,11 @@ import co.elastic.clients.elasticsearch.indices.CreateIndexResponse;
 import co.elastic.clients.elasticsearch.indices.ElasticsearchIndicesClient;
 import co.elastic.clients.elasticsearch.indices.PutMappingResponse;
 import co.elastic.clients.json.JsonData;
+import co.elastic.clients.json.jackson.JacksonJsonProvider;
+import co.elastic.clients.json.jackson.JacksonJsonpGenerator;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.endpoints.BooleanResponse;
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -37,6 +41,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -50,6 +55,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Level;
+
+import jakarta.json.stream.JsonGenerator;
 import org.joda.time.DateTimeZone;
 import org.n52.iceland.statistics.api.mappings.MetadataDataMapping;
 import org.n52.iceland.statistics.api.parameters.AbstractEsParameter;
@@ -195,10 +202,16 @@ public abstract class ElasticsearchSink implements Sink {
             requestBody.put("settings",mapping.getIndexCreationRequest());
         }
         requestBody.put("mappings", schema);
-        String requestJson = JsonData.of(requestBody).toString();
 
+        StringWriter writer = new StringWriter();
+        try (final JacksonJsonpGenerator generator = new JacksonJsonpGenerator(new JsonFactory().createGenerator(writer))) {
+            JsonData.of(requestBody).serialize(generator, new JacksonJsonpMapper());
+        }
+        String requestJson = writer.toString();
+        
         CreateIndexRequest.Builder createBuilder = new CreateIndexRequest.Builder();
         createBuilder.index(indexId);
+
         createBuilder.withJson(new StringReader(requestJson));
         CreateIndexRequest request = createBuilder.build();
 
@@ -214,7 +227,12 @@ public abstract class ElasticsearchSink implements Sink {
         requestBody.put("mappings", getMetadataSchema());
         CreateIndexRequest.Builder createBuilderMeta = new CreateIndexRequest.Builder();
         createBuilderMeta.index(deriveMetadataIndexName(indexId));
-        requestJson = JsonData.of(requestBody).toString();
+
+        writer = new StringWriter();
+        try (final JacksonJsonpGenerator generator = new JacksonJsonpGenerator(new JsonFactory().createGenerator(writer))) {
+            JsonData.of(requestBody).serialize(generator, new JacksonJsonpMapper());
+        }
+        requestJson = writer.toString();
         createBuilderMeta.withJson(new StringReader(requestJson));
         CreateIndexRequest requestMeta = createBuilderMeta.build();
 

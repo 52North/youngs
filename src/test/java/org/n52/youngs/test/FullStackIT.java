@@ -54,8 +54,6 @@ public class FullStackIT {
 
     private static Mapper cswMapper;
 
-    @ClassRule
-    public static ElasticsearchServer server = new ElasticsearchServer(true);
 
     @BeforeClass
     public static void baseDir() throws URISyntaxException, IOException {

@@ -15,15 +15,13 @@
  */
 package org.n52.youngs.load.impl;
 
-import com.google.common.io.Files;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.TransportAddress;
-import org.elasticsearch.node.Node;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import org.n52.youngs.exception.SinkError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +43,7 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
 
     private final int port;
 
-    private final Client client;
+    private final ElasticsearchClient client;
 
     public ElasticsearchRemoteHttpSink(String host, int port, String cluster, String index, String type) {
         this(host, port, cluster, index, type, Mode.TRANSPORT);
@@ -56,31 +54,35 @@ public class ElasticsearchRemoteHttpSink extends ElasticsearchSink {
         super(cluster, index, type);
         this.host = host;
         this.port = port;
+        String serverUrl = "http://" + this.host + ":" + this.port;
 
-        Settings.Builder settings = Settings.builder()
-                .put("cluster.name", getCluster());
+        RestClient restClient = RestClient
+                .builder(HttpHost.create(serverUrl))
+                .build();
 
         try {
             switch (mode) {
                 case TRANSPORT:
-                    TransportClient tClient = new PreBuiltTransportClient(settings.build());
-                    tClient.addTransportAddress(
-                            new TransportAddress(InetAddress.getByName(this.host), this.port));
-                    this.client = tClient;
+                    // Create the transport with a Jackson mapper
+                    ElasticsearchTransport transport = new RestClientTransport(
+                            restClient, new JacksonJsonpMapper());
+
+                    // And create the API client
+                    this.client = new ElasticsearchClient(transport);
                     break;
                 case NODE:
-                throw new SinkError("Node mode is deprecated: %s", mode);
+                    throw new SinkError("Node mode is deprecated: %s", mode);
                 default:
                     throw new SinkError("Unsupported mode %s", mode);
             }
-        } catch (UnknownHostException ex) {
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
-        log.info("Created new client with settings {}:\n{}", settings, client);
+        log.info("Created new client with settings {}:\n{}", serverUrl, client);
     }
 
     @Override
-    public Client getClient() {
+    public ElasticsearchClient getClient() {
         return this.client;
     }
 

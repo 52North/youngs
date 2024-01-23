@@ -51,13 +51,11 @@ mappings:
             store: *STOREDEFAULT
             index: true
             #index_name: "id"
-            boost: 2.0
     title:
         xpath: "//title"
         isoqueryable: false
         properties:
             store: *STOREDEFAULT
-            boost: 10
             #copy_to: autocomplete_field
             term_vector: "yes"
     language:

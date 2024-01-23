@@ -38,6 +38,7 @@ import org.n52.youngs.impl.XPathHelper;
 import org.n52.youngs.load.Sink;
 import org.n52.youngs.load.SinkRecord;
 import org.n52.youngs.load.impl.ElasticsearchClientSink;
+import org.n52.youngs.load.impl.ElasticsearchRemoteHttpSink;
 import org.n52.youngs.transform.Mapper;
 import org.n52.youngs.transform.MappingConfiguration;
 import org.n52.youngs.transform.impl.CswToBuilderMapper;
@@ -54,17 +55,13 @@ public class SpatialSearchIT {
 
     private static Sink sink;
 
-    // set to (true); to run focussed test methods from Netbeans
-    @ClassRule
-    public static ElasticsearchServer server = new ElasticsearchServer(); // (true);
-
     @BeforeClass
     public static void prepareAndStoreSink() throws Exception {
         mapping = new YamlMappingConfiguration(Resources.asByteSource(
                 Resources.getResource("mappings/csw-record.yml")).openStream(),
                 new XPathHelper());
 //        sink = new ElasticsearchRemoteHttpSink("localhost", 9300, "elasticsearch", mapping.getIndex(), mapping.getType());
-        sink = new ElasticsearchClientSink(server.getClient(), "elasticsearhch", mapping.getIndex(), mapping.getType());
+        sink = new ElasticsearchRemoteHttpSink("localhost", 9300, "elasticsearch", mapping.getIndex(), mapping.getType());
         sink.prepare(mapping);
         Mapper mapper = new CswToBuilderMapper(mapping);
 

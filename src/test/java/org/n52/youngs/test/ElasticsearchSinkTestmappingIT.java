@@ -15,17 +15,19 @@
  */
 package org.n52.youngs.test;
 
+import co.elastic.clients.elasticsearch._types.SearchTransform;
+import co.elastic.clients.elasticsearch._types.mapping.Property;
+import co.elastic.clients.elasticsearch._types.mapping.TypeMapping;
+import co.elastic.clients.elasticsearch.indices.ElasticsearchIndicesClient;
+import co.elastic.clients.elasticsearch.indices.GetMappingRequest;
+import co.elastic.clients.elasticsearch.indices.GetMappingResponse;
+import co.elastic.clients.elasticsearch.indices.get_mapping.IndexMappingRecord;
 import com.google.common.io.Resources;
 import java.io.IOException;
 import java.util.Map;
 import org.apache.http.StatusLine;
 import org.apache.http.client.fluent.Request;
-import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsAction;
-import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequestBuilder;
-import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
-import org.elasticsearch.client.IndicesAdminClient;
-import org.elasticsearch.cluster.metadata.MappingMetaData;
-import org.elasticsearch.common.collect.ImmutableOpenMap;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -51,17 +53,13 @@ public class ElasticsearchSinkTestmappingIT {
 
     private YamlMappingConfiguration mapping;
 
-    // set to (true); to run focussed test methods from Netbeans
-    @ClassRule
-    public static ElasticsearchServer server = new ElasticsearchServer(); // (true);
-
     @Before
     public void createMappingAndSink() throws IOException {
         mapping = new YamlMappingConfiguration(Resources.asByteSource(
                 Resources.getResource("mappings/testmapping.yml")).openStream(),
                 new XPathHelper());
 
-        sink = new ElasticsearchRemoteHttpSink("localhost", 9300, "elasticsearch", mapping.getIndex(), mapping.getType());
+        sink = new ElasticsearchRemoteHttpSink("localhost", 9200, "elasticsearch", mapping.getIndex(), mapping.getType());
         sink.clear(mapping);
     }
 
@@ -77,23 +75,23 @@ public class ElasticsearchSinkTestmappingIT {
     public void insertSchema() throws Exception {
         sink.prepare(mapping);
 
-        IndicesAdminClient indicesClient = sink.getClient().admin().indices();
-        GetMappingsRequestBuilder builder = new GetMappingsRequestBuilder(indicesClient, GetMappingsAction.INSTANCE, mapping.getIndex())
-                .addTypes(mapping.getType());
-        GetMappingsResponse response = indicesClient.getMappings(builder.request()).actionGet();
-        ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>> mappings = response.getMappings();
+        ElasticsearchIndicesClient indicesClient = sink.getClient().indices();
+        GetMappingRequest.Builder builder = new GetMappingRequest.Builder().index(mapping.getIndex());
+        GetMappingResponse resp = indicesClient.getMapping(builder.build());
 
-        Map<String, Object> recordTypeMap = mappings.get(mapping.getIndex()).get(mapping.getType()).getSourceAsMap();
-        assertThat("dynamic value is correct", Boolean.valueOf(recordTypeMap.get("dynamic").toString()), is(mapping.isDynamicMappingEnabled()));
+        Map<String, IndexMappingRecord> mappings = resp.result();
+
+        TypeMapping recordTypeMap = mappings.get(mapping.getIndex()).mappings();
+        assertThat("dynamic value is correct", Boolean.valueOf(recordTypeMap.dynamic().jsonValue()), is(mapping.isDynamicMappingEnabled()));
 
         Thread.sleep(1000);
 
         // https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-get-mapping.html
         String allMappingsResponse = Request
-                .Get("http://localhost:9200/_mapping/_all?pretty").execute()
+                .Get("http://localhost:9200/_mapping?pretty").execute()
                 .returnContent().asString();
-        assertThat("record type is provided (checking id property type", allMappingsResponse, hasJsonPath(mapping.getIndex() + ".mappings." + mapping.getType() + ".properties.id.type", is("text")));
-        assertThat("metadata type is provided (checking mt_update-time property type)", allMappingsResponse, hasJsonPath(mapping.getIndex() + "-meta.mappings.mt.properties.mt-update-time.type", is("date")));
+        assertThat("record type is provided (checking id property type", allMappingsResponse, hasJsonPath(mapping.getIndex() + ".mappings.properties.id.type", is("text")));
+        assertThat("metadata type is provided (checking mt_update-time property type)", allMappingsResponse, hasJsonPath(mapping.getIndex() + "-meta.mappings.properties.mt-update-time.type", is("date")));
 
         // https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-types-exists.html
         StatusLine recordsStatus = Request
