@@ -66,7 +66,7 @@ public class YamlConfigurationTest {
     @Test
     public void entryByName() throws IOException {
         assertThat("name is correct", config.getEntry("title").getFieldName(), is(equalTo("title")));
-        assertThat("name is correct", config.getEntry("title").getIndexProperties().size(), is(equalTo(4)));
+        assertThat("name is correct", config.getEntry("title").getIndexProperties().size(), is(equalTo(3)));
     }
 
     @Test
@@ -236,11 +236,10 @@ public class YamlConfigurationTest {
         iter.next();
         MappingEntry second = iter.next();
         Map<String, Object> props = second.getIndexProperties();
-        assertThat("id entry index properties size", props.size(), is(equalTo(4)));
+        assertThat("id entry index properties size", props.size(), is(equalTo(3)));
         assertThat("id entry property type", props.get("type"), is(equalTo("text")));
         assertThat("id entry property type", props.get("store"), is(equalTo(true)));
         assertThat("id entry property type", props.get("index"), is(equalTo(true)));
-        assertThat("id entry property type", props.get("boost"), is(equalTo(2d)));
     }
 
     @Test
@@ -282,9 +281,9 @@ public class YamlConfigurationTest {
         assertThat("create is true", config.isIndexCreationEnabled(), is(true));
         assertThat("dynamic mapping false", config.isDynamicMappingEnabled(), is(false));
         assertThat("index request is provided", config.hasIndexCreationRequest(), is(true));
-        Map<String, Object> indexSettings = (Map) config.getIndexCreationRequest().get("settings");
+        Map<String, Object> indexSettings = (Map) config.getIndexCreationRequest().get("index");
         int shards =  (int) indexSettings.get("number_of_shards");
-        int replicas =  (int) indexSettings.get("number_of_replica");
+        int replicas =  (int) indexSettings.get("number_of_replicas");
         assertThat("number of shards is 1", shards, is(1));
         assertThat("number of replicas is 1", replicas, is(1));
     }

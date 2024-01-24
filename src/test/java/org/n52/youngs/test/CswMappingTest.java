@@ -67,7 +67,7 @@ public class CswMappingTest {
         assertThat("Mapped record contains envelope location", mappedRecordString,
                 allOf(containsString("location"), containsString("envelope")));
         assertThat("Mapped record contains correct coordinate string", mappedRecordString,
-                containsString("[[68.41,13.754],[60.042,17.92]]"));
+                containsString("[[60.042,17.92],[68.41,13.754]]"));
     }
 
     @Test

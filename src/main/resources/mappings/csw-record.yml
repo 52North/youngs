@@ -19,47 +19,47 @@ mappings:
         xpath: "//dc:identifier"
         identifier: true
         properties:
-            type: string
-            boost: 10.0
+            type: text
+
     title:
         xpath: "//dc:title"
         properties:
-            type: string
-            boost: 5.0
+            type: text
+
     type:
         xpath: "//dc:type"
         properties:
-            type: string
-            boost: 2.0
+            type: text
+
     format:
         xpath: "//dc:format/text()"
         properties:
-            type: string
-            boost: 2.0
+            type: text
+
     subject:
         xpath: "//dc:subject"
         properties:
-            type: string
-            boost: 2.0
+            type: text
+
     subjScheme:
         xpath: "//dc:subject/@scheme"
         properties:
-            type: string
-            index_name: subjectScheme
+            type: text
+
     abstract:
         xpath: "//dct:abstract"
         properties:
-            type: string
-            boost: 4.0
+            type: text
+
     rel:
         xpath: "//dc:relation"
         properties:
-            type: string
-            boost: 4.0
+            type: text
+
     rights:
         xpath: "//dc:rights"
         properties:
-            type: string
+            type: text
     # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
     date:
         xpath: "//dc:date"
@@ -80,7 +80,7 @@ mappings:
     youngs_used_mapping:
         xpath: "string('CSW Record Mapping version 1')"
         properties:
-            type: string
+            type: text
     # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-geo-shape-type.html#_envelope
     # coordinate order depends on CRS hard to handle here, support only WGS84 which is "northing first", so "lat,lon", which has  http://spatialreference.org/ref/epsg/wgs-84/
     # FIXME this does not support bounding boxes crossing the date line
@@ -91,25 +91,22 @@ mappings:
         # normalize-space does not work on numbers; the outer 'number(min(..))' call removes trailing zeros after comparison [e.g. min((1.23, 1.1)) = 1.10], to be consistent between the latitute and longitude
         coordinates:
             points:
-                -   lon: "number(substring-before(ows:UpperCorner, ' '))"
-                    lat: "min( ( number(substring-after(ows:UpperCorner, ' ') ),
-                    number(substring-after(ows:LowerCorner, ' ')) ) )"
                 -   lon: "number(substring-before(ows:LowerCorner, ' '))"
                     lat: "max( ( number(substring-after(ows:UpperCorner, ' ') ),
                     number(substring-after(ows:LowerCorner, ' ')) ) )"
+                -   lon: "number(substring-before(ows:UpperCorner, ' '))"
+                    lat: "min( ( number(substring-after(ows:UpperCorner, ' ') ),
+                    number(substring-after(ows:LowerCorner, ' ')) ) )"
         coordinates_type: envelope
         properties:
-            index_name: location
             type: geo_shape
-            tree: quadtree
-            precision: 1m
     raw_xml:
         xpath: "/"
         raw_xml: TRUE
         properties:
-            type: string
+            type: text
             index: no
-            index_name: xmldoc
+
         output_properties:
             - name: indent
               value: "yes"
@@ -117,9 +114,9 @@ mappings:
         xpath: "//ows:BoundingBox"
         raw_xml: TRUE
         properties:
-            type: string
+            type: text
             index: no
-            index_name: bbox_xmldoc
+
     replacer:
         xpath: "//ows:BoundingBox/*/text()"
         replacements:

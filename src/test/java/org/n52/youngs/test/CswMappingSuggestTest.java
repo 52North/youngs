@@ -76,8 +76,8 @@ public class CswMappingSuggestTest {
         Assert.assertThat(suggest.get("output").asText(),
                 CoreMatchers.equalTo("Surface Solar Radiation Data Set - Heliosat (SARAH) - Edition 1"));
 
-        Assert.assertThat(suggest.has("input"), CoreMatchers.is(true));
-        JsonNode input = suggest.get("input");
+        Assert.assertThat(suggest.has("inputs"), CoreMatchers.is(true));
+        JsonNode input = suggest.get("inputs");
         Assert.assertThat(input, CoreMatchers.instanceOf(ArrayNode.class));
         ArrayNode inputArray = (ArrayNode) input;
 

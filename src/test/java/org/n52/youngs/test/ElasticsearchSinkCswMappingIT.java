@@ -59,7 +59,7 @@ public class ElasticsearchSinkCswMappingIT {
         mapping = new YamlMappingConfiguration(Resources.asByteSource(
                 Resources.getResource("mappings/csw-record.yml")).openStream(),
                 new XPathHelper());
-        sink = new ElasticsearchRemoteHttpSink("localhost", 9300, "elasticsearch", mapping.getIndex(), mapping.getType());
+        sink = new ElasticsearchRemoteHttpSink("localhost", 9200, "elasticsearch", mapping.getIndex(), mapping.getType());
 
         boolean prepare = sink.prepare(mapping);
         assertThat("sink is prepared", prepare, is(true));
@@ -68,7 +68,7 @@ public class ElasticsearchSinkCswMappingIT {
 
     @After
     public void clearSink() throws IOException {
-        boolean result = sink.clear(mapping);
+        boolean result = sink.clear(mapping, true);
         assertThat("sink is cleared", result, is(true));
     }
 
@@ -81,13 +81,13 @@ public class ElasticsearchSinkCswMappingIT {
         Thread.sleep(1000);
         assertThat("all records stored", stored);
 
-        String query = "http://localhost:9200/" + mapping.getIndex() + "/" + mapping.getType()
-                + "/_search?q=*&size=100";
+        String query = "http://localhost:9200/" + mapping.getIndex()
+                + "/_search?size=100";
         String searchAllResponse = Request
                 .Get(query).execute()
                 .returnContent().asString();
         assertThat("all records were added to the index", searchAllResponse,
-                hasJsonPath("hits.total", is(mappedRecords.size())));
+                hasJsonPath("hits.total.value", is(mappedRecords.size())));
         assertThat("ids are contains", searchAllResponse, allOf(
                 containsString("urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:METOP:NRP"),
                 containsString("urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:METOP:SEM"),
@@ -97,8 +97,8 @@ public class ElasticsearchSinkCswMappingIT {
 
         String id = "urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:METOP:ORBITVIEW";
         String recordResponse = Request
-                .Get("http://localhost:9200/" + mapping.getIndex() + "/" + mapping.getType()
-                        + "/" + id).execute()
+                .Get("http://localhost:9200/" + mapping.getIndex()
+                        + "/_doc/" + id).execute()
                 .returnContent().asString();
         assertThat("record is in index", recordResponse, hasJsonPath("_index", is(equalTo(mapping.getIndex()))));
         assertThat("record is found", recordResponse, hasJsonPath("_id", is(id)));
@@ -113,12 +113,14 @@ public class ElasticsearchSinkCswMappingIT {
         boolean stored = sink.store(sinkRecord);
         assertThat("record added", stored);
 
-        String response = Request.Get("http://localhost:9200/" + mapping.getIndex() + "/" + mapping.getType() + "/_search?pretty&q=*")
+        Thread.sleep(1000);
+
+        String response = Request.Get("http://localhost:9200/" + mapping.getIndex() + "/_search")
                 .setHeader("Accept", "application/json").execute().returnContent().asString();
-        assertThat(response, containsString("\"total\" : 1"));
+        assertThat(response, containsString("\"value\":1"));
         assertThat(response, containsString("urn:uuid:94bc9c83-97f6-4b40-9eb8-a8e8787a5c63"));
-        assertThat(response, containsString("xmldoc"));
-        assertThat(response, containsString("<dc:subject scheme=\"http://www.digest.org/2.1\">Vegetation-Cropland</dc:subject>"));
+        assertThat(response, containsString("raw_xml"));
+        assertThat(response, containsString(">Vegetation-Cropland</"));
     }
 
 }

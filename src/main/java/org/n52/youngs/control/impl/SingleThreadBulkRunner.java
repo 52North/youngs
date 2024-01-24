@@ -162,7 +162,7 @@ public class SingleThreadBulkRunner implements Runner {
         final Stopwatch timer = Stopwatch.createStarted();
         long pageStart = startPosition;
         long count = source.getRecordCount();
-        final long limit = recordsLimit == Long.MAX_VALUE ? count : Math.min(recordsLimit + startPosition, count);
+        final long limit = recordsLimit == Long.MAX_VALUE ? count : Math.min(recordsLimit, count);
 
         final Stopwatch sourceTimer = Stopwatch.createUnstarted();
         final Stopwatch mappingTimer = Stopwatch.createUnstarted();

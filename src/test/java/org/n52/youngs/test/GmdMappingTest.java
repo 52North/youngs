@@ -73,8 +73,8 @@ public class GmdMappingTest {
         String mappedRecordString = mappedRecord.getData().toString();
 
         assertThat("Mapped record contains extend timestamps", mappedRecordString,
-                allOf(containsString("\"extent_begin\" : \"1985-01-01T00:00:00\""),
-                        containsString("\"extent_end\" : \"2005-12-31T23:45:00\"")));
+                allOf(containsString("\"extent_begin\":\"1985-01-01T00:00:00\""),
+                        containsString("\"extent_end\":\"2005-12-31T23:45:00\"")));
     }
 
     @Test
@@ -93,8 +93,8 @@ public class GmdMappingTest {
         String mappedRecordString = mappedRecord.getData().toString();
 
         assertThat("Mapped record contains extend timestamps", mappedRecordString,
-                allOf(containsString("\"extent_begin\" : \"1991-08-22\""),
-                        containsString("\"extent_end\" : \"1994-11-24\"")));
+                allOf(containsString("\"extent_begin\":\"1991-08-22\""),
+                        containsString("\"extent_end\":\"1994-11-24\"")));
     }
 
     @Test
@@ -104,7 +104,7 @@ public class GmdMappingTest {
         String mappedRecordString = mappedRecord.getData().toString();
 
         assertThat("Mapped record contains extent timestamps", mappedRecordString,
-                allOf(containsString("\"id\" : \"5a716d99-afac-47e0-9de9-14cf707be994\"")));
+                allOf(containsString("\"id\":\"5a716d99-afac-47e0-9de9-14cf707be994\"")));
     }
 
     @Test
@@ -128,9 +128,9 @@ public class GmdMappingTest {
         String mappedRecordString = mappedRecord.getData().toString();
 
         assertThat("Mapped record contains update frequency", mappedRecordString,
-                allOf(containsString("\"metadata_maintenance\" : \"asNeeded\"")));
+                allOf(containsString("\"metadata_maintenance\":\"asNeeded\"")));
         assertThat("Mapped record contains next update", mappedRecordString,
-                allOf(containsString("\"metadata_next_update\" : \"2015-01-01\"")));
+                allOf(containsString("\"metadata_next_update\":\"2015-01-01\"")));
     }
 
 }

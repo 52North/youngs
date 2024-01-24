@@ -208,7 +208,7 @@ public abstract class ElasticsearchSink implements Sink {
             JsonData.of(requestBody).serialize(generator, new JacksonJsonpMapper());
         }
         String requestJson = writer.toString();
-        
+
         CreateIndexRequest.Builder createBuilder = new CreateIndexRequest.Builder();
         createBuilder.index(indexId);
 
@@ -269,7 +269,12 @@ public abstract class ElasticsearchSink implements Sink {
 
         // schema can be updated
         Map<String, Object> schema = schemaGenerator.generate(mapping);
-        String requestJson = JsonData.of(schema).toString();
+
+        StringWriter writer = new StringWriter();
+        try (final JacksonJsonpGenerator generator = new JacksonJsonpGenerator(new JsonFactory().createGenerator(writer))) {
+            JsonData.of(schema).serialize(generator, new JacksonJsonpMapper());
+        }
+        String requestJson = writer.toString();
 
         PutMappingResponse response;
         try {
@@ -307,14 +312,14 @@ public abstract class ElasticsearchSink implements Sink {
     private double getCurrentVersion(String indexId) throws IOException {
 
         GetResponse<ObjectNode> response = getClient().get(g -> g
-            .index(indexId)
+            .index(indexId + "-meta")
             .id(MetadataDataMapping.METADATA_ROW_ID),
             ObjectNode.class     //raw json
-         );
+        );
 
         if (response.found() && response.source() != null) {
             JsonNode versionString = response.source().get(MetadataDataMapping.METADATA_VERSION_FIELD.getName());
-            if (versionString == null || !versionString.isTextual() || versionString.asText().isEmpty()) {
+            if (versionString == null || versionString.asText().isEmpty()) {
                 throw new IOException(String.format("Database inconsistency. Version can't be found in row %s/%s/%s",
                         deriveMetadataIndexName(indexId), MetadataDataMapping.METADATA_TYPE_NAME, MetadataDataMapping.METADATA_ROW_ID));
             }else{

@@ -61,27 +61,27 @@ public class CswSourceIT {
 
     @Test
     public void kvpCount() throws Exception {
-        CswSource source = new KvpCswSource(new URL("http://api.eurogeoss-broker.eu/dab/services/cswiso"),
+        CswSource source = new KvpCswSource(new URL("https://navigator.eumetsat.int/elastic-csw/service"),
                 (Collection<String>) ImmutableList.of("http://www.opengis.net/cat/csw/2.0.2"), NamespaceContextImpl.create(),
                 "csw:Record", "http://www.opengis.net/cat/csw/2.0.2");
 
         long count = source.getRecordCount();
-        Assert.assertThat("record count is higher than last manual check", count, is(greaterThan(900000l)));
+        Assert.assertThat("record count is higher than last manual check", count, is(greaterThan(800l)));
     }
 
     @Test
     public void poxCount() throws Exception {
-        CswSource source = new PoxCswSource(new URL("http://api.eurogeoss-broker.eu/dab/services/cswiso"),
+        CswSource source = new PoxCswSource(new URL("https://navigator.eumetsat.int/elastic-csw/service"),
                 (Collection<String>) ImmutableList.of("http://www.opengis.net/cat/csw/2.0.2"), NamespaceContextImpl.create(),
                 "csw:Record", "http://www.opengis.net/cat/csw/2.0.2");
 
         long count = source.getRecordCount();
-        Assert.assertThat("record count is higher than last manual check", count, is(greaterThan(900000l)));
+        Assert.assertThat("record count is higher than last manual check", count, is(greaterThan(800l)));
     }
 
     @Test
     public void harvestKVP() throws Exception {
-        CswSource source = new KvpCswSource(new URL("http://api.eurogeoss-broker.eu/dab/services/cswiso"),
+        CswSource source = new KvpCswSource(new URL("https://navigator.eumetsat.int/elastic-csw/service"),
                 (Collection<String>) ImmutableList.of("http://www.opengis.net/cat/csw/2.0.2"), NamespaceContextImpl.create(),
                 "csw:Record", "http://www.opengis.net/cat/csw/2.0.2");
 
@@ -92,14 +92,13 @@ public class CswSourceIT {
 
         Set<String> ids = mappedRecords.stream().map(SinkRecord::getId).collect(Collectors.toSet());
         assertThat("ids are contained in mapped records", ids, // some test IDs
-                hasItems("urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:MULT:AHL-DLI",
-                        "urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:METOP:IASIL2CLP",
-                        "urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:GOES:FAG"));
+                hasItems("EO:EUM:DAT:MODEL:MESA-UG_SSH",
+                        "EO:EUM:DAT:MSG:CSR-IODC"));
     }
 
     @Test
     public void harvestPOX() throws Exception {
-        CswSource source = new PoxCswSource(new URL("http://api.eurogeoss-broker.eu/dab/services/cswiso"),
+        CswSource source = new PoxCswSource(new URL("https://navigator.eumetsat.int/elastic-csw/service"),
                 (Collection<String>) ImmutableList.of("http://www.opengis.net/cat/csw/2.0.2"), NamespaceContextImpl.create(),
                 "csw:Record", "http://www.opengis.net/cat/csw/2.0.2");
 
@@ -110,9 +109,8 @@ public class CswSourceIT {
 
         Set<String> ids = mappedRecords.stream().map(SinkRecord::getId).collect(Collectors.toSet());
         assertThat("ids are contained in mapped records", ids, // some test IDs
-                hasItems("urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:MULT:AHL-DLI",
-                        "urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:METOP:IASIL2CLP",
-                        "urn:x-wmo:md:int.eumetsat::EO:EUM:DAT:GOES:FAG"));
+                hasItems("EO:EUM:DAT:MODEL:MESA-UG_SSH",
+                        "EO:EUM:DAT:MSG:CSR-IODC"));
     }
 
 }

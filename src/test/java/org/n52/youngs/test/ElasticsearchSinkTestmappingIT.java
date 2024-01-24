@@ -60,13 +60,13 @@ public class ElasticsearchSinkTestmappingIT {
                 new XPathHelper());
 
         sink = new ElasticsearchRemoteHttpSink("localhost", 9200, "elasticsearch", mapping.getIndex(), mapping.getType());
-        sink.clear(mapping);
+        sink.clear(mapping, true);
     }
 
     @After
     public void clearSink() throws IOException {
         if (sink != null) {
-            boolean result = sink.clear(mapping);
+            boolean result = sink.clear(mapping, true);
             assertThat("sink is cleared", result, is(true));
         }
     }
@@ -125,16 +125,16 @@ public class ElasticsearchSinkTestmappingIT {
 
     private void assertEmptyNode() throws IOException {
         String allMappingsResponse = Request
-                .Get("http://localhost:9200/_mapping/_all?pretty").execute()
+                .Get("http://localhost:9200/_mapping?pretty").execute()
                 .returnContent().asString();
         assertThat("response is empty", allMappingsResponse, not(containsString("mappings")));
 
         StatusLine recordsStatus = Request
-                .Head("http://localhost:9200/" + mapping.getIndex() + "/" + mapping.getType()).execute()
+                .Head("http://localhost:9200/" + mapping.getIndex()).execute()
                 .returnResponse().getStatusLine();
         assertThat("records type is not available", recordsStatus.getStatusCode(), OrderingComparison.greaterThanOrEqualTo(404));
         StatusLine mtStatus = Request
-                .Head("http://localhost:9200/" + mapping.getIndex() + "/mt").execute()
+                .Head("http://localhost:9200/" + mapping.getIndex() + "-meta").execute()
                 .returnResponse().getStatusLine();
         assertThat("metadata type is not available", mtStatus.getStatusCode(), OrderingComparison.greaterThanOrEqualTo(404));
     }
