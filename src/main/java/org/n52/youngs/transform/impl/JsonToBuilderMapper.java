@@ -18,9 +18,10 @@ package org.n52.youngs.transform.impl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.elasticsearch.common.xcontent.DeprecationHandler;
 import org.elasticsearch.common.xcontent.NamedXContentRegistry;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -110,7 +111,7 @@ public class JsonToBuilderMapper implements Mapper {
                     log.trace("Metadata node: \n" + metadataNode);
                 }
             }
-            addFulltext((ObjectNode) metadataNode, objectWriter.writeValueAsString(metadataNode));
+            addFulltext((ObjectNode) metadataNode, this.createParseableFulltext((ObjectNode) metadataNode));
             byte[] bytes = objectWriter.writeValueAsBytes(metadataNode);
             parser = JsonXContent.jsonXContent.createParser(NamedXContentRegistry.EMPTY,
                                                             this.deprecationHandler,
@@ -122,6 +123,29 @@ public class JsonToBuilderMapper implements Mapper {
             log.error("Could not create XContentBuilder from InputStream.", e);
             return null;
         }
+    }
+
+    protected String createParseableFulltext(ObjectNode json) throws JsonProcessingException {
+        return this.extractJsonValue(json);
+    }
+
+    private String extractJsonValue(JsonNode jsonNode) {
+        final StringBuilder sb = new StringBuilder();
+        if (jsonNode.isObject()) {
+            jsonNode.fields().forEachRemaining((Map.Entry<String, JsonNode> e) -> {
+                sb.append(e.getKey());
+                sb.append(" ");
+                sb.append(this.extractJsonValue(e.getValue()));
+            });
+        } else if (jsonNode.isArray()) {
+            ((ArrayNode) jsonNode).forEach((JsonNode jn) -> {
+                sb.append(this.extractJsonValue(jn));
+            });
+        } else {
+            sb.append(jsonNode.asText());
+        }
+        sb.append(" ");
+        return sb.toString();
     }
 
     private void addFulltext(ObjectNode metadataNode, String fulltext) {
