@@ -30,7 +30,7 @@ jobs:
   publish-snapshot:
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/hotfix/2.1.0'
 
     steps:
       - uses: actions/checkout@v3
