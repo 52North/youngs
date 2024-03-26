@@ -28,6 +28,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.n52.youngs.harvest.JsonNodeSourceRecord;
@@ -142,6 +144,7 @@ public class JsonMappingTest {
         checkValues(mappedRecordJsonNode);
         checkTypicalFilenames(mappedRecordJsonNode);
         checkAvailableFormats(mappedRecordJsonNode);
+        checkFulltext(mappedRecordJsonNode);
     }
 
     private void checkTypicalFilenames(JsonNode mappedRecordJsonNode) {
@@ -283,6 +286,24 @@ public class JsonMappingTest {
             if (!expectedKeywords.contains(keyWordText)) {
                 fail(String.format("Mapped keywords do not contain %s.", keyWordText));
             }
+        }
+    }
+
+    private void checkFulltext(JsonNode mappedRecordJsonNode) {
+        TextNode fulltext = (TextNode) mappedRecordJsonNode.path("fulltext");
+        String fullTextString = fulltext.asText();
+
+        String[] expectedValues = new String[] {
+                "meteosat-msg_natural.tif",
+                "Natural Colour RGB - MSG - 0 degree",
+                "Latest image",
+                "MSG Interpretation Guide",
+                "theme:AtmosphereCloud",
+                "-79.0",
+                "-81.0"
+        };
+        for (String ev : expectedValues) {
+            MatcherAssert.assertThat(fullTextString, Matchers.containsString(String.format(" %s ", ev)));
         }
     }
 }
