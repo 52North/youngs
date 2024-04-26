@@ -45,6 +45,16 @@ public class JsonTransformer {
 
     private static final Logger log = LoggerFactory.getLogger(JsonTransformer.class);
 
+    private String xsltResource;
+
+    public JsonTransformer() {
+        this("xslt/pn-json/stream.xsl");
+    }
+
+    public JsonTransformer(String xsltResource) {
+        this.xsltResource = xsltResource;
+    }
+
     // uses a stream to feed the JSON to the XSLT
     // uses the Saxon API to call a named template of the stylesheet
     public String transformWithStream(String jsonImput) throws SaxonApiException, XmlException {
@@ -63,7 +73,8 @@ public class JsonTransformer {
         });
 
         XsltCompiler compiler = processor.newXsltCompiler();
-        XsltExecutable stylesheet = compiler.compile(new StreamSource(getClass().getClassLoader().getResourceAsStream("xslt/pn-json/stream.xsl")));
+
+        XsltExecutable stylesheet = compiler.compile(new StreamSource(getClass().getClassLoader().getResourceAsStream(this.xsltResource)));
         Xslt30Transformer transformer = stylesheet.load30();
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
