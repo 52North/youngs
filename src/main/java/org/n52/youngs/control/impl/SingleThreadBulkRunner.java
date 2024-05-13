@@ -145,6 +145,13 @@ public class SingleThreadBulkRunner implements Runner {
         log.info("Starting harvest from {} to {} with {}", source, this.sink, mapper);
         ReportImpl report = new ReportImpl();
 
+        long recordCount = this.source.getRecordCount();
+        if (recordCount > Long.MIN_VALUE) {
+            report.addMessage(String.format("Importing %s records", recordCount));
+        } else {
+            report.addMessage("Importing records (unpredictable count)");
+        }
+
         try {
             boolean prepareSink = sink.prepare(mapper.getMapper());
             if (!prepareSink) {
