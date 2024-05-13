@@ -195,13 +195,13 @@ public class SingleThreadBulkRunner implements Runner {
                         try {
                             List<String> messages = validate(record);
                             if (!messages.isEmpty()) {
-                                messages.forEach(m -> report.addMessage(m, Level.INFO));
+                                messages.forEach(m -> report.addMessage(String.format("%s: %s", record.getProtocolIdentifier(), m), Level.INFO));
                             }
                             log.debug("File #{} is schema valid", index++);
                             validRecords.add(record);
                         } catch (SourceException e) {
                             String msg = String.format("Issue while processing record %s: %s",
-                                    index, e.getMessage());
+                                    record.getProtocolIdentifier(), e.getMessage());
                             log.info(msg, e);
                             report.addMessage(msg, Level.ERROR);
                         }
