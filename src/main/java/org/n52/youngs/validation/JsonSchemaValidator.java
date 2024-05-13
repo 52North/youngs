@@ -78,7 +78,8 @@ public class JsonSchemaValidator implements org.n52.youngs.validation.Validator 
         // TODO: add more possible breaking error codes
         List<String> fatalCodes = Arrays.asList(ValidatorTypeCode.REQUIRED.getErrorCode(),
                 ValidatorTypeCode.TYPE.getErrorCode(),
-                ValidatorTypeCode.ENUM.getErrorCode());
+                ValidatorTypeCode.ENUM.getErrorCode(),
+                ValidatorTypeCode.FORMAT.getErrorCode());
 
         String fatalErrors = validationMessages.stream()
                 .filter(vm -> fatalCodes.contains(vm.getCode()))

@@ -397,7 +397,7 @@
 		<dependency>
 			<groupId>com.networknt</groupId>
 			<artifactId>json-schema-validator</artifactId>
-			<version>1.0.72</version>
+			<version>1.4.0</version>
 			<exclusions>
 			    <exclusion>
 			        <groupId>org.slf4j</groupId>

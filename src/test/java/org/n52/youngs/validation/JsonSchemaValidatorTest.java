@@ -49,8 +49,7 @@ public class JsonSchemaValidatorTest {
         ObjectMapper om = new ObjectMapper();
 
         JsonNodeSourceRecord source = new JsonNodeSourceRecord(om.readTree(getClass().getResourceAsStream("/records/json/record_enum_invalid.json")), "json");
-        List<String> result = val.validate(source.getRecord());
-        assertTrue(result.stream().collect(Collectors.joining("\n")).isEmpty());
+        val.validate(source.getRecord());
     }
 
     @Test
@@ -61,6 +60,21 @@ public class JsonSchemaValidatorTest {
         JsonNodeSourceRecord source = new JsonNodeSourceRecord(om.readTree(getClass().getResourceAsStream("/records/json/record_enum.json")), "json");
         List<String> result = val.validate(source.getRecord());
         Assert.assertTrue("valid document expected", result.isEmpty());
+    }
+
+    @Test
+    public void testUriValidationInvalid() throws SAXException, SourceException, IOException, URISyntaxException {
+        JsonSchemaValidator val = new JsonSchemaValidator(getClass().getResource("/schemas/collection_schema_v2-6.json").toURI());
+        ObjectMapper om = new ObjectMapper();
+
+        JsonNodeSourceRecord source = new JsonNodeSourceRecord(om.readTree(getClass().getResourceAsStream("/records/json/EO_EUM_CM_MSG_LSA-450.json")), "json");
+        try {
+            val.validate(source.getRecord());
+            Assert.fail("invalid document expected");
+        } catch (JsonValidationException e) {
+            Assert.assertTrue("invalid document expected", e.getMessage().toLowerCase().contains("does not match the uri pattern"));
+        }
+
     }
 
 }
