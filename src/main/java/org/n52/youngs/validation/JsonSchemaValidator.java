@@ -78,8 +78,7 @@ public class JsonSchemaValidator implements org.n52.youngs.validation.Validator 
         // TODO: add more possible breaking error codes
         List<String> fatalCodes = Arrays.asList(ValidatorTypeCode.REQUIRED.getErrorCode(),
                 ValidatorTypeCode.TYPE.getErrorCode(),
-                ValidatorTypeCode.ENUM.getErrorCode(),
-                ValidatorTypeCode.FORMAT.getErrorCode());
+                ValidatorTypeCode.ENUM.getErrorCode());
 
         String fatalErrors = validationMessages.stream()
                 .filter(vm -> fatalCodes.contains(vm.getCode()))
@@ -93,8 +92,12 @@ public class JsonSchemaValidator implements org.n52.youngs.validation.Validator 
                 // eat
             }
 
+            String otherErrors = validationMessages.stream()
+                    .filter(vm -> !fatalCodes.contains(vm.getCode()))
+                    .map(vm -> vm.getMessage()).collect(Collectors.joining("; "));
+
             LOG.error("Fatal validation errors for record with id: " + id);
-            throw new JsonValidationException(String.format("The validation of the record with id %s encountered fatal errors: ", id) + fatalErrors);
+            throw new JsonValidationException(String.format("The validation of the record with id %s encountered fatal errors. Fatal errors can be downstream errors of other errors.\nFatal errors: %s\nOther errors: %s", id, fatalErrors, otherErrors));
         }
 
         return result;

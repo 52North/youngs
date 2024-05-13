@@ -1,0 +1,129 @@
+{
+    "$schema": "./collection_schema_v2-6.json",
+    "hierarchyLevel": "series",
+    "abstract": "The full archive of MSG/SEVIRI data was reprocessed to provide the user community a consistent, homogeneous and continuous Data Record of the 10-days Fraction of Vegetation Cover (MTFVC) for the period 2004-2015. This Data Record was obtained with the best version of its equivalent NRT product (MTFVC) which can also complement the time series from 2016 onwards.",
+    "acronyms": [
+        "LSA-450",
+        "MTFVC-R"
+    ],
+    "creationDate": "2018-05-11",
+    "services": {
+        "name": "0 degree",
+        "orbitType": "GEO"
+    },
+    "dataApplications": [
+        {
+            "label": "Climate",
+            "href": "/data/themes/climate"
+        },
+        {
+            "label": "Climate system monitoring - Terrestrial",
+            "href": "/data/themes/climate/climate-system-monitoring-terrestrial"
+        }
+    ],
+    "dataPolicies": [
+        {
+            "href": "https://user.eumetsat.int/resources/user-guides/data-registration-and-licensing#ID-Data-Licensing",
+            "policy": "Free and unrestricted",
+            "policyId": "NoConditions"
+        }
+    ],
+    "datasetLanguage": "eng",
+    "datasetTitle": "Reprocessed 10-days Fraction of Vegetation Cover - MSG",
+    "dateStamp": "2024-01-04",
+    "dataTailorCustomisation": true,
+    "digitalTransfers": [
+        {
+            "availability": "SAF archive",
+            "onLine": {
+                "label": "Access",
+                "href": "https://landsaf.ipma.pt/ChangeSystemProdLong.do?system=MSG Reprocess V1&algo=MTFVC",
+                "function": "access",
+                "protocol": "https"
+            },
+            "formats": [
+                {
+                    "name": "HDF5",
+                    "averageFileSize": "7.6 MB",
+                    "filenameConvention": "HDF5_LSASAF_MSG_<Product>_<GeoArea>_YYYYMMDDHHmm",
+                    "frequency": "1 (every 10 days)",
+                    "typicalFilename": [
+                        "HDF5_LSASAF_MSG_FVC-D10_MSG-Disk_201512050000"
+                    ]
+                }
+            ]
+        }
+    ],
+    "distributors": [
+        {
+            "email": "helpdesk.landsaf@ipma.pt",
+            "individualName": "EUMETSAT SAF on Land Surface Analysis",
+            "organisationName": "LSA SAF",
+            "responsiblePartyRole": "distributor",
+            "href": "http://landsaf.ipma.pt"
+        }
+    ],
+    "eumetsatData": true,
+    "id": "EO:EUM:CM:MSG:LSA-450",
+    "parameters": [
+        "Land",
+        "Vegetation"
+    ],
+    "language": "eng",
+    "location": {
+        "coordinates": [
+            [
+                -79,
+                81
+            ],
+            [
+                79,
+                -81
+            ]
+        ],
+        "type": "envelope"
+    },
+    "originator": {
+        "email": "helpdesk.landsaf@ipma.pt",
+        "individualName": "EUMETSAT SAF on Land Surface Analysis",
+        "organisationName": "LSA SAF",
+        "responsiblePartyRole": "originator",
+        "href": "http://landsaf.ipma.pt"
+    },
+    "processingLevels": [
+        "Level 3"
+    ],
+    "productStatus": "Released",
+    "processingMode": "CDR",
+    "satellites": [
+        {
+            "seriesName": "MSG",
+            "owner": "EUMETSAT",
+            "orbitType": "GEO",
+            "nominalLongitude": 0,
+            "sensors": [
+                {
+                    "name": "SEVIRI",
+                    "type": "Optical"
+                }
+            ]
+        }
+    ],
+    "temporalExtent": {
+        "begin": "2004-01-25",
+        "end": "2015-12-05"
+    },
+    "thumbnails": [
+        {
+            "href": "https://navigator.eumetsat.int/preview/HDF5_LSASAF_MSG_FVC-D10_MSG-Disk.png",
+            "name": "Thumbnail"
+        }
+    ],
+    "doi": {
+        "id": "10.15770/EUM_SAF_LSA_0003",
+        "href": "https://dx.doi.org/10.15770/EUM_SAF_LSA_0003",
+        "publisher": "EUMETSAT SAF on Land Surface Analysis",
+        "publicationYear": "2018",
+        "author": "LSA SAF"
+    }
+}

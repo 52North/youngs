@@ -1,0 +1,1219 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://eumetsat.int/json-schemas/catalogue/collection/2.5/collection_schema_v2-6.json",
+    "title": "Root schema for the Catalogue Collection Metadata",
+    "description": "Root schema for the Catalogue (ex: Product Navigator) Collection Metadata. Version 2.6, 27/04/2024, Uwe Voges, u.voges@conterra.de",
+    "type": "object",
+    "definitions": {
+        "CollectionLinkType": {
+            "description": "CollectionLinkType enum defined in separate class",
+            "enum": [
+                "parent",
+                "partOf",
+                "relatedProduct",
+                "newVersion"
+            ]
+        },
+        "DOILinkType": {
+            "description": "DOILinkType enum defined in separate class",
+            "enum": [
+                "references",
+                "isCitedBy"
+            ]
+        },
+        "RelatedVersionType": {
+            "description": "DOILinkType enum defined in separate class",
+            "enum": [
+                "Previous version",
+                "Latest version"
+            ]
+        },
+        "InstrumentType": {
+            "description": "The instrument types available",
+            "type": "string"
+        },
+        "LicenseName": {
+            "description": "License Names used by EUMETSAT",
+            "enum": [
+                "Copernicus",
+                "GeneralLicense",
+                "NoConditions",
+                "NRTLicense",
+                "Proprietary",
+                "Third-partyLicence"
+            ]
+        },
+        "OrbitType": {
+            "description": "The orbit types available",
+            "type": "string"
+        },
+        "ResourceLinkType": {
+            "description": "ResourceLinkType enum",
+            "enum": [
+                "documentation",
+                "information",
+                "tool",
+                "dataSample",
+                "references",
+                "browseGraphic"
+            ]
+        },
+        "DOI": {
+            "title": "The DOI Resource",
+            "type": "object",
+            "description": "Resource representing a DOI",
+            "required": [
+                "id",
+                "href",
+                "author"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "title": "The id",
+                    "description": "The id (dataCiteIdentifier) of the DOI.",
+                    "examples": ["10.15770/EUM_SEC_CLM_0029"]
+                },
+                "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "title": "The href",
+                    "description": "The href within the linkedDOI object.",
+                    "examples": ["http://doi.org/10.15770/EUM_SEC_CLM_0029"]
+                },
+                "edition": {
+                    "type": "string",
+                    "title": "The edition",
+                    "description": "The edition of the DOI.",
+                    "examples": ["2"]
+                },
+                "author": {
+                    "title": "The creator",
+                    "description": "The creator of the DOI.",
+                    "type": "string"
+                },
+                "relatedDataRecords": {
+                    "oneOf": [
+                        {"$ref": "#/definitions/RelatedDataRecord"},
+                        {
+                            "type": "array",
+                            "items": [
+                                {"$ref": "#/definitions/RelatedDataRecord"}
+                            ]
+                        }
+                    ]
+                },
+                "relatedVersions": {
+                    "type": "array",
+                    "oneOf": [
+                        {"$ref": "#/definitions/RelatedVersion"},
+                        {
+                            "type": "array",
+                            "items": [
+                                {"$ref": "#/definitions/RelatedVersion"}
+                            ]
+                        }
+                    ]
+                },
+                "relatedReferences": {
+                    "type": "array",
+                    "oneOf": [
+                        {"$ref": "#/definitions/RelatedReference"},
+                        {
+                            "type": "array",
+                            "items": [
+                                {"$ref": "#/definitions/RelatedReference"}
+                            ]
+                        }
+                    ]
+                },
+                "publicationYear": {"type": "string"},
+                "publisher": {"type": "string"}
+            },
+            "additionalProperties": false
+        },
+        "RelatedDataRecord": {
+            "type": "object",
+            "properties": {
+                "label": {"type": "string"},
+                "href": {
+                    "type": "string",
+                    "format": "uri"
+                }
+            }
+        },
+        "RelatedVersion": {
+            "type": "object",
+            "properties": {
+                "href": {
+                    "type": "string",
+                    "format": "uri"
+                },
+                "label": {"type": "string"},
+                "type": {"$ref": "#/definitions/RelatedVersionType"},
+                "version": {"type": "string"}
+            }
+        },
+        "Instrument": {
+            "title": "The Instrument Resource",
+            "type": "object",
+            "description": "Resource representing an instrument",
+            "required": [
+                "name",
+                "type"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "title": "The name",
+                    "description": "The name of the instrument.",
+                    "examples": ["SEVIRI"]
+                },
+                "description": {
+                    "type": "string",
+                    "title": "The description",
+                    "description": "The description of the instrument",
+                    "examples": ["description of SEVIRI"]
+                },
+                "type": {
+                    "title": "The instrument type",
+                    "description": "The type of the instrument",
+                    "$ref": "#/definitions/InstrumentType",
+                    "examples": ["Solar activity monitor"]
+                }
+            },
+            "additionalProperties": false
+        },
+        "Satellite": {
+            "title": "Satellite Resource",
+            "type": "object",
+            "description": "Resource representing a satellite (having one or more instruments)",
+            "required": [
+                "seriesName",
+                "sensors"
+            ],
+            "properties": {
+                "seriesName": {
+                    "type": "string",
+                    "title": "The name",
+                    "description": "The name of the satellite.",
+                    "examples": ["MSG"]
+                },
+                "owner": {
+                    "type": "string",
+                    "title": "Satellite owner",
+                    "description": "The owner of the satellite.",
+                    "examples": [
+                        "EUMETSAT",
+                        "NOAA"
+                    ]
+                },
+                "description": {
+                    "type": "string",
+                    "title": "The description",
+                    "description": "The description of the satellite",
+                    "examples": ["description of MSG"]
+                },
+                "orbitType": {
+                    "title": "The orbitType of the satellite",
+                    "description": "An explanation about the orbitType",
+                    "$ref": "#/definitions/OrbitType"
+                },
+                "nominalLongitude": {
+                    "type": "number",
+                    "title": "The nominalLongitude",
+                    "description": "The nominalLongitude is ",
+                    "examples": ["2.5"]
+                },
+                "sensors": {
+                    "oneOf": [
+                        {"$ref": "#/definitions/Instrument"},
+                        {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {"$ref": "#/definitions/Instrument"}
+                        }
+                    ],
+                    "title": "The instruments",
+                    "description": "The instruments of the satellite",
+                    "examples": ["SEVIRI"]
+                }
+            },
+            "additionalProperties": false
+        },
+        "LinkedCollection": {
+            "title": "Linked Collection",
+            "type": "object",
+            "description": "linking other Collections to the current Collection.",
+            "required": [
+                "type",
+                "collectionID"
+            ],
+            "properties": {
+                "type": {
+                    "title": "The collection link type",
+                    "description": "The type of the link to the other Collection (e.g. partOf)",
+                    "$ref": "#/definitions/CollectionLinkType",
+                    "examples": ["relatedProduct"]
+                },
+                "label": {
+                    "title": "The link title",
+                    "description": "The title of the link",
+                    "type": "string"
+                },
+                "collectionID": {
+                    "title": "ID of collection",
+                    "description": "The ID of the linked collection",
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false
+        },
+        "RelatedReference": {
+            "title": "Linked DOI",
+            "type": "object",
+            "description": "A linked DOI",
+            "required": [
+                "type",
+                "label",
+                "href"
+            ],
+            "properties": {
+                "type": {
+                    "title": "The DOI link type",
+                    "description": "The type of the linked DOI (e.g. partOf)",
+                    "$ref": "#/definitions/DOILinkType",
+                    "examples": ["isCitedBy"]
+                },
+                "label": {
+                    "type": "string",
+                    "title": "The name",
+                    "description": "The name within the linkedDOI object.",
+                    "examples": ["name"]
+                },
+                "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "title": "The href",
+                    "description": "The href within the linkedDOI object."
+                }
+            },
+            "additionalProperties": false
+        },
+        "LinkedResource": {
+            "title": "Linked Online Resource",
+            "type": "object",
+            "description": "Link to an Online Resource, e.g. of type documentation",
+            "required": [
+                "name",
+                "href"
+            ],
+            "properties": {
+                "linkType": {
+                    "title": "The Online Resource link type",
+                    "description": "The type of the linked Online Resource (e.g. documentation)",
+                    "$ref": "#/definitions/ResourceLinkType",
+                    "examples": ["documentation"]
+                },
+                "name": {
+                    "type": "string",
+                    "title": "The name",
+                    "description": "The name within the linked online resource object.",
+                    "examples": ["name"]
+                },
+                "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "title": "The href",
+                    "description": "The href within the linked online resource object."
+                },
+                "description": {
+                    "type": "string",
+                    "title": "The description",
+                    "description": "The description within the linked online resource object.",
+                    "examples": ["description"]
+                },
+                "mimeType": {
+                    "title": "The mimeType of the resource",
+                    "description": "The mimeType of the response when de-referencing the href",
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false
+        },
+        "DataPolicy": {
+            "type": "object",
+            "title": "The DataPolicy schema",
+            "description": "An explanation about the purpose of this instance.",
+            "examples": [
+                {
+                    "policy": "NRTLicense",
+                    "title": "NRTLicense - required for accessing the data less than 3 hours old",
+                    "href": "http://eumetsat.int/data-policy/eumetsat-data-policy.pdf#page=13"
+                }
+            ],
+            "required": [
+                "policy",
+                "href"
+            ],
+            "properties": {
+                "description": {
+                    "title": "The title schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "type": "string",
+                    "examples": ["NRTLicense - required for accessing the data less than 3 hours old"]
+                },
+                "policyId": {
+                    "title": "The policyId schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "$ref": "#/definitions/LicenseName",
+                    "examples": ["NoConditions"]
+                },
+                "policy": {
+                    "title": "The policy schema",
+                    "type": "string",
+                    "description": "An explanation about the purpose of this instance.",
+                    "examples": ["Free and unrestricted"]
+                },
+                "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "title": "The href schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "examples": ["http://eumetsat.int/data-policy/eumetsat-data-policy.pdf#page=13"]
+                }
+            },
+            "additionalProperties": false
+        },
+        "EATService": {
+            "title": "EAT Service",
+            "type": "object",
+            "description": "Link to an EAT Service",
+            "required": [
+                "id",
+                "name",
+                "receptionMode"
+            ],
+            "properties": {
+                "id": {
+                    "title": "The EAT Service ID",
+                    "description": "The ID of the EAT Service",
+                    "type": "number"
+                },
+                "name": {
+                    "title": "The EAT Service name (user readable)",
+                    "description": "The user readable name of the EAT Service",
+                    "type": "string"
+                },
+                "receptionMode": {
+                    "title": "The EAT Service receptionMode",
+                    "description": "The receptionMode of the EAT Service",
+                    "type": "string"
+                }
+            }
+        },
+        "Parameter": {
+            "type": "string"
+        },
+        "DataApplication": {
+            "type": "object",
+            "required": [
+                "label",
+                "href"
+            ],
+            "properties": {
+                "label": {
+                    "title": "The label, rendered in UI components",
+                    "type": "string"
+                },
+                "href": {
+                    "title": "The target link, used in UI components",
+                    "type": "string"
+                }
+            }
+        },
+        "ResponsiblePartyType": {
+            "title": "ResponsiblePartyType",
+            "type": "object",
+            "description": "The responsibleParty schema.",
+            "required": ["responsiblePartyRole"],
+            "properties": {
+                "thumbnail": {
+                    "title": "thumbnail href",
+                    "description": "href of the of the thumbnail",
+                    "type": "string",
+                    "format": "uri"
+                },
+                "email": {
+                    "type": "string",
+                    "format": "email",
+                    "title": "The email schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "ops@eumetsat.int",
+                    "examples": ["ops@eumetsat.int"]
+                },
+                "individualName": {
+                    "type": "string",
+                    "title": "The individualName schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "European Organisation for the Exploitation of Meteorological Satellites",
+                    "examples": ["European Organisation for the Exploitation of Meteorological Satellites"]
+                },
+                "organisationName": {
+                    "type": "string",
+                    "title": "The organisationName schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "EUMETSAT",
+                    "examples": ["EUMETSAT"]
+                },
+                "responsiblePartyRole": {
+                    "$id": "#/properties/responsibleParty/properties/responsiblePartyRole",
+                    "type": "string",
+                    "enum": [
+                        "resourceProvider",
+                        "custodian",
+                        "owner",
+                        "user",
+                        "distributor",
+                        "originator",
+                        "pointOfContact",
+                        "principalInvestigator",
+                        "processor",
+                        "publisher",
+                        "author"
+                    ],
+                    "title": "The responsiblePartyRole schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "examples": ["originator"]
+                },
+                "href": {
+                    "$id": "#/properties/responsibleParty/properties/href",
+                    "type": "string",
+                    "format": "uri",
+                    "title": "The href schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "http://www.eumetsat.int",
+                    "examples": ["http://www.eumetsat.int"]
+                }
+            },
+            "additionalProperties": false
+        },
+        "OnLine": {
+            "title": "OnLine",
+            "type": "object",
+            "description": "The OnLine schema.",
+            "required": [
+                "function",
+                "protocol",
+                "href"
+            ],
+            "properties": {
+                "function": {
+                    "title": "function code ",
+                    "description": "the function code, e.g. dataccess service(download,order,subscribe) or view-service(view)",
+                    "type": "string",
+                    "enum": [
+                        "order",
+                        "access",
+                        "view",
+                        "download",
+                        "subscribe"
+                    ]
+                },
+                "label": {
+                    "title": "label (name) of the availability",
+                    "description": "the name (label) of the availability.",
+                    "type": "string"
+                },
+                "protocol": {
+                    "title": "availability access protocol",
+                    "description": "protocol to get access to the of the availability.",
+                    "oneOf": [
+                        {
+                            "type": "string",
+                            "enum": [
+                                "http",
+                                "https",
+                                "ftp",
+                                "file"
+                            ]
+                        },
+                        {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "http",
+                                    "https",
+                                    "ftp",
+                                    "file"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "href": {
+                    "title": "availability href",
+                    "description": "href of the of the online service",
+                    "type": "string",
+                    "format": "uri"
+                }
+            },
+            "additionalProperties": false
+        },
+        "MainFormat": {
+            "title": "Format",
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+                "timeliness": {
+                    "title": "timeliness",
+                    "description": "is the timeliness",
+                    "type": "string"
+                },
+                "averageFileSize": {
+                    "title": "averageFileSize",
+                    "description": "averageFileSize as text (Convention defined for the content:shall include the units (e.g. &quot;3 MB&quot;) and can include a range (&quot;3-5 MB&quot;)",
+                    "type": "string"
+                },
+                "fileFormatDescription": {
+                    "title": "fileFormatDescription",
+                    "description": "fileFormatDescription",
+                    "examples": [
+                        [
+                            "JPEG (Grayscale)",
+                            "PNG (Grayscale)"
+                        ]
+                    ],
+                    "oneOf": [
+                        {"type": "string"},
+                        {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {"type": "string"}
+                        }
+                    ]
+                },
+                "filenameConvention": {
+                    "title": "filenameConvention",
+                    "description": "filenameConvention",
+                    "examples": ["&quot;S-LSA_-HDF5_LSASAF_MSG_<product>_<geographical-area>_<YYYYMMDDHHmm>.bz2 where <product> is (e.g. ALBEDO, AL-C1, AL-C2, ...) , <geographical-area> is (e.g. Euro, NAfr, SAme, ...)&quot;,\n                &quot;format4DataCite&quot;: &quot;f"],
+                    "oneOf": [
+                        {"type": "string"},
+                        {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {"type": "string"}
+                        }
+                    ]
+                },
+                "format4DataCite": {
+                    "title": "format4DataCite",
+                    "description": "is the format to be provided in the DataCite metadata upon doi export?",
+                    "type": "string",
+                    "enum": [
+                        "true",
+                        "false"
+                    ]
+                },
+                "frequency": {
+                    "title": "frequency",
+                    "description": "How frequently are products of the collection published",
+                    "type": "string"
+                },
+                "onLine": {
+                    "description": "onLine acess to the data",
+                    "oneOf": [
+                        {"$ref": "#/definitions/OnLine"},
+                        {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {"$ref": "#/definitions/OnLine"}
+                        }
+                    ]
+                },
+                "name": {
+                    "title": "format name",
+                    "description": "the name of the format",
+                    "type": "string"
+                },
+                "bulletinHeader": {
+                    "title": "bulletinHeader",
+                    "description": "the bulletinHeader",
+                    "type": "string"
+                },
+                "totalSizeOfDataset": {
+                    "title": "totalSizeOfDataset",
+                    "description": "totalSizeOfDataset as text (which shall include the units (e.g. &quot;3 TB&quot;) and can include a range (&quot;3-5 TB&quot;)",
+                    "type": "string"
+                },
+                "typicalFilename": {
+                    "oneOf": [
+                        {"type": "string"},
+                        {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {"type": "string"}
+                        }
+                    ],
+                    "title": "filename schema",
+                    "description": "The typicalFilename schema.",
+                    "examples": [
+                        [
+                            "H-000-MSG1__-MSG1_IODC___-IR_016___-000001___-201706121600-C_",
+                            "H-000-MSG1__-MSG1_IODC___-WV_062___-000001___-201706121600-C_"
+                        ]
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
+        "DigitalTransfer": {
+            "title": "DigitalTransfer",
+            "type": "object",
+            "properties": {
+                "availability": {
+                    "title": "availability - how to get access to the data",
+                    "description": "availability - the kind of access, e.g. Data Store or EUMETCast. Please note: in the future we want to derive specific availabilities (like GeonetCastAvailability) and define specific attributes/constraints for those&quot;,",
+                    "type": "string"
+                },
+                "channels": {
+                    "title": "EUMETCAST channels",
+                    "description": "EUMETCASTChannels - which channels are supported.",
+                    "oneOf": [
+                        {"type": "string"},
+                        {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {"type": "string"}
+                        }
+                    ],
+                    "examples": [
+                        [
+                            "A1C-GEO-1",
+                            "E1B-GEO-1"
+                        ]
+                    ]
+                },
+                "onLine": {
+                    "description": "onLine acess to the data",
+                    "oneOf": [
+                        {"$ref": "#/definitions/OnLine"},
+                        {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {"$ref": "#/definitions/OnLine"}
+                        }
+                    ]
+                },
+                "formats": {
+                    "description": "formats",
+                    "oneOf": [
+                        {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {"$ref": "#/definitions/MainFormat"}
+                        },
+                        {"$ref": "#/definitions/MainFormat"}
+                    ]
+                },
+                "eatServices": {
+                    "title": "eatServices",
+                    "description": "eatServices required for the EAT subscriptions.",
+                    "oneOf": [
+                        {"$ref": "#/definitions/EATService"},
+                        {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {"$ref": "#/definitions/EATService"}
+                        }
+                    ]
+                }
+            },
+            "required": [
+                "availability",
+                "formats",
+                "onLine"
+            ]
+        },
+        "Envelope": {
+            "title": "Envelope",
+            "type": "object",
+            "properties": {
+                "coordinates": {
+                    "title": "coordinates",
+                    "description": "Array of linestrings",
+                    "type": "array",
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "items": {
+                        "description": "Linear ring, i.e. linestring or array of positions",
+                        "type": "array",
+                        "minItems": 2,
+                        "maxItems": 2,
+                        "items": {
+                            "description": "One position",
+                            "type": "number"
+                        }
+                    }
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["envelope"]
+                }
+            },
+            "required": [
+                "coordinates",
+                "type"
+            ],
+            "additionalProperties": false
+        },
+        "Coordinates": {
+            "title": "Coordinates",
+            "type": "object",
+            "oneOf": [
+                {"$ref": "#/definitions/Envelope"}
+            ]
+        },
+        "PerTimeliness": {
+            "title": "PerTimeliness",
+            "type": "object",
+            "required": [
+                "timeliness",
+                "value",
+                "uom"
+            ],
+            "properties": {
+                "timeliness": {
+                    "title": "timeliness type",
+                    "description": "timeliness type",
+                    "type": "string"
+                },
+                "value": {
+                    "title": "timeliness type",
+                    "description": "timeliness type",
+                    "type": "integer"
+                },
+                "uom": {
+                    "title": "uom type",
+                    "description": "uom type",
+                    "type": "string",
+                    "enum": [
+                        "hours",
+                        "days",
+                        "months",
+                        "years"
+                    ]
+                }
+            }
+        },
+        "RetentionPeriod": {
+            "title": "Retention Times",
+            "type": "object",
+            "required": [
+                "value",
+                "uom"
+            ],
+            "properties": {
+                "value": {
+                    "title": "default value",
+                    "description": "default value",
+                    "type": "integer"
+                },
+                "uom": {
+                    "title": "default uom",
+                    "description": "default uom",
+                    "type": "string",
+                    "enum": [
+                        "hours",
+                        "days",
+                        "months",
+                        "years"
+                    ]
+                },
+                "perTimeliness": {
+                    "$id": "#/retentionPeriod/properties/perTimeliness",
+                    "description": "perTimeliness",
+                    "anyOf": [
+                        {
+                            "type": "array",
+                            "items": {"$ref": "#/definitions/PerTimeliness"}
+                        }
+                    ]
+                }
+            }
+        },
+        "Service": {
+            "title": "The ServiceType Resource",
+            "type": "object",
+            "description": "Resource representing a ServiceType",
+            "required": ["name"],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "title": "name",
+                    "examples": ["Indian Ocean"]
+                },
+                "orbitType": {
+                    "$ref": "#/definitions/OrbitType",
+                    "title": "The orbitType",
+                    "description": "The orbitType of a ServiceType object.",
+                    "examples": ["GEO"]
+                }
+            },
+            "additionalProperties": false
+        },
+        "ProcessingBaseline": {
+            "type": "object",
+            "properties": {
+                "version": {"type": "string"},
+                "date": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "details": {"type": "string"}
+            },
+            "required": [
+                "date",
+                "version"
+            ],
+            "additionalProperties": false
+        }
+    },
+    "properties": {
+        "abstract": {
+            "title": "The abstract schema",
+            "description": "Textual description of the data.",
+            "type": "string"
+        },
+        "processingBaselines": {
+            "oneOf": [
+                {"$ref": "#/definitions/ProcessingBaseline"},
+                {
+                    "type": "array",
+                    "items": [
+                        {"$ref": "#/definitions/ProcessingBaseline"}
+                    ]
+                }
+            ]
+        },
+        "acronyms": {
+            "oneOf": [
+                {"type": "string"},
+                {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {"type": "string"}
+                }
+            ],
+            "title": "The acronym schema",
+            "description": "The acronym used internally by EUMETSAT.",
+            "examples": [
+                [
+                    "MSG15",
+                    "HRSEVIRI-IODC"
+                ]
+            ],
+            "additionalItems": false
+        },
+        "services": {
+            "oneOf": [
+                {"$ref": "#/definitions/Service"},
+                {
+                    "type": "array",
+                    "items": [
+                        {"$ref": "#/definitions/Service"}
+                    ]
+                }
+            ],
+            "title": "The spatial resolution(s)",
+            "description": "The spatial resolution(s) assigned to the collection"
+        },
+        "datasetLanguage": {
+            "type": "string",
+            "title": "The datasetLanguage schema",
+            "description": "Language of the dataset.",
+            "default": "eng",
+            "examples": ["eng"]
+        },
+        "datasetTitle": {
+            "type": "string",
+            "title": "The datasetTitle schema",
+            "description": "Title of the dataset.",
+            "examples": ["High Rate SEVIRI Level 1.5 Image Data - MSG - Indian Ocean 41.5 degrees E - Test Metadata"]
+        },
+        "dateStamp": {
+            "type": "string",
+            "format": "date",
+            "title": "metadata dateStamp.",
+            "description": "date stamp of the metadata.",
+            "examples": ["2020-02-27"]
+        },"creationDate": {
+            "type": "string",
+            "format": "date",
+            "title": "metadata creationDate.",
+            "description": "creation date of the metadata.",
+            "examples": ["2020-02-27"]
+        },
+        "digitalTransfers": {
+            "title": "The digitalTransfers schema",
+            "description": "Array of DigitalTransfers",
+            "oneOf": [
+                {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {"$ref": "#/definitions/DigitalTransfer"}
+                }
+            ]
+        },
+        "distributors": {
+            "oneOf": [
+                {"$ref": "#/definitions/ResponsiblePartyType"},
+                {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/ResponsiblePartyType"}
+                }
+            ]
+        },
+        "originator": {"$ref": "#/definitions/ResponsiblePartyType"},
+        "doi": {
+            "title": "The doi schema",
+            "description": "The doi information",
+            "anyOf": [
+                {"$ref": "#/definitions/DOI"}
+            ]
+        },
+        "eumetsatData": {
+            "type": "boolean",
+            "title": "eumdata yes=true/no=false",
+            "description": "Is the product from EUMETSAT or from an external organization?",
+            "default": "true",
+            "examples": ["true"]
+        },
+        "dataPolicies": {
+            "oneOf": [
+                {"$ref": "#/definitions/DataPolicy"},
+                {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/DataPolicy"}
+                }
+            ]
+        },
+        "userGroups": {
+            "oneOf": [
+                {"type": "string"},
+                {
+                    "type": "array",
+                    "items": {"type": "string"}
+                }
+            ]
+        },
+        "hierarchyLevel": {
+            "type": "string",
+            "enum": [
+                "series",
+                "bulletin",
+                "software",
+                "climate"
+            ],
+            "title": "The hierarchyLevel schema",
+            "description": "An explanation about the purpose of this instance.",
+            "examples": ["series"]
+        },
+        "id": {
+            "type": "string",
+            "title": "The id schema",
+            "description": " A unique identifier to the collection.",
+            "examples": ["EO:EUM:DAT:MSG:HRSEVIRI-IODC-TestMD"]
+        },
+        "language": {
+            "type": "string",
+            "pattern": "[A-Za-z]{1,8}(-[A-Za-z0-9]{1,8})*",
+            "title": "The metadata language schema",
+            "description": "The language of the metadata.",
+            "default": "eng",
+            "examples": ["eng"]
+        },
+        "linkedCollections": {
+            "oneOf": [
+                {"$ref": "#/definitions/LinkedCollection"},
+                {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/LinkedCollection"}
+                }
+            ]
+        },
+        "location": {
+            "type": "object",
+            "title": "The location schema",
+            "description": "An explanation about the purpose of this instance.",
+            "oneOf": [
+                {"$ref": "#/definitions/Coordinates"}
+            ]
+        },
+        "onlineResources": {
+            "oneOf": [
+                {"$ref": "#/definitions/LinkedResource"},
+                {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/LinkedResource"}
+                }
+            ],
+            "examples": [
+                [
+                    {
+                        "name": "MSG Level 1.5 Image Data Format Description",
+                        "href": "http://www.eumetsat.int/website/wcm/idc/idcplg?IdcService=GET_FILE&dDocName=PDF_TEN_05105_MSG_IMG_DATA&RevisionSelectionMethod=LatestReleased&Rendition=Web"
+                    },
+                    {
+                        "name": "Meteorological Use Of The Seviri Ir3.9 Channel",
+                        "href": "http://eumetrain.org/IntGuide/PowerPoints/Channels/Channel_IR39.ppt"
+                    }
+                ]
+            ]
+        },
+        "orbitNominalLongitude": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180,
+            "title": "The orbitNominalLongitude schema",
+            "description": "An explanation about the purpose of this instance.",
+            "examples": ["41.5"]
+        },
+        "processingLevels": {
+            "title": "The processingLevel schema",
+            "description": "An explanation about the purpose of this instance.",
+            "examples": ["Level 1 Data"],
+            "oneOf": [
+                {"type": "string"},
+                {
+                    "type": "array",
+                    "items": [
+                        {"type": "string"}
+                    ]
+                }
+            ]
+        },
+        "processingMode": {
+            "type": "string"
+        },
+        "productStatus": {
+            "type": "string",
+            "title": "The productStatus schema",
+            "description": "An explanation about the purpose of this instance.",
+            "examples": ["Operational"]
+        },
+        "retentionPeriod": {
+            "title": "The retentionPeriod schema",
+            "description": "Default retention period plus an array of timeliness related retentions",
+            "anyOf": [
+                {"$ref": "#/definitions/RetentionPeriod"}
+            ]
+        },
+        "satellites": {
+            "oneOf": [
+                {"$ref": "#/definitions/Satellite"},
+                {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/Satellite"}
+                }
+            ],
+            "title": "The satellites",
+            "description": "The satellites assigned to the collection"
+        },
+        "spatialResolutions": {
+            "oneOf": [
+                {"type": "string"},
+                {
+                    "type": "array",
+                    "items": {"type": "string"}
+                }
+            ],
+            "title": "The spatial resolution(s)",
+            "description": "The spatial resolution(s) assigned to the collection"
+        },
+        "temporalExtent": {
+            "type": "object",
+            "title": "The temporalExtent schema",
+            "description": "When the first and the last products are found.",
+            "examples": ["2017-02-01"],
+            "properties": {
+                "begin": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "end": {
+                    "type": "string",
+                    "format": "date"
+                }
+            }
+        },
+        "view_category ": {
+            "type": "string",
+            "enum": [
+                "Channels",
+                "Products",
+                "RGBs"
+            ]
+        },
+        "dataApplications": {
+            "oneOf": [
+                {"$ref": "#/definitions/DataApplication"},
+                {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/DataApplication"}
+                }
+            ],
+            "title": "The themes keyword schema",
+            "description": "An explanation about the purpose of this instance.",
+            "examples": [
+                [
+                    {
+                        "label": "Marine",
+                        "href": "https://vuser.eumetsat.int/data/themes/marine"
+                    },
+                    {
+                        "label": "Climate system monitoring - Terrestrial",
+                        "href": "https://vuser.eumetsat.int/data/themes/climate/climate-system-monitoring-terrestrial"
+                    }
+                ]
+            ],
+            "additionalItems": true
+        },
+        "parameters": {
+            "oneOf": [
+                {"$ref": "#/definitions/Parameter"},
+                {
+                    "type": "array",
+                    "items": [
+                        {"$ref": "#/definitions/Parameter"}
+                    ]
+                }
+            ]
+        },
+        "thumbnails": {
+            "title": "The thumbnails schema",
+            "description": "A preview or quickview of the product.",
+            "anyOf": [
+                {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/LinkedResource"}
+                }
+            ],
+            "examples": ["https://eum-dcsi.demo.52north.org/IMG_MTG_FCI_TEST_DATA_2017.jpg"]
+        },
+        "dataTailorCustomisation": {"type": "boolean"}
+    },
+    "required": [
+        "abstract",
+        "datasetTitle",
+        "creationDate",
+        "distributors",
+        "originator",
+        "hierarchyLevel",
+        "id",
+        "location"
+    ],
+    "additionalProperties": true
+}
